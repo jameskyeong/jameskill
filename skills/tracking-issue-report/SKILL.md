@@ -46,6 +46,7 @@ SEVERITY_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker
 TAGS_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.tags')
 ASSIGNEE_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.assignee')
 REASON_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.reason // empty')
+SOURCE_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.source // empty')
 ```
 
 **Security rule**: NEVER echo/print/output `NOTION_KEY`. Pass it only as a shell variable (`$NOTION_KEY`) in curl calls.
@@ -140,21 +141,22 @@ fi
 
 ## 4. Source Attribution
 
-If the prompt includes a person's name, record the source in the reason (rich_text) property.
+If the prompt includes a person's name, record it in the **dedicated source property** (`$SOURCE_PROP`), separate from the reason/notes field which is reserved for developer notes.
 
-- **Format**: `[Source: {name}, {today's date}]`
+- **Format**: `{name} ({date})`
 - **Use system date**: `$(date +%Y-%m-%d)`
-- **If no name is present**, omit the reason property
+- **If no name is present**, omit the source property
+- **If `$SOURCE_PROP` is empty** (not configured), record in the first paragraph of the body instead
 
-Example: `[Source: Jane Kim, 2026-05-15]`
+Example: `Jane Kim (2026-05-15)`
 
-Reason property JSON (using `$REASON_PROP`):
+Source property JSON (using `$SOURCE_PROP`):
 
 ```json
 {
-  "$REASON_PROP": {
+  "$SOURCE_PROP": {
     "rich_text": [
-      {"type": "text", "text": {"content": "[Source: Jane Kim, 2026-05-15]"}}
+      {"type": "text", "text": {"content": "Jane Kim (2026-05-15)"}}
     ]
   }
 }
@@ -270,9 +272,10 @@ HAS_SEVERITY=$(echo "$DB_PROPS" | grep -c "^${SEVERITY_PROP}$")
 HAS_ASSIGNEE=$(echo "$DB_PROPS" | grep -c "^${ASSIGNEE_PROP}$")
 HAS_REASON=$(echo "$DB_PROPS" | grep -c "^${REASON_PROP}$")
 HAS_TAGS=$(echo "$DB_PROPS" | grep -c "^${TAGS_PROP}$")
+HAS_SOURCE=$([ -n "$SOURCE_PROP" ] && echo "$DB_PROPS" | grep -c "^${SOURCE_PROP}$" || echo 0)
 ```
 
-If the reason property does not exist in the DB but source information is available, record `[Source: ...]` in the first paragraph of the body instead.
+If the source property does not exist in the DB but source information is available, record source in the first paragraph of the body instead.
 
 ---
 
@@ -298,7 +301,7 @@ PAGE_RESULT=$(curl -s -X POST "https://api.notion.com/v1/pages" \
       "'$TITLE_PROP'": {"title": [{"text": {"content": "Issue title"}}]},
       "'$SEVERITY_PROP'": {"select": {"name": "P1"}},
       "'$ASSIGNEE_PROP'": {"people": [{"object": "user", "id": "'$ASSIGNEE_ID'"}]},
-      "'$REASON_PROP'": {"rich_text": [{"text": {"content": "[Source: Jane Kim, 2026-05-15]"}}]}
+      "'$SOURCE_PROP'": {"rich_text": [{"text": {"content": "Jane Kim (2026-05-15)"}}]}
     }
   }')
 
@@ -306,7 +309,7 @@ PAGE_ID=$(echo "$PAGE_RESULT" | jq -r '.id')
 PAGE_URL=$(echo "$PAGE_RESULT" | jq -r '.url')
 ```
 
-If no assignee, remove the `$ASSIGNEE_PROP` property. If no reason, remove `$REASON_PROP`. If severity is unspecified, remove `$SEVERITY_PROP`.
+If no assignee, remove `$ASSIGNEE_PROP`. If no source, remove `$SOURCE_PROP`. If severity is unspecified, remove `$SEVERITY_PROP`. The `$REASON_PROP` is **not set** by this skill — it is reserved for developer notes written during issue resolution.
 
 ### Step B: Add Body Blocks (only when templatePageId exists)
 
@@ -422,7 +425,7 @@ Specific error messages by situation:
 5. For each valid issue:
    a. Select DB (keyword-based)
    b. Extract properties (title, severity, tags, etc.)
-   c. Process source attribution (name -> reason property)
+   c. Process source attribution (name -> source property)
 6. Fetch DB schema + validate                     -> stop on failure
 7. Dynamic title property extraction
 8. Fetch template block structure (if configured)
