@@ -24,7 +24,8 @@ Maps logical roles to actual Notion DB property names. This allows the same skil
 | `databases.issueTracker.propertyMap.severity` | string | required | Name of the select property used for severity/priority |
 | `databases.issueTracker.propertyMap.tags` | string | required | Name of the multi_select property used for tags/labels |
 | `databases.issueTracker.propertyMap.assignee` | string | required | Name of the people property used for assignee |
-| `databases.issueTracker.propertyMap.reason` | string | optional | Name of the rich_text property used for reason/notes |
+| `databases.issueTracker.propertyMap.reason` | string | optional | Name of the rich_text property for developer notes (written during resolve) |
+| `databases.issueTracker.propertyMap.source` | string | optional | Name of the rich_text property for feedback source/attribution (who reported) |
 
 ### Status Map
 
@@ -56,7 +57,8 @@ Maps logical workflow states to actual select option values in the DB.
         "severity": "Priority",
         "tags": "Tags",
         "assignee": "Assignee",
-        "reason": "Reason"
+        "reason": "Reason",
+        "source": "Source"
       },
       "statusMap": {
         "pending": "Pending",
@@ -92,6 +94,7 @@ SEVERITY_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker
 TAGS_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.tags')
 ASSIGNEE_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.assignee')
 REASON_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.reason // empty')
+SOURCE_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.propertyMap.source // empty')
 
 # Status map — actual select option values
 PENDING_STATUS=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.statusMap.pending')

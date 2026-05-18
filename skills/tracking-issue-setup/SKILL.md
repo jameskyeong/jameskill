@@ -301,10 +301,12 @@ curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
   | jq '[.properties | to_entries[] | select(.value.type == "rich_text") | .key]'
 ```
 
-- **Zero found** — skip silently. Leave `propertyMap.notes` as empty string.
-- **One or more found** — ask: "Which rich_text property should be used for **notes / reason**? (optional — press Enter to skip)"
+- **Zero found** — skip silently. Leave `propertyMap.reason` and `propertyMap.source` as empty strings.
+- **One or more found** — ask two questions:
+  1. "Which rich_text property should be used for **developer notes / reason**? (optional — press Enter to skip)"
+  2. "Which rich_text property should be used for **feedback source / attribution**? (optional — press Enter to skip)"
 
-Save to `propertyMap.notes` if chosen, otherwise leave empty.
+Save to `propertyMap.reason` and `propertyMap.source` respectively. Either or both can be skipped.
 
 ### 2-4. Save DB ID and property map
 
@@ -318,7 +320,8 @@ jq \
   --arg severity_prop "<chosen severity>" \
   --arg tags_prop "<chosen tags>" \
   --arg assignee_prop "<chosen assignee>" \
-  --arg notes_prop "<chosen notes or empty>" \
+  --arg reason_prop "<chosen reason or empty>" \
+  --arg source_prop "<chosen source or empty>" \
   --arg status_pending "<mapped pending>" \
   --arg status_progress "<mapped in progress>" \
   --arg status_done "<mapped done>" \
@@ -330,7 +333,8 @@ jq \
     .propertyMap.severity = $severity_prop |
     .propertyMap.tags = $tags_prop |
     .propertyMap.assignee = $assignee_prop |
-    .propertyMap.notes = $notes_prop |
+    .propertyMap.reason = $reason_prop |
+    .propertyMap.source = $source_prop |
     .statusMap.pending = $status_pending |
     .statusMap.inProgress = $status_progress |
     .statusMap.done = $status_done |
