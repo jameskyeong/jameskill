@@ -35,6 +35,7 @@ REASON_PROP=$(cat "$CONFIG" | jq -r '.databases.issueTracker.propertyMap.reason 
 
 # Status values (mapped from config)
 PENDING_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.pending')
+WAITING_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.waiting // empty')
 IN_PROGRESS_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.inProgress')
 DEPLOY_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.readyToDeploy')
 ```
@@ -74,7 +75,13 @@ curl -s -X POST "https://api.notion.com/v1/databases/${DB_ID}/query" \
 
 ## Step 2: Query "Pending" issues
 
+Query both `pending` and `waiting` statuses from the config. Some DBs use a single pending state, others split into "not started" and "waiting" — query both and merge results.
+
 ```bash
+PENDING_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.pending')
+WAITING_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.waiting // empty')
+
+# Always query the primary pending status
 curl -s -X POST "https://api.notion.com/v1/databases/${DB_ID}/query" \
   -H "Authorization: Bearer $NOTION_KEY" \
   -H "Notion-Version: 2022-06-28" \
@@ -82,10 +89,22 @@ curl -s -X POST "https://api.notion.com/v1/databases/${DB_ID}/query" \
   -d '{
     "filter": {"property": "'"$STATUS_PROP"'", "select": {"equals": "'"$PENDING_STATUS"'"}},
     "page_size": 100
-  }'
+  }' > /tmp/notion_pending1.json
+
+# If a separate waiting status exists, query it too and merge
+if [ -n "$WAITING_STATUS" ]; then
+  curl -s -X POST "https://api.notion.com/v1/databases/${DB_ID}/query" \
+    -H "Authorization: Bearer $NOTION_KEY" \
+    -H "Notion-Version: 2022-06-28" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "filter": {"property": "'"$STATUS_PROP"'", "select": {"equals": "'"$WAITING_STATUS"'"}},
+      "page_size": 100
+    }' > /tmp/notion_pending2.json
+fi
 ```
 
-Pagination: if `has_more: true`, repeat with `next_cursor` until all pages are collected.
+Merge results from both queries before sorting. Pagination: if `has_more: true`, repeat with `next_cursor` until all pages are collected for each query.
 
 ---
 
@@ -100,41 +119,49 @@ Fields to extract per issue:
 - **title**: the property with `type == "title"` -> `.title[0].plain_text`
 - **severity**: `.results[].properties[$SEVERITY_PROP].select.name`
 
+**Important: Use file-based parsing.** Notion responses with Korean/Unicode text can break `jq` when piped through shell variables. Always save API responses to temp files first, then parse with `python3 -c` or `jq < file`.
+
 ```bash
-echo "$RESPONSE" | jq --arg sev "$SEVERITY_PROP" '[.results[] | {
-  id: .id,
-  title: (.properties | to_entries[] | select(.value.type == "title") | .value.title[0].plain_text),
-  severity: .properties[$sev].select.name
-}] | sort_by(
-  if .severity == "P0" then 0
-  elif .severity == "P1" then 1
-  elif .severity == "P2" then 2
-  elif .severity == "P3" then 3
-  else 4 end
-)'
+# Preferred: Python for reliable Unicode handling
+python3 -c "
+import json, sys
+severity_order = {'P0': 0, 'P1': 1, 'P2': 2, 'P3': 3}
+all_results = []
+for path in sys.argv[1:]:
+    with open(path) as f:
+        data = json.load(f)
+    for r in data.get('results', []):
+        props = r['properties']
+        title = next((v['title'][0]['plain_text'] for v in props.values() if v.get('type') == 'title' and v.get('title')), '(no title)')
+        sev = props.get('$SEVERITY_PROP', {}).get('select', {}).get('name', '')
+        all_results.append({'id': r['id'], 'title': title, 'severity': sev})
+all_results.sort(key=lambda x: severity_order.get(x['severity'], 4))
+print(json.dumps(all_results, ensure_ascii=False, indent=2))
+" /tmp/notion_pending1.json /tmp/notion_pending2.json
 ```
 
 ---
 
 ## Step 4: Display the list
 
-Present query results in this format:
+Present query results in this format. Merge "pending" and "waiting" issues into one numbered list, sorted by severity. If needed, show the source status in parentheses.
 
 ```
 ⏳ In Progress (1):
 • [P1] Guide UX improvement
 
-📋 Pending (4):
-1. [P0] Senior touch responsiveness
-2. [P1] Close button touch area
-3. [P2] Drawing UI improvement
-4. [P2] Emotion quilt brush change
+📋 Pending (7):
+1. [P0] Senior touch responsiveness (시작 전)
+2. [P1] Close button touch area (시작 전)
+3. [P1] Drawing response delay (대기 중)
+4. [P2] Drawing UI improvement (대기 중)
 
 Which issue to work on? (number or "all")
 ```
 
 Rules:
 - If there are "In Progress" issues, show them at the **top in a ⏳ section** so the user can resume
+- Pending list includes both "pending" and "waiting" status issues, merged and sorted by severity
 - If there are no "Pending" issues: display "📋 Pending (0) — All issues have been resolved."
 - If there are no issues at all (neither In Progress nor Pending): display "No pending issues found." and stop
 
