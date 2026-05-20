@@ -33,7 +33,8 @@ Maps logical workflow states to actual select option values in the DB.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `databases.issueTracker.statusMap.pending` | string | required | Option value representing "pending" / waiting state |
+| `databases.issueTracker.statusMap.pending` | string | required | Option value representing "pending" / not-started state |
+| `databases.issueTracker.statusMap.waiting` | string | optional | Option value representing a secondary "waiting" state (queried alongside pending) |
 | `databases.issueTracker.statusMap.inProgress` | string | required | Option value representing "in progress" state |
 | `databases.issueTracker.statusMap.readyToDeploy` | string | required | Option value representing "ready to deploy" state |
 
