@@ -13,13 +13,53 @@ Orchestrates Matt Pocock skills into a complete development flow: understand the
 
 **Compound engineering guarantee:** Every workflow run improves domain docs, test coverage, and codebase structure — not just the immediate deliverable.
 
+**Hard requirement:** This workflow requires Matt Pocock skills to be installed at user-level (`~/.claude/skills/`) or project-level (`.claude/skills/`). Phase -1 verifies this and **halts the workflow** if any required skill is missing. There is no fallback path — if a required skill cannot be invoked, the workflow stops.
+
 ---
 
-## Phase 0: Clarify — `mattpocock-skills:grill-me`
+## Phase -1: Preflight — Verify Matt Pocock skills
+
+**Goal:** Confirm every required Matt Pocock skill is installed before doing anything else.
+
+Run this Bash command immediately when the workflow starts:
+
+```bash
+required=(grill-me grill-with-docs diagnose prototype to-prd to-issues tdd improve-codebase-architecture)
+missing=()
+for s in "${required[@]}"; do
+  if [ ! -f "$HOME/.claude/skills/$s/SKILL.md" ] && [ ! -f ".claude/skills/$s/SKILL.md" ]; then
+    missing+=("$s")
+  fi
+done
+if [ ${#missing[@]} -gt 0 ]; then
+  echo "MISSING: ${missing[*]}"
+  exit 1
+fi
+echo "OK"
+```
+
+**If the output is `MISSING: ...` or the command exits non-zero, STOP IMMEDIATELY.** Do not proceed to any other phase. Report to the user:
+
+> Matt Pocock 스킬이 설치되지 않아 workflow를 진행할 수 없습니다.
+>
+> **누락된 스킬:** [누락 목록]
+>
+> **설치 방법:**
+> - user-level (`~/.claude/skills/`) 또는 project-level (`.claude/skills/`)에 다음 스킬들이 모두 있어야 합니다:
+>   `grill-me`, `grill-with-docs`, `diagnose`, `prototype`, `to-prd`, `to-issues`, `tdd`, `improve-codebase-architecture`
+> - `setup-matt-pocock-skills` 스킬을 실행하거나 공식 출처에서 직접 설치해주세요.
+>
+> 설치 완료 후 `/jameskill:workflow`를 다시 실행해주세요.
+
+Proceed to Phase 0 only when the command outputs `OK`.
+
+---
+
+## Phase 0: Clarify — `grill-me`
 
 **Goal:** Reach shared understanding of what the user actually wants.
 
-Invoke `mattpocock-skills:grill-me` with the problem/feature description.
+**MUST invoke `grill-me` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report to the user — do NOT proceed manually.
 
 - Interview the user until every branch of the decision tree is resolved
 - If invoked from `jameskill:tracking-issue-resolve`, use the issue title + body as the starting context
@@ -33,11 +73,11 @@ Invoke `mattpocock-skills:grill-me` with the problem/feature description.
 
 ---
 
-## Phase 1: Grill — `mattpocock-skills:grill-with-docs`
+## Phase 1: Grill — `grill-with-docs`
 
 **Goal:** Validate the clarified requirements against the project's domain model and documented decisions.
 
-Invoke `mattpocock-skills:grill-with-docs` with the output from Phase 0.
+**MUST invoke `grill-with-docs` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 
 - Challenge the plan against CONTEXT.md and existing ADRs
 - Sharpen terminology to match the project's ubiquitous language
@@ -53,11 +93,11 @@ Invoke `mattpocock-skills:grill-with-docs` with the output from Phase 0.
 
 Based on Phase 1 output, determine the nature of the work and route accordingly. **Only one route is taken per run.**
 
-### Route A: Bug → `mattpocock-skills:diagnose`
+### Route A: Bug → `diagnose`
 
 **Signal:** Error reports, stack traces, "it used to work", reproducible broken behavior.
 
-Invoke `mattpocock-skills:diagnose`. Follow its discipline:
+**MUST invoke `diagnose` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually. Follow its discipline:
 1. Reproduce the bug
 2. Minimize the reproduction
 3. Form a hypothesis
@@ -67,22 +107,22 @@ Invoke `mattpocock-skills:diagnose`. Follow its discipline:
 
 After diagnose completes, proceed to **Phase 3.5** (skip Phase 3 — diagnose already includes the fix + test).
 
-### Route B: Exploration → `mattpocock-skills:prototype`
+### Route B: Exploration → `prototype`
 
 **Signal:** UI shape is uncertain, data model needs experimentation, "I'm not sure how this should work".
 
-Invoke `mattpocock-skills:prototype`. It will either:
+**MUST invoke `prototype` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually. It will either:
 - Build a runnable terminal app (for state/logic questions)
 - Generate multiple UI variations (for design questions)
 
 After the user picks a direction from the prototype, proceed to **Phase 3**.
 
-### Route C: Large feature → `mattpocock-skills:to-prd` → `mattpocock-skills:to-issues`
+### Route C: Large feature → `to-prd` → `to-issues`
 
 **Signal:** Phase 1 output contains 3+ distinct tasks, spans multiple modules, or would take multiple sessions.
 
-1. Invoke `mattpocock-skills:to-prd` to formalize the requirements into a PRD
-2. Invoke `mattpocock-skills:to-issues` to break the PRD into vertical-slice issues
+1. **MUST invoke `to-prd` via the Skill tool** to formalize the requirements into a PRD. If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
+2. **MUST invoke `to-issues` via the Skill tool** to break the PRD into vertical-slice issues. If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 3. Present the issue list to the user
 4. Inform the user they can register issues via `/jameskill:tracking-issue-report` and work each one via `/jameskill:workflow` individually
 5. **Stop here** — do not attempt to implement all issues in one run
@@ -95,11 +135,11 @@ Proceed directly to **Phase 3**.
 
 ---
 
-## Phase 3: Build — `mattpocock-skills:tdd`
+## Phase 3: Build — `tdd`
 
 **Goal:** Implement the solution with test-driven development.
 
-Invoke `mattpocock-skills:tdd`. Follow the red-green-refactor loop strictly:
+**MUST invoke `tdd` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually. Follow the red-green-refactor loop strictly:
 1. **RED** — Write a failing test first
 2. **GREEN** — Write minimal code to make it pass
 3. **REFACTOR** — Clean up while keeping tests green
@@ -113,11 +153,11 @@ Invoke `mattpocock-skills:tdd`. Follow the red-green-refactor loop strictly:
 
 ---
 
-## Phase 3.5: Architecture — `mattpocock-skills:improve-codebase-architecture`
+## Phase 3.5: Architecture — `improve-codebase-architecture`
 
 **Goal:** Check whether the new code fits well structurally, and fix what can be fixed now.
 
-Invoke `mattpocock-skills:improve-codebase-architecture` scoped to the files changed in Phase 3 (or Route A).
+**MUST invoke `improve-codebase-architecture` via the Skill tool**, scoped to the files changed in Phase 3 (or Route A). If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 
 Review results and act:
 
@@ -136,6 +176,8 @@ Review results and act:
 ## Phase 4: Review — Two-Axis Code Review
 
 **Goal:** Two-axis code review before declaring done. Standards and Spec are reviewed independently so one axis cannot mask the other.
+
+This phase is self-contained — it does not invoke a Matt Pocock skill, but spawns sub-agents directly.
 
 ### 4.1: Determine the diff
 
@@ -228,15 +270,3 @@ If the user interrupts at any phase:
 - Work completed in prior phases (docs updates, tests, code) persists in the working tree
 - The user can resume by running `/jameskill:workflow` again with the same context
 - No automatic state tracking — the user decides where to pick up
-
----
-
-## Skill availability
-
-Each phase invokes a Matt Pocock skill (except Phase 4 which is self-contained). If a skill is unavailable:
-- **grill-me / grill-with-docs unavailable:** Proceed with standard interactive brainstorming — present context and work through the solution conversationally
-- **tdd unavailable:** Implement with manual TDD discipline (write test first, then code)
-- **diagnose unavailable:** Debug systematically (reproduce → hypothesize → verify → fix)
-- **Any other skill unavailable:** Inform the user and adapt the phase's intent with available tools
-
-Never skip a phase entirely because a skill is unavailable — fulfill the phase's goal by other means.
