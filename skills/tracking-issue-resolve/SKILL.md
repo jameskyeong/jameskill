@@ -156,9 +156,9 @@ curl -s -X PATCH "https://api.notion.com/v1/pages/${PAGE_ID}" \
 
 ---
 
-## Step 6: Fetch issue body + Brainstorming
+## Step 6: Fetch issue body + Workflow
 
-Retrieve the selected issue's body (block children) and include it in the brainstorming prompt.
+Retrieve the selected issue's body (block children) and pass it to the workflow skill.
 
 ```bash
 curl -s "https://api.notion.com/v1/blocks/${PAGE_ID}/children?page_size=100" \
@@ -168,7 +168,7 @@ curl -s "https://api.notion.com/v1/blocks/${PAGE_ID}/children?page_size=100" \
 
 Extract `rich_text[].plain_text` from each block in `.results[]` to compose the issue body text.
 
-Then invoke the `superpowers:brainstorming` skill:
+Then invoke the `jameskill:workflow` skill with:
 - **First line of the prompt**: Issue title
 - **Subsequent lines**: Issue body (text extracted from block children)
 
@@ -178,9 +178,11 @@ Then invoke the `superpowers:brainstorming` skill:
 [Issue body — text from block children]
 ```
 
-**If `superpowers:brainstorming` is not available:** Inform the user that the brainstorming skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
+The workflow skill handles the full cycle: clarify (grill-me) → validate (grill-with-docs) → route (diagnose/prototype/to-prd+to-issues/direct) → build (tdd) → architecture review → code review → verify.
 
-Once brainstorming is complete, get the user's confirmation and proceed to implementation (executing).
+**If `jameskill:workflow` is not available:** Inform the user that the workflow skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
+
+Once the workflow completes and the user confirms "done", proceed to Step 7.
 
 ---
 
@@ -246,8 +248,8 @@ When the user selects "all", process issues **sequentially in severity order (P0
 Processing order:
 1. Change issue N's status to "In Progress"
 2. Fetch issue N's body
-3. Invoke the brainstorming skill (or standard brainstorming if unavailable)
-4. After implementation, get user's "done" confirmation
+3. Invoke `jameskill:workflow` (or standard brainstorming if unavailable)
+4. After workflow completes, get user's "done" confirmation
 5. Change issue N's status to "Ready to Deploy"
 6. **Only after issue N is fully complete**, move to issue N+1
 
