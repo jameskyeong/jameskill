@@ -33,8 +33,6 @@ Load values:
 NOTION_KEY=$(cat .claude/tracking-issue.json | jq -r '.notionApiKey')
 ISSUE_DB_ID=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.id')
 ISSUE_TEMPLATE=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.templatePageId // empty')
-FEEDBACK_DB_ID=$(cat .claude/tracking-issue.json | jq -r '.databases.fieldFeedback.id // empty')
-FEEDBACK_TEMPLATE=$(cat .claude/tracking-issue.json | jq -r '.databases.fieldFeedback.templatePageId // empty')
 ASSIGNEE_ID=$(cat .claude/tracking-issue.json | jq -r '.defaults.assigneeId // empty')
 ```
 
@@ -53,24 +51,78 @@ SOURCE_PROP=$(cat .claude/tracking-issue.json | jq -r '.databases.issueTracker.p
 
 ---
 
-## 2. Issue Splitting Rules
+## 2. Issue Parsing & Auto-Grouping
 
-Parse individual issues from the user prompt:
+Parse items from the user prompt and **auto-group related items** before registration. Each group becomes one Notion issue.
 
-- **Numbered list** (1. 2. 3.) or **line-break-separated items** — each becomes an independent issue
-- **Single block of text** without numbering — treated as one issue
+### 2-1. Item parsing
 
-Example:
+Identify candidate items:
+- **Numbered list** (`1. 2. 3.`) — each numbered item is a candidate
+- **Line-break-separated items** — each line is a candidate
+- **Single block of text** without numbering — treated as one item; no grouping needed
+
+### 2-2. Auto-grouping (when 2+ candidates)
+
+Cluster items by affinity. Combine signals from all three dimensions:
+
+| Dimension | Examples |
+|---|---|
+| **UI area** | login screen, search results, settings page |
+| **Technical system** | auth module, search API, canvas rendering |
+| **Fix type** | text/copy changes, sizing adjustments, missing loading state |
+
+Items that share at least one dimension may be grouped. Items that don't fit any group remain standalone.
+
+**Codebase verification (Section 2.5) feeds into grouping** — if two items touch the same file or module, they belong together.
+
+### 2-3. Group → Issue mapping
+
+Each group becomes **one Notion issue**:
+
+| Field | Rule |
+|---|---|
+| **Title** | Generate a meta title that captures the group's common theme. Do NOT copy a single item's title. |
+| **Body — Problem Description** | List each original item as a bullet. Preserve all originals — no summarization, no merging text. |
+| **Severity** | Highest severity within the group. |
+| **Tags** | Union of all items' tags. |
+
+### 2-4. Flow
+
+Auto-group → **show grouping summary** → **proceed directly to registration** (no confirmation wait). The user can correct in a follow-up message if needed.
+
+Example output before registration:
 
 ```
-# 3 independent issues
-1. Undo button does not work on the drawing screen
-2. Close button touch target too small in activity review
-3. No loading indicator when saving emotion diary
+Auto-grouped 5 items into 3 issues:
 
-# 1 single issue
-The undo button does not work on the drawing screen. After drawing
-a line on the canvas, pressing undo has no effect.
+🔧 Group 1 — "Login flow has end-to-end issues" (P0)
+  • Login button doesn't respond to tap
+  • After successful login, no redirect to home
+  • Session persists after logout
+
+🔧 Group 2 — "Search filter UI improvements" (P1)
+  • Filter dropdown text is cut off
+  • Apply button hard to find
+
+🔧 Standalone — "Settings page crash on iOS 17"
+```
+
+### Example inputs
+
+```
+# 5 items → 3 issues (2 groups + 1 standalone)
+1. Login button doesn't work
+2. Login redirect fails
+3. Session persists after logout
+4. Search filter dropdown text cut off
+5. Settings page crash on iOS 17
+```
+
+```
+# 1 single block → 1 issue (no grouping)
+The undo button on the canvas doesn't respond when tapped
+after multiple strokes have been drawn.
 ```
 
 ---
@@ -99,51 +151,32 @@ Show verification summary before registration:
 
 ```
 Codebase verification results:
-[P0] Senior touch responsiveness — src/app/hooks/use-press.ts confirmed, 300ms delay present
-[P1] Close button hard to tap — src/app/components/review-popup.tsx, currently 24px target
-[SKIP] Zodiac difficulty variance — cannot verify via code (content domain)
-[DONE] Drawing UI improvement — already in progress on feat/brush-preset branch, skipping
+[P0] Login button touch responsiveness — src/hooks/use-press.ts confirmed, 300ms delay present
+[P1] Close button hard to tap — src/components/popup.tsx, currently 24px target
+[SKIP] Content difficulty balance — cannot verify via code (content domain)
+[DONE] Search UI improvement — already in progress on feat/search-redesign branch, skipping
 ```
 
 After showing verification results, **proceed directly to registration without confirmation**. Only skip already-resolved issues (DONE). Valid and cannot-verify issues are registered immediately.
 
 ### Post-implementation Registration
 
-When the user explicitly states work is already completed (e.g., "이미 구현 완료", "배포 예정으로 변경해줘"), this is a **retroactive log** — not a bug report. In this case:
+When the user explicitly states work is already completed (e.g., "already implemented", "set status to ready to deploy"), this is a **retroactive log** — not a bug report. In this case:
 
 1. **Codebase verification** still runs, but classifies as **Valid** (confirmed by the diff in the working tree)
 2. **Title** must still follow Section 5 Title Writing Rules — describe the **original problem/need** that was solved, not the solution itself
-3. **Status** can be set directly to the requested value (e.g., "배포 예정") in the same POST that creates the page
-4. **Reason (`$REASON_PROP`)** should contain an `[구현 메모]` prefix with a plain-language summary of what changed
+3. **Status** can be set directly to the requested value (e.g., the configured "Ready to Deploy" status) in the same POST that creates the page
+4. **Reason (`$REASON_PROP`)** should contain an `[Outcome]` prefix with a plain-language description of what the user can now do or how the experience changed — not the technical work performed
 
 ---
 
-## 3. DB Selection Rules
+## 3. Target DB
 
-Select the target DB based on issue content:
-
-| Keywords | Target DB |
-|---|---|
-| "field feedback", "observation", "on-site", "senior quote", "elder remark" | `fieldFeedback` |
-| Korean equivalents for backward compatibility | `fieldFeedback` |
-| Everything else | `issueTracker` |
-
-**If fieldFeedback DB is not configured** (`FEEDBACK_DB_ID` is empty), always use `issueTracker` regardless of keywords.
+All issues are registered to the `issueTracker` DB configured in `.claude/tracking-issue.json`.
 
 ```bash
-# DB selection logic ($ISSUE_TEXT contains the issue text)
-if echo "$ISSUE_TEXT" | grep -qiE 'field feedback|observation|on-site|senior quote|elder remark|현장 피드백|참관|관찰|어르신 발언'; then
-  if [ -n "$FEEDBACK_DB_ID" ]; then
-    TARGET_DB_ID="$FEEDBACK_DB_ID"
-    TARGET_TEMPLATE="$FEEDBACK_TEMPLATE"
-  else
-    TARGET_DB_ID="$ISSUE_DB_ID"
-    TARGET_TEMPLATE="$ISSUE_TEMPLATE"
-  fi
-else
-  TARGET_DB_ID="$ISSUE_DB_ID"
-  TARGET_TEMPLATE="$ISSUE_TEMPLATE"
-fi
+TARGET_DB_ID="$ISSUE_DB_ID"
+TARGET_TEMPLATE="$ISSUE_TEMPLATE"
 ```
 
 ---
@@ -183,7 +216,7 @@ Extract the following properties from the prompt:
 | Severity (`$SEVERITY_PROP`) | Search for P0, P1, P2, P3 keywords | Empty (unset in Notion) |
 | Tags (`$TAGS_PROP`) | Search for `#tagname` or `[tag]` format | Empty |
 | Related module | Extract technical module names from text | Record in body |
-| App/Screen | Extract "user app", "manager", screen names | Record in body |
+| App/Screen | Extract application or area name plus screen name | Record in body |
 | Assignee (`$ASSIGNEE_PROP`) | Use `defaults.assigneeId` from config | Omit if empty |
 | Status (`$STATUS_PROP`) | **Do NOT set** (use Notion DB default) | — |
 
@@ -191,20 +224,22 @@ Extract the following properties from the prompt:
 
 **MANDATORY.** Every title MUST follow these rules. Violations are treated as errors.
 
-1. **Write as a user-visible problem or improvement** — not a commit message, not a technical changelog. The title should read like something a non-developer stakeholder would write.
+The issue page is reviewed by **non-developers** (PMs, support, designers, field staff, customers). Write so a non-technical reader can grasp the problem immediately — no context, no engineering background.
+
+1. **Write as a user-visible problem or improvement** — not a commit message, not a technical changelog. Describe the experience, not the cause.
 2. **Max 30 characters (Korean) / 50 characters (English).** If longer, rewrite.
-3. **No technical jargon** — no file names, component names, CSS values, function names, or framework terms.
+3. **No technical jargon** — no file names, component names, CSS values, function names, framework terms, or implementation hints.
 4. **No prefixes** — no `feat:`, `fix:`, `refactor:`, severity tags, or category markers.
-5. **No compound titles** — if the title has `+`, `및`, `—`, or `·` joining two unrelated topics, split into separate issues instead.
+5. **No compound titles** — if the title has `+`, `&`, `and`, `—`, or `·` joining two unrelated topics, split into separate issues instead. (For grouped issues, write a meta title that describes the shared theme — see Section 2-3.)
 
 | Bad (reject) | Good |
 |---|---|
-| `feat(user): 드로잉 도구 그룹 1 — 팔레트 통합, 캔버스 갭, 지우개 프리뷰` | `색상 팔레트가 너무 많아 전환이 어려움` |
-| `활동 화면 UI 개선 — 버튼 통일 + 완료 애니메이션 + 팔레트 기본 열림` | `활동 화면 버튼 크기와 스타일이 제각각` |
-| `스티커 캔버스 비율 수정 + 영상 미리보기 레터박스 해결` | `어항 꾸미기에서 도안이 가로로 늘어남` |
-| `활동 결과 화면 UX 개선 및 캔버스 비율 수정` | `결과 화면에서 다음 행동을 찾기 어려움` |
+| `feat(auth): login group 1 — button, redirect, session persistence` | `Login button doesn't respond when tapped` |
+| `Search UI improvement — filter unify + result animation + dropdown open` | `Search filter dropdown text is cut off` |
+| `Sticker canvas aspect fix + video preview letterbox resolution` | `Sticker image stretches horizontally` |
+| `Result screen UX improvement and canvas aspect fix` | `Hard to find next action on result screen` |
 
-**Self-check before POST:** Re-read the title. If it sounds like a git commit, a PR title, or a release note — rewrite it as a problem statement that a field instructor would say.
+**Self-check before POST:** Re-read the title. If it sounds like a git commit, a PR title, or a release note — rewrite it as a problem statement that a non-technical stakeholder would say at a support desk.
 
 ---
 
@@ -268,8 +303,6 @@ DB schema validation failed:
 - Required property missing: "$TAGS_PROP" (multi_select)
 ```
 
-**fieldFeedback DB** only requires the title property. Other properties (type, category, lesson format) are optional — warn but continue if absent.
-
 ---
 
 ## 8. Template Structure Lookup
@@ -290,7 +323,7 @@ Replicate **every** block's `type` and structure (rich_text, icon, color, etc.) 
 
 **If templatePageId is not set**: Do not create body blocks (set page properties only). This is normal behavior, not an error.
 
-**Important: Check property existence** — Compare against the DB schema properties from Section 7. Exclude any property from the POST body that does not exist in the target DB. For example, the `fieldFeedback` DB may lack reason, severity, or assignee properties — sending nonexistent properties causes Notion API errors.
+**Important: Check property existence** — Compare against the DB schema properties from Section 7. Exclude any property from the POST body that does not exist in the target DB. Sending nonexistent properties causes Notion API errors.
 
 ```bash
 # Extract property list from DB schema (reuse $DB_SCHEMA from Section 7)
@@ -353,8 +386,8 @@ curl -s -X PATCH "https://api.notion.com/v1/blocks/${PAGE_ID}/children" \
       {"type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": "1. Problem Description"}}]}},
       {"type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": "Issue details"}}]}},
       {"type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": "2. Location"}}]}},
-      {"type": "bulleted_list_item", "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": "App: user"}}]}},
-      {"type": "bulleted_list_item", "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": "Screen: drawing"}}]}},
+      {"type": "bulleted_list_item", "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": "App: <application or area>"}}]}},
+      {"type": "bulleted_list_item", "bulleted_list_item": {"rich_text": [{"type": "text", "text": {"content": "Screen: <screen name>"}}]}},
       {"type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": "3. Reproduction Steps"}}]}},
       {"type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": ""}}]}},
       {"type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": "4. Screenshots"}}]}},
@@ -397,12 +430,12 @@ After processing all issues, output results in this format:
 Issue registration complete: 3 succeeded / 1 failed
 
 Succeeded:
-- "Drawing undo button not working" -> https://notion.so/xxx
-- "Activity review close button touch target too small" -> https://notion.so/xxx
-- "No loading indicator on emotion diary save" -> https://notion.so/xxx
+- "Login flow has end-to-end issues" -> https://notion.so/xxx
+- "Search filter UI improvements" -> https://notion.so/xxx
+- "Settings page crash on iOS 17" -> https://notion.so/xxx
 
 Failed:
-- "Sticker screen crash" — DB access denied: verify the Integration is connected to the target DB.
+- "Notification permission UX" — DB access denied: verify the Integration is connected to the target DB.
 ```
 
 Omit the failed section if all succeed. Omit the succeeded section if all fail.
