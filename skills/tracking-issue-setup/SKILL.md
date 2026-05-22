@@ -304,7 +304,7 @@ curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
 - **Zero found** — skip silently. Leave `propertyMap.reason` and `propertyMap.source` as empty strings.
 - **One or more found** — ask two questions:
   1. "Which rich_text property should be used for **developer notes / reason**? (optional — press Enter to skip)"
-  2. "Which rich_text property should be used for **feedback source / attribution**? (optional — press Enter to skip)"
+  2. "Which rich_text property should be used for **source attribution** (who reported the issue)? (optional — press Enter to skip)"
 
 Save to `propertyMap.reason` and `propertyMap.source` respectively. Either or both can be skipped.
 
@@ -342,15 +342,6 @@ jq \
   ' .claude/tracking-issue.json > .claude/tracking-issue.json.tmp \
   && mv .claude/tracking-issue.json.tmp .claude/tracking-issue.json
 ```
-
-### 2-5. (Optional) Field feedback DB
-
-Ask the user:
-
-> Would you also like to connect a field feedback database? (optional)
-> This lets you log field observations and feedback to a separate DB.
-
-If yes, repeat steps 2-1 through 2-2 for the field feedback DB. Only the title property needs to be verified (the rest is optional). Save to `databases.fieldFeedback.id`.
 
 ---
 
@@ -537,7 +528,6 @@ Notion Issue Tracker Setup Complete
     Done:               {statusMap.done}
   Severity options:     {severityOptions joined by ", "}
   Template page:        {present / none}
-  Field feedback DB:    {DB title or "not set"}
   Default assignee:     {name or "not set"}
   .gitignore:           {included}
 
