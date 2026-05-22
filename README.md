@@ -11,16 +11,20 @@ Notion-based issue tracker integration. Report, resolve, and manage issues direc
 | Skill | Command | Description |
 |---|---|---|
 | Setup | `/tracking-issue-setup` | Configure Notion connection |
-| Report | `/tracking-issue-report` | Create issues from a prompt |
-| Resolve | `/tracking-issue-resolve` | Work on pending issues |
+| Report | `/tracking-issue-report` | Create issues from a prompt — auto-groups related items into single tickets |
+| Resolve | `/tracking-issue-resolve` | Work on pending issues, with non-developer-friendly outcome notes |
+
+Designed for cross-functional teams: titles and notes follow a non-developer-friendly tone (PMs, support, customers can read them as-is — no engineering context required).
 
 ### Workflow
 
-Structured development workflow that orchestrates multiple skills into a complete flow: clarify requirements, validate against the domain model, implement with TDD, review, and verify.
+Structured development workflow that orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) into a complete flow: clarify requirements, validate against the domain model, implement with TDD, review, and verify.
 
 | Skill | Command | Description |
 |---|---|---|
 | Workflow | `/workflow` | Full development flow from problem to verified implementation |
+
+**Requires Matt Pocock skills installed** (user-level `~/.claude/skills/` or project-level `.claude/skills/`). The workflow halts at Phase -1 (Preflight) if any required skill is missing.
 
 **Phases:**
 
