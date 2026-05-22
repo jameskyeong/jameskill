@@ -9,8 +9,6 @@ Per-project config stored at `.claude/tracking-issue.json`. Must be included in 
 | `notionApiKey` | string | required | Notion Internal Integration token (`ntn_` prefix) |
 | `databases.issueTracker.id` | string (UUID) | required | Issue tracker Notion DB ID |
 | `databases.issueTracker.templatePageId` | string (UUID) | optional | Body template reference page ID |
-| `databases.fieldFeedback.id` | string (UUID) | optional | Field feedback Notion DB ID |
-| `databases.fieldFeedback.templatePageId` | string (UUID) | optional | Body template reference page ID |
 | `defaults.assigneeId` | string (UUID) | optional | Default assignee Notion User ID |
 | `defaults.assigneeName` | string | optional | Default assignee display name |
 
@@ -67,10 +65,6 @@ Maps logical workflow states to actual select option values in the DB.
         "readyToDeploy": "Ready to Deploy"
       },
       "severityOptions": ["P0", "P1", "P2", "P3"]
-    },
-    "fieldFeedback": {
-      "id": "ghi12345-aaaa-bbbb-cccc-0123456789ab",
-      "templatePageId": "jkl12345-aaaa-bbbb-cccc-0123456789ab"
     }
   },
   "defaults": {

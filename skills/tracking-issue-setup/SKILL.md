@@ -76,23 +76,23 @@ cat > .claude/tracking-issue.json << 'EOF'
   "databases": {
     "issueTracker": {
       "id": "",
-      "templatePageId": ""
+      "templatePageId": "",
+      "propertyMap": {
+        "status": "",
+        "severity": "",
+        "tags": "",
+        "assignee": "",
+        "reason": "",
+        "source": ""
+      },
+      "statusMap": {
+        "pending": "",
+        "inProgress": "",
+        "readyToDeploy": ""
+      },
+      "severityOptions": []
     }
   },
-  "propertyMap": {
-    "title": "",
-    "status": "",
-    "severity": "",
-    "tags": "",
-    "assignee": "",
-    "notes": ""
-  },
-  "statusMap": {
-    "pending": "",
-    "inProgress": "",
-    "done": ""
-  },
-  "severityOptions": [],
   "defaults": {}
 }
 EOF
@@ -173,9 +173,9 @@ curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
   | jq '.properties | to_entries[] | {name: .key, type: .value.type}'
 ```
 
-#### a) Title property (auto-detect)
+#### a) Title property (auto-detect at read time)
 
-Find the property with `type: "title"`:
+Confirm that exactly one property has `type: "title"`:
 
 ```bash
 curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
@@ -184,7 +184,7 @@ curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
   | jq -r '.properties | to_entries[] | select(.value.type == "title") | .key'
 ```
 
-There is always exactly one title property. Save it to `propertyMap.title` automatically.
+There is always exactly one title property. **Do not store it in the config** — `tracking-issue-report` and `tracking-issue-resolve` look it up dynamically at read time (since the title property name can vary per DB).
 
 #### b) Status property (select type)
 
@@ -222,16 +222,18 @@ Present the options and ask the user to map each semantic status:
 > [list of option names]
 >
 > Please tell me which option corresponds to each status:
-> 1. **Pending / To-do** — which option?
-> 2. **In progress** — which option?
-> 3. **Ready to deploy / Done** — which option?
+> 1. **Pending / Not started** — which option?
+> 2. **Waiting** (optional — e.g., for blocked items in a secondary queue) — which option? Press Enter to skip.
+> 3. **In progress** — which option?
+> 4. **Ready to deploy** — which option?
 
 Save to `statusMap`:
 ```json
 {
   "pending": "<user's answer for 1>",
-  "inProgress": "<user's answer for 2>",
-  "done": "<user's answer for 3>"
+  "waiting": "<user's answer for 2 or empty>",
+  "inProgress": "<user's answer for 3>",
+  "readyToDeploy": "<user's answer for 4>"
 }
 ```
 
@@ -315,7 +317,6 @@ Write all gathered values to the config file:
 ```bash
 jq \
   --arg db_id "<verified DB ID>" \
-  --arg title_prop "<auto-detected title>" \
   --arg status_prop "<chosen status>" \
   --arg severity_prop "<chosen severity>" \
   --arg tags_prop "<chosen tags>" \
@@ -323,25 +324,28 @@ jq \
   --arg reason_prop "<chosen reason or empty>" \
   --arg source_prop "<chosen source or empty>" \
   --arg status_pending "<mapped pending>" \
+  --arg status_waiting "<mapped waiting or empty>" \
   --arg status_progress "<mapped in progress>" \
-  --arg status_done "<mapped done>" \
+  --arg status_ready "<mapped ready to deploy>" \
   --argjson severity_opts '["opt1","opt2"]' \
   '
     .databases.issueTracker.id = $db_id |
-    .propertyMap.title = $title_prop |
-    .propertyMap.status = $status_prop |
-    .propertyMap.severity = $severity_prop |
-    .propertyMap.tags = $tags_prop |
-    .propertyMap.assignee = $assignee_prop |
-    .propertyMap.reason = $reason_prop |
-    .propertyMap.source = $source_prop |
-    .statusMap.pending = $status_pending |
-    .statusMap.inProgress = $status_progress |
-    .statusMap.done = $status_done |
-    .severityOptions = $severity_opts
+    .databases.issueTracker.propertyMap.status = $status_prop |
+    .databases.issueTracker.propertyMap.severity = $severity_prop |
+    .databases.issueTracker.propertyMap.tags = $tags_prop |
+    .databases.issueTracker.propertyMap.assignee = $assignee_prop |
+    .databases.issueTracker.propertyMap.reason = $reason_prop |
+    .databases.issueTracker.propertyMap.source = $source_prop |
+    .databases.issueTracker.statusMap.pending = $status_pending |
+    .databases.issueTracker.statusMap.waiting = $status_waiting |
+    .databases.issueTracker.statusMap.inProgress = $status_progress |
+    .databases.issueTracker.statusMap.readyToDeploy = $status_ready |
+    .databases.issueTracker.severityOptions = $severity_opts
   ' .claude/tracking-issue.json > .claude/tracking-issue.json.tmp \
   && mv .claude/tracking-issue.json.tmp .claude/tracking-issue.json
 ```
+
+Title property is auto-detected at read time via dynamic lookup (the single property with `type: "title"`) — no need to store it.
 
 ---
 
@@ -516,17 +520,18 @@ Notion Issue Tracker Setup Complete
   API connection:       {Integration name}
   Issue tracker DB:     {DB title} ({first 8 chars of DB ID}...)
   Property mapping:
-    Title:              {propertyMap.title}
-    Status:             {propertyMap.status}
-    Severity:           {propertyMap.severity}
-    Tags:               {propertyMap.tags}
-    Assignee:           {propertyMap.assignee}
-    Notes:              {propertyMap.notes or "not set"}
+    Status:             {databases.issueTracker.propertyMap.status}
+    Severity:           {databases.issueTracker.propertyMap.severity}
+    Tags:               {databases.issueTracker.propertyMap.tags}
+    Assignee:           {databases.issueTracker.propertyMap.assignee}
+    Reason:             {databases.issueTracker.propertyMap.reason or "not set"}
+    Source:             {databases.issueTracker.propertyMap.source or "not set"}
   Status mapping:
-    Pending:            {statusMap.pending}
-    In progress:        {statusMap.inProgress}
-    Done:               {statusMap.done}
-  Severity options:     {severityOptions joined by ", "}
+    Pending:            {databases.issueTracker.statusMap.pending}
+    Waiting:            {databases.issueTracker.statusMap.waiting or "not set"}
+    In progress:        {databases.issueTracker.statusMap.inProgress}
+    Ready to deploy:    {databases.issueTracker.statusMap.readyToDeploy}
+  Severity options:     {databases.issueTracker.severityOptions joined by ", "}
   Template page:        {present / none}
   Default assignee:     {name or "not set"}
   .gitignore:           {included}

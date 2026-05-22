@@ -15,10 +15,6 @@ Properties are identified by **role** and **type**, not by name. Actual property
 | (created_by) | created_by | automatic | -- |
 | (created_time) | created_time | automatic | -- |
 
-## Field Feedback DB
-
-No `propertyMap` is defined for this DB. Its schema is project-specific. The only requirement is that the DB exists and is accessible via the integration token.
-
 ## Validation
 
 Validation is **type-based**: read the property name from `propertyMap`, look it up in the DB schema, and verify its Notion type matches the expected type.
