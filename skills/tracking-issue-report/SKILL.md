@@ -343,6 +343,19 @@ If the source property does not exist in the DB but source information is availa
 
 ## 9. Parallel Creation
 
+> **Use the bundled helper.** `../tracking-issue-references/issue-builder.sh` exposes a validated `create_issue <input.json>` function that does POST + PATCH with proper shell-escape handling. Prefer the helper over hand-writing curl calls per session.
+>
+> ```bash
+> # Required env vars (export before sourcing):
+> #   NOTION_KEY, ISSUE_DB_ID, ASSIGNEE_ID,
+> #   TITLE_PROP, SEVERITY_PROP, TAGS_PROP, ASSIGNEE_PROP, SOURCE_PROP, NOTION_SOURCE
+>
+> source ../tracking-issue-references/issue-builder.sh
+> create_issue /tmp/issue1.json   # see helper file for input JSON schema
+> ```
+>
+> The Step A / Step B blocks below describe what the helper does internally — use them only when you need to deviate from the standard flow.
+
 When registering multiple issues:
 
 - **If Agent tool is available**: Process each issue as an independent Agent in parallel. The parallel unit is "one complete issue" (POST /pages + PATCH /blocks/children). Do NOT batch all POSTs first then PATCHes later.
@@ -367,8 +380,8 @@ PAGE_RESULT=$(curl -s -X POST "https://api.notion.com/v1/pages" \
     }
   }')
 
-PAGE_ID=$(echo "$PAGE_RESULT" | jq -r '.id')
-PAGE_URL=$(echo "$PAGE_RESULT" | jq -r '.url')
+PAGE_ID=$(jq -r '.id' <<< "$PAGE_RESULT")
+PAGE_URL=$(jq -r '.url' <<< "$PAGE_RESULT")
 ```
 
 If no assignee, remove `$ASSIGNEE_PROP`. If no source, remove `$SOURCE_PROP`. If severity is unspecified, remove `$SEVERITY_PROP`. The `$REASON_PROP` is **not set** by this skill — it is reserved for developer notes written during issue resolution.
@@ -412,10 +425,10 @@ When registering multiple issues, some may fail:
 3. If still failing after retry, **include the failed title + error reason in the final summary**
 
 ```bash
-# Error check pattern
-ERROR=$(echo "$PAGE_RESULT" | jq -r '.object // empty')
+# Error check pattern — use `<<<` here-string, not `echo "$var" | jq` (see Section 12)
+ERROR=$(jq -r '.object // empty' <<< "$PAGE_RESULT")
 if [ "$ERROR" = "error" ]; then
-  ERROR_MSG=$(echo "$PAGE_RESULT" | jq -r '.message')
+  ERROR_MSG=$(jq -r '.message' <<< "$PAGE_RESULT")
   # Record after retry still fails
 fi
 ```
@@ -453,12 +466,19 @@ If declined, end here.
 
 ---
 
-## 12. Security Rules
+## 12. Security & Shell-Compat Rules
 
+**Security:**
 - NEVER include `NOTION_KEY` in echo, print, logs, or output
 - Pass it only as a shell variable (`$NOTION_KEY`) in curl calls
 - Do not expose the API key even when debugging errors
 - Do not output the raw contents of `tracking-issue.json`
+
+**Shell compatibility — parsing API responses:**
+- Always parse Notion API responses with `jq <<< "$var"` (here-string) — **never** `echo "$var" | jq`.
+- Reason: when the user shell is zsh (default on macOS), bash builtin `echo` inside a `.sh` script may interpret `\n` escape sequences in JSON strings as raw newlines. The downstream `jq` then errors with `Invalid string: control characters from U+0000 through U+001F must be escaped`. The page may still be created — but the script's error branch is skipped, so real failures get masked as success.
+- Verified safe alternatives: `jq '.x' <<< "$var"` (preferred, terse) or `printf '%s' "$var" | jq '.x'`.
+- This rule applies to ALL response parsing — not just error checks. Same hazard for `PAGE_ID`, `PAGE_URL`, `.message`, `.results[]`, etc.
 
 ---
 

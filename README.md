@@ -1,40 +1,51 @@
-# jameskill
+<p align="center">
+  <img src="docs/banner.jpg" alt="jameskill" />
+</p>
 
-Developer productivity skills for [Claude Code](https://claude.ai/claude-code) — issue tracking, structured workflows, and more.
+<p align="center">
+  <em>Developer productivity skills for <a href="https://claude.ai/claude-code">Claude Code</a></em>
+</p>
+
+<p align="center">
+  <a href="#installation"><img src="https://img.shields.io/badge/install-claude%20plugin-1a1a1a?style=flat-square" alt="install" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square" alt="MIT" /></a>
+  <img src="https://img.shields.io/badge/skills-4-1a1a1a?style=flat-square" alt="4 skills" />
+</p>
+
+---
+
+A small, opinionated set of skills that plug into Claude Code. Built around two ideas:
+
+- **Issue tracking that reads like a problem statement, not a commit message** — titles and notes stay readable for PMs, support, customers.
+- **A workflow that knows when to slow down** — clarify before designing, design before building, verify before claiming done.
 
 ## Skills
 
-### Issue Tracking
+### 🗂  Issue Tracking
 
-Notion-based issue tracker integration. Report, resolve, and manage issues directly from your terminal.
+Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to grouped, codebase-verified tickets — and back out into shippable fixes.
 
-| Skill | Command | Description |
-|---|---|---|
-| Setup | `/tracking-issue-setup` | Configure Notion connection |
-| Report | `/tracking-issue-report` | Create issues from a prompt — auto-groups related items into single tickets |
-| Resolve | `/tracking-issue-resolve` | Work on pending issues, with non-developer-friendly outcome notes |
+| Command | Purpose |
+|---|---|
+| `/tracking-issue-setup` | One-time Notion connection — API key, database, property mapping, defaults |
+| `/tracking-issue-report` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
+| `/tracking-issue-resolve` | Pick a pending issue, brainstorm a fix, implement, update status with a human-readable outcome note |
 
-Designed for cross-functional teams: titles and notes follow a non-developer-friendly tone (PMs, support, customers can read them as-is — no engineering context required).
+**Why it's different** — issue titles are written as user-visible problems, not git commit messages. Cross-functional readers (PMs, support, customers) can scan the tracker without engineering context.
 
-### Workflow
+### 🛠  Workflow
 
-Structured development workflow that orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) into a complete flow: clarify requirements, validate against the domain model, implement with TDD, review, and verify.
+Structured development flow that orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) into a single chain: from problem statement to verified implementation.
 
-| Skill | Command | Description |
-|---|---|---|
-| Workflow | `/workflow` | Full development flow from problem to verified implementation |
+| Command | Purpose |
+|---|---|
+| `/workflow` | Full development flow from problem to verified implementation |
 
-**Requires Matt Pocock skills installed** (user-level `~/.claude/skills/` or project-level `.claude/skills/`). The workflow halts at Phase -1 (Preflight) if any required skill is missing.
+**Phases** — clarify → grill → route → build (TDD) → architecture → review → verify.
 
-**Phases:**
+The router fans out by task type: bugs go to `diagnose`, exploratory work goes to `prototype`, large features get a PRD + issue decomposition, clear features go straight to build.
 
-1. **Clarify** — Interview to resolve ambiguity
-2. **Grill** — Validate against domain model and documented decisions
-3. **Route** — Bug (diagnose) / Exploration (prototype) / Large feature (PRD + issue decomposition) / Clear feature (straight to build)
-4. **Build** — Test-driven development (red-green-refactor)
-5. **Architecture** — Structural review with compound improvement
-6. **Review** — Two-axis code review (Standards + Spec)
-7. **Verify** — Type checking, tests, lint
+> Requires Matt Pocock skills installed at `~/.claude/skills/` or `.claude/skills/`. The workflow halts at Phase −1 (Preflight) if any required skill is missing — no silent skips.
 
 ## Installation
 
@@ -46,8 +57,8 @@ claude plugins install jameskill
 ## Requirements
 
 - [Claude Code](https://claude.ai/claude-code)
-- `curl` + `jq` (for issue tracking skills)
-- A [Notion Internal Integration](https://www.notion.so/my-integrations) token (for issue tracking skills)
+- `curl` + `jq` (issue tracking skills)
+- A [Notion Internal Integration](https://www.notion.so/my-integrations) token (issue tracking skills)
 
 ## License
 
