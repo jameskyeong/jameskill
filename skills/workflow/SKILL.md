@@ -148,6 +148,29 @@ Proceed directly to **Phase 3**.
 
 ---
 
+## Phase 2.5: Checkpoint — Commit docs baseline
+
+**Goal:** Seal off Phase 0–2 documentation work (CONTEXT.md, ADRs, terminology updates) as a separate commit so Phase 4's review diff sees only code changes.
+
+**Applies to:** Routes A, B, D. Route C exits before this phase.
+
+**Skip conditions:**
+- Not a git repository
+- No changes to commit (Phase 0–2 produced no docs updates)
+
+If the working tree has uncommitted documentation changes, create one commit scoped to docs only:
+
+```bash
+git add CONTEXT.md docs/adr/ <other-doc-paths>
+git commit -m "docs: capture domain context for <problem statement>"
+```
+
+Record the resulting commit SHA — Phase 4.1 uses it as the baseline for the implementation diff.
+
+**Output:** Clean working tree, baseline commit SHA captured.
+
+---
+
 ## Phase 3: Build — `tdd`
 
 **Goal:** Implement the solution with test-driven development.
@@ -194,7 +217,7 @@ Review results and act:
 
 ### 4.1: Determine the diff
 
-Capture the changes made since this workflow started. Compare the current state against the commit where Phase 3 (or Route A's diagnose) began, using the merge-base comparison. Also note the commit list for context.
+Compare the current state against the **Phase 2.5 baseline commit** (the docs commit captured before implementation began). If Phase 2.5 was skipped, fall back to the commit at which the workflow started. Use merge-base comparison. Also note the commit list for context.
 
 ### 4.2: Collect review sources
 
@@ -246,7 +269,22 @@ If the project has a single command that runs all checks, prefer that over runni
 
 If any check fails, fix the issue and re-run from Phase 5 (do not re-run earlier phases unless the fix is substantial).
 
-**Output:** All checks green. Work is complete.
+### 5.1: Final commit
+
+Once every check is green, commit the implementation as a single coherent change.
+
+**Skip conditions:**
+- Not a git repository
+- No code changes to commit (e.g., docs-only workflow)
+
+```bash
+git add <implementation files>
+git commit -m "<type>: <one-line description of what was built>"
+```
+
+Use the spec source from Phase 4.2 to inform the message. If invoked from `resolve-issue`, include the issue reference (e.g., `refs #123`).
+
+**Output:** All checks green and the implementation captured as one commit on top of the Phase 2.5 baseline.
 
 ---
 
