@@ -4,7 +4,7 @@ description: >-
   Matt Pocock skill orchestrator — from problem understanding to verified implementation.
   Chains grill-with-docs, tdd, diagnose, prototype, to-prd, to-issues, and improve-codebase-architecture
   based on context. Use when: 'workflow', 'start working on', 'implement this',
-  'fix this', 'build this'. Also invoked by tracking-issue-resolve after issue selection.
+  'fix this', 'build this'. Also invoked by resolve-issue after issue selection.
 ---
 
 # Workflow — Matt Pocock Skill Orchestrator
@@ -50,7 +50,7 @@ Proceed to Phase 0 only when all required skills are confirmed available.
 **MUST invoke `grill-me` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report to the user — do NOT proceed manually.
 
 - Interview the user until every branch of the decision tree is resolved
-- If invoked from `jameskill:tracking-issue-resolve`, use the issue title + body as the starting context
+- If invoked from `jameskill:resolve-issue`, use the issue title + body as the starting context
 - If invoked standalone, use whatever the user provided
 
 **Skip conditions:**
@@ -137,7 +137,7 @@ After the user picks a direction from the prototype, proceed to **Phase 3**.
 1. **MUST invoke `to-prd` via the Skill tool** to formalize the requirements into a PRD. If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 2. **MUST invoke `to-issues` via the Skill tool** to break the PRD into vertical-slice issues. If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 3. Present the issue list to the user
-4. Inform the user they can register issues via `/jameskill:tracking-issue-report` and work each one via `/jameskill:workflow` individually
+4. Inform the user they can register issues via `/jameskill:report-issue` and work each one via `/jameskill:workflow` individually
 5. **Stop here** — do not attempt to implement all issues in one run
 
 ### Route D: Clear feature → Phase 3 directly
@@ -178,7 +178,7 @@ Review results and act:
 |---|---|
 | In scope of current work | Fix immediately (loop back to Phase 3 tdd for the fix) |
 | Out of scope, small (1-2 lines) | Fix immediately |
-| Out of scope, large | Note for the user — suggest `/jameskill:tracking-issue-report` to track separately |
+| Out of scope, large | Note for the user — suggest `/jameskill:report-issue` to track separately |
 
 **Compound effect:** Codebase architecture improves incrementally with every workflow run.
 
@@ -206,7 +206,7 @@ Capture the changes made since this workflow started. Compare the current state 
 
 **Spec source** — what was agreed to build:
 - The problem statement from Phase 0-1 (grill-me + grill-with-docs output)
-- If invoked from tracking-issue-resolve: the original issue title + body
+- If invoked from resolve-issue: the original issue title + body
 - Issue references in commit messages
 - PRD from Route C if applicable
 
@@ -252,12 +252,12 @@ If any check fails, fix the issue and re-run from Phase 5 (do not re-run earlier
 
 ## Caller integration
 
-### From `jameskill:tracking-issue-resolve`
+### From `jameskill:resolve-issue`
 
-When invoked from tracking-issue-resolve:
+When invoked from resolve-issue:
 - Phase 0 receives the issue title + body as starting context
 - All phases proceed normally
-- On completion, control returns to tracking-issue-resolve for status transition + memo
+- On completion, control returns to resolve-issue for status transition + memo
 
 ### Standalone usage
 

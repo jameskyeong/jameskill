@@ -27,9 +27,9 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 
 | Command | Purpose |
 |---|---|
-| `/tracking-issue-setup` | One-time Notion connection — API key, database, property mapping, defaults |
-| `/tracking-issue-report` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
-| `/tracking-issue-resolve` | Pick a pending issue, brainstorm a fix, implement, update status with a human-readable outcome note |
+| `/setup-issue` | One-time Notion connection — API key, database, property mapping, defaults |
+| `/report-issue` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
+| `/resolve-issue` | Pick a pending issue, brainstorm a fix, implement, update status with a human-readable outcome note |
 
 **Why it's different** — issue titles are written as user-visible problems, not git commit messages. Cross-functional readers (PMs, support, customers) can scan the tracker without engineering context.
 

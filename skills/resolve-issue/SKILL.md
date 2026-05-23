@@ -1,8 +1,8 @@
 ---
-name: jameskill:tracking-issue-resolve
+name: jameskill:resolve-issue
 description: >-
   Fetch pending issues from Notion, brainstorm solutions, implement fixes,
-  and update issue status. Use when: 'tracking-issue-resolve', 'resolve issues',
+  and update issue status. Use when: 'resolve-issue', 'resolve issues',
   'work on pending issues'.
 ---
 
@@ -21,7 +21,7 @@ Read `.claude/tracking-issue.json` from the project root and extract mapped prop
 ```bash
 CONFIG=".claude/tracking-issue.json"
 if [ ! -f "$CONFIG" ]; then
-  echo "Configuration required. Please run /tracking-issue-setup first."
+  echo "Configuration required. Please run /setup-issue first."
   exit 1
 fi
 
@@ -40,7 +40,7 @@ IN_PROGRESS_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.in
 DEPLOY_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.readyToDeploy')
 ```
 
-If the config file is missing, **stop immediately** and direct the user to run `/tracking-issue-setup`.
+If the config file is missing, **stop immediately** and direct the user to run `/setup-issue`.
 
 **Security:** NEVER echo, print, or output the `NOTION_KEY` value. Pass it only as a shell variable in curl calls.
 
@@ -342,7 +342,7 @@ If there are remaining groups, proceed to the next group (back to Step 5c → St
 
 If the user interrupts mid-work:
 - The current issue's status **remains "In Progress"** (already changed in Step 5 before brainstorming)
-- On the next `/tracking-issue-resolve` call, the issue will appear in the **⏳ In Progress section** so work can resume
+- On the next `/resolve-issue` call, the issue will appear in the **⏳ In Progress section** so work can resume
 - No special abort handler is needed
 
 ---
@@ -351,7 +351,7 @@ If the user interrupts mid-work:
 
 | Situation | Message |
 |---|---|
-| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/tracking-issue-setup` first." |
+| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/setup-issue` first." |
 | Invalid API key (401 response) | "Notion API key is invalid. Please verify your token." |
 | DB inaccessible (403/404 response) | "Cannot access the database. Please verify the integration is connected to this DB." |
 | 0 issues found | "No pending issues found." |

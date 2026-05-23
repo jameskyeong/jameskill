@@ -1,5 +1,5 @@
 #!/bin/bash
-# tracking-issue-report 빌더 헬퍼
+# report-issue 빌더 헬퍼
 #
 # 검증된 페이지 생성 + 본문 PATCH 로직.
 # zsh/bash 셸 호환을 위해 응답 파싱 시 `jq <<< "$var"` here-string 사용.

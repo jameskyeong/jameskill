@@ -1,10 +1,10 @@
 ---
-name: jameskill:tracking-issue-setup
+name: jameskill:setup-issue
 description: >-
   Configure Notion issue tracker integration. Guides you through API key setup,
   database connection, property mapping, template detection, and defaults.
-  Use when: 'tracking-issue-setup', 'setup issue tracker', or when
-  tracking-issue-report/resolve detects missing configuration.
+  Use when: 'setup-issue', 'setup issue tracker', or when
+  report-issue/resolve-issue detects missing configuration.
 ---
 
 # Notion Issue Tracker Setup
@@ -184,7 +184,7 @@ curl -s "https://api.notion.com/v1/databases/${DB_ID}" \
   | jq -r '.properties | to_entries[] | select(.value.type == "title") | .key'
 ```
 
-There is always exactly one title property. **Do not store it in the config** — `tracking-issue-report` and `tracking-issue-resolve` look it up dynamically at read time (since the title property name can vary per DB).
+There is always exactly one title property. **Do not store it in the config** — `report-issue` and `resolve-issue` look it up dynamically at read time (since the title property name can vary per DB).
 
 #### b) Status property (select type)
 
@@ -536,8 +536,8 @@ Notion Issue Tracker Setup Complete
   Default assignee:     {name or "not set"}
   .gitignore:           {included}
 
-You can now use /tracking-issue-report to file issues,
-and /tracking-issue-resolve to process them.
+You can now use /report-issue to file issues,
+and /resolve-issue to process them.
 ```
 
 **WARNING: Never include the API key value in the summary.**
