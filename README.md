@@ -43,15 +43,15 @@ Structured development flow that orchestrates [Matt Pocock skills](https://githu
 
 **Phases** — clarify → grill → **route** → build → architecture → quality/security → independent code review → verify → finish.
 
-The router fans out by task scope, not just task type:
+The router fans out by task type. **Tracker-free** — every artifact lives in the repo, cross-session work resumes from local PRD/plan files.
 
 | Route | When | Skill chain |
 |---|---|---|
-| **Bug** | Reproducible broken behavior | `diagnose` |
-| **Exploration** | UI shape or data model unclear | `prototype` |
-| **Large cross-session** | 3+ modules, multiple sessions, AFK pickup | PRD + Notion issues |
-| **Medium in-session** | Coherent feature, multiple dependent tasks, one session | `writing-plans` → `subagent-driven-development` |
-| **Small clear** | Single contained change | Direct TDD |
+| **DIAGNOSE** | Reproducible broken behavior | `diagnose` |
+| **PROTOTYPE** | UI shape or data model unclear | `prototype` |
+| **PRD** | Large feature, requirements need formalization | local PRD → `writing-plans` → `subagent-driven-development` |
+| **PLAN** | Coherent feature, multiple dependent tasks, one session | `writing-plans` → `subagent-driven-development` |
+| **DIRECT** | Single contained change | Direct TDD |
 
 **What's different from a plain TDD chain**
 

@@ -1,17 +1,19 @@
 ---
 name: jameskill:workflow
 description: >-
-  Skill orchestrator combining Matt Pocock and superpowers with Notion-integrated issue tracking.
-  Routes by task scope: bug, exploration, large cross-session (PRD + Notion issues), medium
-  in-session (local plan + subagent execution), or small clear feature. Runs grill → route →
-  build → architecture → quality/security → independent code review → verify → finish.
-  Use when: 'workflow', 'start working on', 'implement this', 'fix this', 'build this'.
+  Skill orchestrator combining Matt Pocock and superpowers, tracker-free and git-only.
+  Routes by task type — DIAGNOSE (bug), PROTOTYPE (exploration), PRD (large spec),
+  PLAN (medium plan), DIRECT (small TDD). Runs grill → route → build → architecture
+  → quality/security → independent code review → verify → finish. Use when:
+  'workflow', 'start working on', 'implement this', 'fix this', 'build this'.
   Also invoked by resolve-issue after issue selection.
 ---
 
 # Workflow — Skill Orchestrator
 
 Orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) and [superpowers](https://github.com/obra/superpowers) into a complete development flow: understand the problem, build it right, review it independently, verify it works, and finish the branch cleanly.
+
+**Tracker-free.** This workflow has no external dependencies beyond git. All artifacts (specs, plans, PRDs, ADRs, CONTEXT.md) live in the repository. Cross-session work resumes by re-running `/jameskill:workflow` with the relevant plan or PRD file path as context.
 
 **Compound engineering guarantee:** Every workflow run improves domain docs, test coverage, and codebase structure — not just the immediate deliverable.
 
@@ -31,9 +33,6 @@ Check whether the following skills are available in the current session by verif
 **superpowers skills:**
 - `writing-plans`, `subagent-driven-development`, `requesting-code-review`, `verification-before-completion`, `finishing-a-development-branch`
 
-**jameskill skills** (required only if Route C is taken — preflight verifies upfront for safety):
-- `jameskill:report-issue`
-
 Skills may be installed as plugins, in `~/.claude/skills/`, or in `.claude/skills/` — the installation method does not matter. What matters is that each skill can be invoked via the Skill tool.
 
 **If any required skill is missing, STOP IMMEDIATELY.** Do not proceed to any other phase. Report to the user:
@@ -45,7 +44,6 @@ Skills may be installed as plugins, in `~/.claude/skills/`, or in `.claude/skill
 > **How to install:**
 > - Matt Pocock skills — see [mattpocock/skills](https://github.com/mattpocock/skills) for installation instructions.
 > - superpowers — see [obra/superpowers](https://github.com/obra/superpowers) for installation instructions.
-> - jameskill skills: install the `jameskill` plugin via the jameskill marketplace.
 >
 > Re-run `/jameskill:workflow` after installation completes.
 
@@ -130,15 +128,13 @@ Based on Phase 1 output, determine the nature of the work and route accordingly.
 
 | Route | When | Skill chain |
 |---|---|---|
-| **A. Bug** | Error reports, stack traces, "it used to work", reproducible broken behavior | `diagnose` |
-| **B. Exploration** | UI shape uncertain, data model needs experimentation | `prototype` |
-| **C. Large cross-session feature** | 3+ distinct modules, multiple sessions, AFK pickup intended | PRD + `jameskill:report-issue` (Notion) |
-| **D. Medium in-session feature** | Single coherent feature, multiple dependent tasks, one session | `writing-plans` → `subagent-driven-development` |
-| **E. Small clear feature** | Single contained change, requirements obvious | Phase 3 directly |
+| **DIAGNOSE** | Error reports, stack traces, "it used to work", reproducible broken behavior | `diagnose` |
+| **PROTOTYPE** | UI shape uncertain, data model needs experimentation | `prototype` |
+| **PRD** | Large feature, requirements need formalization, may span multiple sessions | local PRD → `writing-plans` → `subagent-driven-development` |
+| **PLAN** | Coherent feature, multiple dependent tasks, one session, no PRD needed | `writing-plans` → `subagent-driven-development` |
+| **DIRECT** | Single contained change, requirements obvious | Phase 3 directly (`tdd`) |
 
-### Route A: Bug → `diagnose`
-
-**Signal:** Error reports, stack traces, "it used to work", reproducible broken behavior.
+### Route DIAGNOSE — Bug → `diagnose`
 
 **MUST invoke `diagnose` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually. Follow its discipline:
 1. Reproduce the bug
@@ -150,23 +146,21 @@ Based on Phase 1 output, determine the nature of the work and route accordingly.
 
 After diagnose completes, proceed to **Phase 3.5** (skip Phase 3 — diagnose already includes the fix + test).
 
-### Route B: Exploration → `prototype`
-
-**Signal:** UI shape is uncertain, data model needs experimentation, "I'm not sure how this should work".
+### Route PROTOTYPE — Exploration → `prototype`
 
 **MUST invoke `prototype` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually. It will either:
 - Build a runnable terminal app (for state/logic questions)
 - Generate multiple UI variations (for design questions)
 
-After the user picks a direction from the prototype, proceed to **Phase 3**.
+After the user picks a direction from the prototype, proceed to **Phase 3** (or re-enter the router at Phase 2 with the prototype findings as input if the chosen direction warrants Route PRD or PLAN).
 
-### Route C: Large cross-session feature → PRD + vertical-slice Notion issues
+### Route PRD — Large feature → local PRD + plan + subagent execution
 
-**Signal:** Phase 1 output contains 3+ distinct tasks, spans multiple modules, or would take multiple sessions (often picked up later by an AFK agent).
+**Signal:** Phase 1 output contains 3+ distinct tasks, spans multiple modules, requirements need formalization as a PRD. May span multiple sessions — but cross-session pickup happens via the local PRD/plan files, not an external tracker.
 
-This route formalises requirements into a PRD that lives in the codebase, then breaks it into vertical-slice issues that get registered in Notion via `jameskill:report-issue`. No matt-tracker calls — Notion is the single source of truth.
+This route formalises requirements into a PRD that lives in the codebase, then breaks it into an execution plan, then executes the plan via subagents. No external tracker — git is the single source of truth.
 
-#### C.1: Write the PRD
+#### PRD.1: Write the PRD
 
 Save to `docs/prd/YYYY-MM-DD-<feature-slug>.md` using this template (adapted from matt's `to-prd`):
 
@@ -187,7 +181,7 @@ The solution from the user's perspective.
 - Modules to build/modify and their interfaces
 - Schema changes, API contracts, architectural decisions
 - Do NOT include specific file paths or code snippets (they go stale fast).
-- Exception: snippets from a Route B prototype that encode a decision more precisely than prose (state machine, reducer, schema, type shape) — inline trimmed and note the prototype origin.
+- Exception: snippets from a Route PROTOTYPE that encode a decision more precisely than prose (state machine, reducer, schema, type shape) — inline trimmed and note the prototype origin.
 
 ## Testing Decisions
 - What makes a good test (test external behavior, not implementation details)
@@ -198,73 +192,43 @@ The solution from the user's perspective.
 Things deliberately excluded from this PRD.
 ```
 
-Use the project's domain glossary from `CONTEXT.md` throughout. Respect any ADRs in `docs/adr/` for the area you're touching. Commit the PRD file before moving on (it counts as a Phase 0–2 docs artifact).
+Use the project's domain glossary from `CONTEXT.md` throughout. Respect any ADRs in `docs/adr/` for the area you're touching.
 
-#### C.2: Draft vertical-slice issues
+#### PRD.2: Write the execution plan
 
-Break the PRD into **tracer-bullet** issues — each is a thin vertical slice through every layer (schema → API → UI → tests), not a horizontal slice of one layer. Slices may be:
+**MUST invoke `writing-plans` via the Skill tool** to produce a local plan file (typically under `docs/plans/<feature-slug>.md`). The plan breaks the PRD into bite-sized tasks with explicit test → implement → commit steps, and notes dependencies between tasks.
 
-- **AFK** — an agent can pick up and merge with no human in the loop
-- **HITL** — requires human interaction (architectural decision, design review)
-
-Prefer AFK over HITL. Prefer many thin slices over few thick ones. Each completed slice must be demoable or verifiable on its own.
-
-For each proposed slice, draft:
-- **Title** — short, descriptive, uses domain glossary
-- **Type** — HITL or AFK
-- **Blocked by** — which other slices must complete first (or "None")
-- **Acceptance criteria** — 2–4 checkboxes covering the slice end-to-end
-- **User stories covered** — which PRD user stories this addresses
-
-#### C.3: Quiz the user
-
-Present the proposed breakdown as a numbered list with the fields above. Ask:
-- Does the granularity feel right? (too coarse / too fine)
-- Are the dependency relationships correct?
-- Should any slices be merged or split further?
-- Are HITL/AFK markers correct?
-
-Iterate until the user approves.
-
-#### C.4: Publish to Notion via `jameskill:report-issue`
-
-**MUST invoke `jameskill:report-issue` via the Skill tool**, passing the approved slices as the input prompt. Publish in **dependency order (blockers first)** so "Blocked by" fields can reference real Notion issue URLs.
-
-For each slice, hand report-issue a structured item containing:
-- The slice title (as the issue title)
-- A body composed of: "What to build" (concise end-to-end description), Acceptance criteria checkboxes, Blocked by reference (issue URL if already published, otherwise the slice title to be linked later), Type (HITL/AFK)
-
-If invocation fails or the skill is unavailable, STOP and report — do NOT fall back to manual Notion API calls.
-
-#### C.5: Stop
-
-**Do not attempt to implement all slices in one run.** Tell the user:
-
-> "PRD written to `<path>` and N vertical-slice issues registered in Notion. Pick up each one via `/jameskill:resolve-issue` — it will route back into this workflow per slice."
-
-### Route D: Medium in-session feature → `writing-plans` → `subagent-driven-development`
-
-**Signal:** single coherent feature that spans multiple tasks but fits in one session. Tasks may have dependencies. Cross-session Notion tracking would be overhead. Typical shape: 5–15 commits touching 2–4 files with shared state.
-
-**Why this route exists:** Route C's Notion round-trip is overhead when work doesn't need cross-session pickup. Phase 3 direct TDD becomes hard to manage when tasks have dependencies and the diff grows past ~10 commits. Route D fills the gap with local plan files and subagent isolation.
-
-#### D.1: Write the plan
-
-**MUST invoke `writing-plans` via the Skill tool** to produce a local plan file (typically under `docs/plans/<feature-slug>.md`). The plan breaks the feature into bite-sized tasks with explicit test → implement → commit steps.
-
-The plan file is a Phase 0–2 docs artifact — it gets sealed off in the Phase 2.5 baseline commit.
-
-#### D.2: Execute the plan
+#### PRD.3: Execute the plan
 
 **MUST invoke `subagent-driven-development` via the Skill tool** to execute the plan. Each task runs in a fresh subagent context with built-in spec-compliance and code-quality review loops.
 
 If a task returns `BLOCKED` or `NEEDS_CONTEXT`, surface it to the user — do NOT improvise.
 
-If invocation fails or the skill is unavailable, STOP and report — do NOT fall back to manual sequential implementation (use Route E for that).
+If invocation fails or the skill is unavailable, STOP and report — do NOT fall back to manual sequential implementation (use Route PLAN or DIRECT for that).
 
 After all tasks complete, proceed to **Phase 3.5** (skip Phase 3 — subagent-driven-development already includes implementation + per-task review).
 
-### Route E: Small clear feature → Phase 3 directly
+#### Cross-session pickup
+
+If the session ends mid-execution, the user resumes by running `/jameskill:workflow` with the plan file path as context. Phase 0 (grill-me) is skipped when the plan file already encodes the agreed problem statement. Re-invoking `subagent-driven-development` on the same plan picks up from incomplete tasks.
+
+### Route PLAN — Medium in-session feature → `writing-plans` → `subagent-driven-development`
+
+**Signal:** single coherent feature that spans multiple tasks but fits in one session. Tasks may have dependencies. No formal PRD needed. Typical shape: 5–15 commits touching 2–4 files with shared state.
+
+**Why this route exists separately from PRD:** when requirements are already clear from Phase 0–1, skip the PRD overhead and go straight to a plan file.
+
+#### PLAN.1: Write the plan
+
+**MUST invoke `writing-plans` via the Skill tool** to produce a local plan file (typically under `docs/plans/<feature-slug>.md`).
+
+#### PLAN.2: Execute the plan
+
+**MUST invoke `subagent-driven-development` via the Skill tool** — same discipline as PRD.3.
+
+After all tasks complete, proceed to **Phase 3.5**.
+
+### Route DIRECT — Small clear feature → Phase 3 directly
 
 **Signal:** None of the above. Requirements are clear, scope is contained (typically 1–4 commits, single file or tightly-grouped files), ready to build.
 
@@ -274,9 +238,16 @@ Proceed directly to **Phase 3**.
 
 ## Phase 2.5: Checkpoint — Commit docs baseline
 
-**Goal:** Seal off Phase 0–2 documentation work (CONTEXT.md, ADRs, terminology updates, Route D plan files) as a separate commit so Phase 4's review diff sees only code changes.
+**Goal:** Seal off Phase 0–2 documentation work (CONTEXT.md, ADRs, terminology updates, PRD files, plan files) as a separate commit so Phase 4's review diff sees only code changes.
 
-**Applies to:** Routes A, B, D, E. Route C exits before this phase.
+**Applies to:** all routes. Phase 2.5 runs after the route's spec artifacts are written but before any code is built or subagent execution starts.
+
+For each route, this means:
+- **DIAGNOSE** — runs after Phase 0–1 docs updates, before `diagnose` is invoked (or skipped if `diagnose` already creates its own fix commits)
+- **PROTOTYPE** — runs after prototype artifacts (`LOGIC.md` / `UI.md`) are committed alongside Phase 0–1 docs
+- **PRD** — runs after PRD.1 and PRD.2 produce the PRD file and plan file, before PRD.3 subagent execution
+- **PLAN** — runs after PLAN.1 produces the plan file, before PLAN.2 subagent execution
+- **DIRECT** — runs after Phase 0–1 docs updates, before Phase 3 tdd
 
 **Skip conditions:**
 - Not a git repository
@@ -285,11 +256,11 @@ Proceed directly to **Phase 3**.
 If the working tree has uncommitted documentation changes, create one commit scoped to docs only:
 
 ```bash
-git add CONTEXT.md docs/adr/ docs/plans/ <other-doc-paths>
+git add CONTEXT.md docs/adr/ docs/prd/ docs/plans/ <other-doc-paths>
 git commit -m "docs: capture domain context for <problem statement>"
 ```
 
-Record the resulting commit SHA — Phase 4.1 uses it as the baseline for the implementation diff.
+Record the resulting commit SHA — Phase 4 uses it as the baseline for the implementation diff.
 
 **Output:** Clean working tree, baseline commit SHA captured.
 
@@ -309,8 +280,8 @@ Before declaring the feature complete, invoke `verification-before-completion` t
 
 **Skip conditions:**
 - UI-only work with no testable logic — if the project's `CLAUDE.md`/`AGENTS.md` explicitly excludes UI tests, honour that
-- Route A already completed fix + test via `diagnose`
-- Route D already completed build + per-task review via `subagent-driven-development`
+- Route DIAGNOSE already completed fix + test via `diagnose`
+- Route PRD / PLAN already completed build + per-task review via `subagent-driven-development`
 
 **Output:** Working implementation with tests, verification gate passed.
 
@@ -320,15 +291,15 @@ Before declaring the feature complete, invoke `verification-before-completion` t
 
 **Goal:** Check whether the new code fits well structurally, and fix what can be fixed now.
 
-**MUST invoke `improve-codebase-architecture` via the Skill tool**, scoped to the files changed in Phase 3 (or Route A's diagnose, or Route D's subagent execution). If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
+**MUST invoke `improve-codebase-architecture` via the Skill tool**, scoped to the files changed in Phase 3 (or in DIAGNOSE's diagnose, or in PRD / PLAN's subagent execution). If invocation fails or the skill is unavailable, STOP and report — do NOT proceed manually.
 
 Review results and act:
 
 | Finding | Action |
 |---|---|
-| In scope of current work | Fix immediately (loop back to Phase 3 tdd, or Route D step 2) |
+| In scope of current work | Fix immediately (loop back to Phase 3 tdd, or PRD.3 / PLAN.2 subagent execution) |
 | Out of scope, small (1-2 lines) | Fix immediately |
-| Out of scope, large | Note for the user — suggest `/jameskill:report-issue` to track separately |
+| Out of scope, large | Note for the user — suggest `/jameskill:report-issue` to track separately in Notion |
 
 If any fixes are applied, invoke `verification-before-completion` before proceeding.
 
@@ -346,7 +317,7 @@ If any fixes are applied, invoke `verification-before-completion` before proceed
 
 - **BASE SHA** — the Phase 2.5 baseline commit (the docs commit captured before implementation began). If Phase 2.5 was skipped, fall back to the commit at which the workflow started.
 - **HEAD SHA** — current `HEAD`
-- **Spec sources** — the problem statement from Phase 0–1, the original issue body if invoked from `resolve-issue`, the PRD from Route C, or the plan file from Route D
+- **Spec sources** — the problem statement from Phase 0–1, the original issue body if invoked from `resolve-issue`, the PRD file from Route PRD, or the plan file from Route PRD / PLAN
 - **Standards sources** — `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CONTEXT.md`, `docs/adr/`. Machine-enforced standards (linter/formatter configs) — note them but don't re-check what tooling already enforces.
 
 If invocation fails or the skill is unavailable, STOP and report — do NOT fall back to manual inline review.
@@ -355,7 +326,7 @@ Triage findings:
 
 | Severity | Action |
 |---|---|
-| **Critical** | Fix immediately, loop back to Phase 3 (or Route D step 2), then re-run Phase 4 |
+| **Critical** | Fix immediately, loop back to Phase 3 (or PRD.3 / PLAN.2), then re-run Phase 4 |
 | **Important** | Fix unless the user explicitly defers |
 | **Minor** | Note in the Phase 5.2 commit body, suggest `/jameskill:report-issue` for follow-up |
 
@@ -376,7 +347,7 @@ If you believe a reviewer finding is technically wrong, follow `receiving-code-r
 - No new files or modules introduced
 - Phase 3.5 reported no out-of-scope findings
 
-Otherwise invoke the `simplify` skill on the Phase 4.1 diff. It reviews changed code for reuse, quality, and efficiency, then applies fixes. If it produces fixes, loop forward to Phase 5 for re-verification — do **not** re-trigger Phase 4 (the diff scope is unchanged).
+Otherwise invoke the `simplify` skill on the Phase 4 diff. It reviews changed code for reuse, quality, and efficiency, then applies fixes. If it produces fixes, loop forward to Phase 5 for re-verification — do **not** re-trigger Phase 4 (the diff scope is unchanged).
 
 **If `simplify` is unavailable in the session, skip with a note — this step is non-blocking.**
 
@@ -431,7 +402,7 @@ Once every check is green, commit the implementation as a single coherent change
 **Skip conditions:**
 - Not a git repository
 - No code changes to commit (e.g., docs-only workflow)
-- Route D already produced per-task commits via `subagent-driven-development` (in which case skip — the work is already captured)
+- Route PRD / PLAN already produced per-task commits via `subagent-driven-development` (in which case skip — the work is already captured)
 
 ```bash
 git add <implementation files>
@@ -468,12 +439,14 @@ If the skill is unavailable, STOP and ask the user — do NOT auto-merge or auto
 When invoked from resolve-issue:
 - Phase 0 receives the issue title + body as starting context
 - All phases proceed normally
-- On completion, control returns to resolve-issue for status transition + memo
+- On completion, control returns to resolve-issue for status transition + memo in Notion
+
+The workflow itself never reads from or writes to Notion — `resolve-issue` handles the Notion side, then hands the workflow a plain problem statement.
 
 ### Standalone usage
 
 When invoked directly via `/jameskill:workflow`:
-- User provides the problem/feature description as the argument
+- User provides the problem/feature description as the argument (or a path to an existing PRD / plan file for resuming cross-session work)
 - All phases proceed normally
 - On completion, summarize what was done
 
@@ -483,5 +456,5 @@ When invoked directly via `/jameskill:workflow`:
 
 If the user interrupts at any phase:
 - Work completed in prior phases (docs updates, tests, code) persists in the working tree
-- The user can resume by running `/jameskill:workflow` again with the same context
+- The user can resume by running `/jameskill:workflow` again with the same context (or with the PRD / plan file path for Routes PRD / PLAN)
 - No automatic state tracking — the user decides where to pick up
