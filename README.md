@@ -43,7 +43,9 @@ Structured development flow that orchestrates [Matt Pocock skills](https://githu
 
 **Phases** — clarify → grill → **route** → build → architecture → quality/security → independent code review → verify → finish.
 
-The router fans out by task type. **Tracker-free** — every artifact lives in the repo, cross-session work resumes from local PRD/plan files.
+The router fans out by task type. **Tracker-free** — the workflow itself never reads or writes Notion (use `/resolve-issue` separately if Notion integration is needed). Every artifact lives in the repo.
+
+> **Resume across sessions**: `/workflow docs/plans/<feature>.md` (or `docs/prd/...md`) — re-enters the plan and picks up from incomplete tasks.
 
 | Route | When | Skill chain |
 |---|---|---|
