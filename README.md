@@ -76,6 +76,38 @@ claude plugins marketplace add https://github.com/jameskyeong/jameskill.git
 claude plugins install mekaknight
 ```
 
+## Migrating from v1.x
+
+v2.0.0-alpha.3 introduces a full rebrand and command rename. See [ADR 0002](docs/adr/0002-mekaknight-rebrand.md) for the rationale.
+
+**Brand**
+
+- Package: `jameskill` → `mekaknight`
+- Namespace: `/jameskill:*` → `/mekaknight:*`
+
+**Command mapping**
+
+| v1 | v2 |
+|---|---|
+| `/jameskill:temper` | `/mekaknight:forge` |
+| `/jameskill:harden` | `/mekaknight:lock` |
+| `/jameskill:ship-ready` | `/mekaknight:launch` |
+| `/jameskill:setup-issue` | `/mekaknight:link` |
+| `/jameskill:report-issue` | `/mekaknight:tag` |
+| `/jameskill:resolve-issue` | `/mekaknight:strike` |
+
+**Install change**
+
+```bash
+# v1
+claude plugins install jameskill
+
+# v2
+claude plugins install mekaknight
+```
+
+The v1.x legacy orchestrator remains available as `/mekaknight:workflow-external` for users who depended on the Matt Pocock + superpowers skill chain.
+
 ## Requirements
 
 - [Claude Code](https://claude.ai/claude-code)
