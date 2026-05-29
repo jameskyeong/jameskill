@@ -5,6 +5,8 @@ Notion issue tracker integration for Claude Code.
 ## Available Skills
 
 - `/temper` — Self-contained development orchestrator: clarify → build-with-tests → verify → finish. Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
+- `/harden` — Inspect a project for vibe-stack security holes (Supabase RLS gaps, secret-key client exposure, missing webhook signature verification). Reports PASS/WARN/BLOCK with fix suggestions.
+- `/ship-ready` — One-line GO / NO-GO deploy verdict. Aggregates inspection findings (currently `/harden`) into a single binary decision.
 - `/report-issue` — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
 - `/resolve-issue` — Fetch pending issues, brainstorm solutions, implement fixes, update status.
 - `/setup-issue` — Configure Notion API key, connect databases, detect templates, set defaults.
