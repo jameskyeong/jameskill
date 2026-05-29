@@ -1,20 +1,20 @@
 ---
-name: jameskill:harden
+name: mekaknight:lock
 description: >-
-  Inspect a vibe-coded project for service-configuration security holes that
+  Inspect a project for service-configuration security holes that
   code scanners (semgrep, Snyk) miss: Supabase RLS gaps, secret-key client
   exposure, and missing webhook signature verification. Reports PASS/WARN/BLOCK
-  with fix suggestions. Use when: 'harden', 'security check', 'check my app',
+  with fix suggestions. Use when: 'lock', 'security check', 'check my app',
   'is this safe to ship'.
 ---
 
-# Harden — Vibe-Stack Security Inspection
+# Lock — Service Configuration Security Inspection
 
 Inspects **the current project** for service-configuration security holes that code-pattern scanners cannot catch.
 
-**What this is NOT:** This does not scan for code-level vulnerabilities like XSS or SQL injection — that's semgrep's job. Harden catches the *configuration* mistakes a vibe coder makes: a database table left world-readable, a secret key bundled into the browser, a payment webhook that trusts forged requests.
+**What this is NOT:** This does not scan for code-level vulnerabilities like XSS or SQL injection — that's semgrep's job. Lock catches the *configuration* mistakes that pattern scanners cannot see: a database table left world-readable, a secret key bundled into the browser, a payment webhook that trusts forged requests.
 
-**Target:** the project in the current working directory (a user's app — typically Next.js + Supabase + Stripe), not jameskill itself.
+**Target:** the project in the current working directory (a user's app — typically Next.js + Supabase + Stripe), not mekaknight itself.
 
 **v0.1 scope:** 3 checks. Five more checks (Clerk/NextAuth env strength, frontend-only auth, raw-body parse order, plan-limit enforcement, webhook idempotency) arrive in v0.2.
 
@@ -48,7 +48,7 @@ If neither exists → `⏭️  SKIP (not applicable)`.
 If `supabase` CLI is installed and the project is linked:
 
 ```bash
-supabase db dump --schema public 2>/dev/null > /tmp/harden_schema.sql
+supabase db dump --schema public 2>/dev/null > /tmp/lock_schema.sql
 ```
 
 ### Strategy B — migration / schema file fallback
@@ -161,7 +161,7 @@ grep -n "constructEvent\|stripe.webhooks.constructEvent" <file>
 After all checks, print:
 
 ```
-🛡️  HARDEN — <project name>
+🔒 LOCK — <project name>
 
 Check 1 — Supabase RLS:          <status>
 Check 2 — Secret key exposure:   <status>
@@ -176,7 +176,7 @@ Check 3 — Stripe webhook:        <status>
 ⚠️  Warnings (<n>):
   • ...
 
-For a GO/NO-GO verdict, run /jameskill:ship-ready.
+For a GO/NO-GO verdict, run /mekaknight:launch.
 ```
 
 If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Never invent findings — only report what the evidence shows.

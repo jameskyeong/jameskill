@@ -1,12 +1,12 @@
 ---
-name: jameskill:resolve-issue
+name: mekaknight:strike
 description: >-
   Fetch pending issues from Notion, brainstorm solutions, implement fixes,
-  and update issue status. Use when: 'resolve-issue', 'resolve issues',
+  and update issue status. Use when: 'strike', 'engage', 'resolve issues',
   'work on pending issues'.
 ---
 
-# Notion Issue Resolve Skill
+# Strike — Notion Issue Resolve
 
 Queries pending issues from the Notion issue tracker DB, then walks through brainstorming, implementation, and status transitions for the issue(s) the user selects.
 
@@ -21,7 +21,7 @@ Read `.claude/tracking-issue.json` from the project root and extract mapped prop
 ```bash
 CONFIG=".claude/tracking-issue.json"
 if [ ! -f "$CONFIG" ]; then
-  echo "Configuration required. Please run /setup-issue first."
+  echo "Configuration required. Please run /mekaknight:link first."
   exit 1
 fi
 
@@ -40,7 +40,7 @@ IN_PROGRESS_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.in
 DEPLOY_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.readyToDeploy')
 ```
 
-If the config file is missing, **stop immediately** and direct the user to run `/setup-issue`.
+If the config file is missing, **stop immediately** and direct the user to run `/mekaknight:link`.
 
 **Security:** NEVER echo, print, or output the `NOTION_KEY` value. Pass it only as a shell variable in curl calls.
 
@@ -246,14 +246,14 @@ Extract `rich_text[].plain_text` from each block in `.results[]` to compose the 
 
 ### 6b. Invoke workflow
 
-**Single issue** — invoke `jameskill:temper` with:
+**Single issue** — invoke `mekaknight:forge` with:
 ```
 [Issue title]
 
 [Issue body — text from block children]
 ```
 
-**Grouped issues (2+)** — invoke `jameskill:temper` once for the entire group with a structured multi-issue prompt:
+**Grouped issues (2+)** — invoke `mekaknight:forge` once for the entire group with a structured multi-issue prompt:
 ```
 Below are N related issues to handle together.
 
@@ -267,9 +267,9 @@ Derive the group's common context in Clarify,
 but address every individual issue in Build without omission.
 ```
 
-The temper skill handles the full cycle: clarify → route (direct/plan) → build-with-tests → peer-review → verify → finish.
+The forge skill handles the full cycle: clarify → route (direct/plan) → build-with-tests → peer-review → verify → finish.
 
-**If `jameskill:temper` is not available:** Inform the user that the temper skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
+**If `mekaknight:forge` is not available:** Inform the user that the forge skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
 
 Once the workflow completes and the user confirms "done", proceed to Step 7.
 
@@ -342,7 +342,7 @@ If there are remaining groups, proceed to the next group (back to Step 5c → St
 
 If the user interrupts mid-work:
 - The current issue's status **remains "In Progress"** (already changed in Step 5 before brainstorming)
-- On the next `/resolve-issue` call, the issue will appear in the **⏳ In Progress section** so work can resume
+- On the next `/mekaknight:strike` call, the issue will appear in the **⏳ In Progress section** so work can resume
 - No special abort handler is needed
 
 ---
@@ -351,7 +351,7 @@ If the user interrupts mid-work:
 
 | Situation | Message |
 |---|---|
-| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/setup-issue` first." |
+| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/mekaknight:link` first." |
 | Invalid API key (401 response) | "Notion API key is invalid. Please verify your token." |
 | DB inaccessible (403/404 response) | "Cannot access the database. Please verify the integration is connected to this DB." |
 | 0 issues found | "No pending issues found." |
