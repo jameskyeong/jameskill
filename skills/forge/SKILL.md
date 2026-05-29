@@ -1,19 +1,19 @@
 ---
-name: jameskill:temper
+name: mekaknight:forge
 description: >-
   Self-contained development orchestrator: clarify → build-with-tests → verify → finish.
   Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
-  Use when: 'temper', 'start working on', 'implement this', 'fix this', 'build this'.
-  Also invoked by resolve-issue after issue selection.
+  Use when: 'forge', 'start working on', 'implement this', 'fix this', 'build this'.
+  Also invoked by strike after issue selection.
 ---
 
-# Temper — Development Orchestrator
+# Forge — Development Orchestrator
 
 Self-contained development orchestrator that takes raw requirements through a disciplined pipeline to produce hardened, production-grade code. No external skill dependencies.
 
-Named after the metallurgical process of repeatedly heating and cooling metal to maximize strength. Each phase hammers the code into shape — one strike at a time.
+Named after the act of forging at the anvil — each phase hammers the code into shape, one strike at a time.
 
-**For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/jameskill:workflow-external`.**
+**For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/mekaknight:workflow-external`.**
 
 ---
 
@@ -56,15 +56,15 @@ The following phrases are **banned** in any completion claim. If you catch yours
 
 ## Preflight: Environment check
 
-**Goal:** Confirm the project can support temper's disciplined pipeline before starting.
+**Goal:** Confirm the project can support forge's disciplined pipeline before starting.
 
 Run these checks and report results:
 
 1. **Git repository**: `git rev-parse --git-dir`
-   - If not a git repo → **HALT**: "This directory is not a git repository. Temper requires git for docs checkpoints and finish."
+   - If not a git repo → **HALT**: "This directory is not a git repository. Forge requires git for docs checkpoints and finish."
 
 2. **Test runner**: check for test scripts in `package.json`, `Makefile`, `pyproject.toml`, or equivalent
-   - If no test runner found → **HALT**: "No test runner detected. Temper enforces strict TDD — a test runner is required. Set up your test framework first, then re-run `/temper`."
+   - If no test runner found → **HALT**: "No test runner detected. Forge enforces strict TDD — a test runner is required. Set up your test framework first, then re-run `/forge`."
    - Report which test command was detected (e.g., `npm test`, `pytest`, `go test`)
 
 3. **Type checker** (optional): check for `tsconfig.json`, `mypy.ini`, `pyrightconfig.json`, or equivalent
@@ -81,7 +81,7 @@ Run these checks and report results:
 
 **Goal:** Reach shared understanding with zero ambiguity remaining.
 
-If invoked from `jameskill:resolve-issue`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
+If invoked from `mekaknight:strike`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
 
@@ -126,7 +126,7 @@ If the work matches these patterns, inform the user and suggest alternatives:
 
 - **Bug / diagnosis**: "This looks like a bug to diagnose. Consider using `mattpocock-skills:diagnose` for systematic root cause analysis, or describe the reproduction steps and I'll investigate directly."
 - **UI exploration / prototype**: "This needs design exploration. Consider using `mattpocock-skills:prototype` to try multiple approaches, or describe the constraints and I'll propose options."
-- **Large multi-session feature**: "This is large enough to need a PRD. Consider writing one in `docs/prd/` and breaking it into multiple `/temper` sessions, or use `superpowers:writing-plans` for structured planning."
+- **Large multi-session feature**: "This is large enough to need a PRD. Consider writing one in `docs/prd/` and breaking it into multiple `/forge` sessions, or use `superpowers:writing-plans` for structured planning."
 
 ### Route: DIRECT
 
@@ -183,7 +183,7 @@ If a task is blocked or unclear, surface it to the user — do NOT improvise.
 
 #### Cross-session pickup
 
-If the session ends mid-execution, the user resumes by running `/temper` with the plan file path as argument. Clarify and Route are skipped — Build picks up from the first incomplete task.
+If the session ends mid-execution, the user resumes by running `/forge` with the plan file path as argument. Clarify and Route are skipped — Build picks up from the first incomplete task.
 
 ---
 
@@ -330,7 +330,7 @@ git add <implementation files>
 git commit -m "<type>: <description>"
 ```
 
-If invoked from `resolve-issue`, include the issue reference in the commit message.
+If invoked from `strike`, include the issue reference in the commit message.
 
 Skip if: not a git repo, no changes to commit, or PLAN route already produced per-task commits.
 
@@ -343,7 +343,7 @@ Present 4 options to the user:
 3. **Keep branch** — Work is paused or not ready to merge. Leave the branch as-is.
 4. **Discard** — Work is throwaway (e.g., informed a decision but won't be shipped). Delete the branch.
 
-If invoked from `resolve-issue`, note that resolve-issue will handle status transition after this step.
+If invoked from `strike`, note that strike will handle status transition after this step.
 
 Do NOT auto-merge or auto-push without the user's explicit choice.
 
@@ -356,11 +356,11 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 
 ## Caller integration
 
-### From `jameskill:resolve-issue`
+### From `mekaknight:strike`
 
 - Clarify receives the issue title + body as starting context
 - All phases proceed normally
-- On completion, control returns to resolve-issue for Notion status transition
+- On completion, control returns to strike for Notion status transition
 
 ### Standalone usage
 
@@ -374,5 +374,5 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 
 If the user interrupts at any phase:
 - Work completed in prior phases (docs, tests, code) persists in the working tree
-- Resume by running `/temper` again with the same context or plan file path
+- Resume by running `/forge` again with the same context or plan file path
 - No automatic state tracking — the user decides where to pick up

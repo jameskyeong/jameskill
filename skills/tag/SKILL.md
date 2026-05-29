@@ -1,12 +1,12 @@
 ---
-name: jameskill:report-issue
+name: mekaknight:tag
 description: >-
   Report issues to a Notion database from a prompt. Parses multiple issues,
   verifies against the codebase, creates pages with proper template blocks.
-  Use when: 'report-issue', 'report issues', 'log issues'.
+  Use when: 'tag', 'report issues', 'log issues'.
 ---
 
-# Issue Report (report-issue)
+# Tag — Notion Issue Report
 
 Report issues from a prompt to a Notion DB.
 Reference docs are in the `../issue-references/` folder:
@@ -22,7 +22,7 @@ Check that `.claude/tracking-issue.json` exists. If missing, stop immediately.
 
 ```bash
 if [ ! -f .claude/tracking-issue.json ]; then
-  echo "Configuration required. Please run /setup-issue first."
+  echo "Configuration required. Please run /mekaknight:link first."
   exit 1
 fi
 ```
@@ -453,15 +453,15 @@ Failed:
 
 Omit the failed section if all succeed. Omit the succeeded section if all fail.
 
-### Link to Resolve Skill
+### Link to Strike Skill
 
 After outputting the result summary, ask about implementation:
 
 ```
-Would you like to proceed with implementation? (/resolve-issue)
+Would you like to proceed with implementation? (/mekaknight:strike)
 ```
 
-If the user agrees, invoke the `/resolve-issue` skill.
+If the user agrees, invoke the `/mekaknight:strike` skill.
 If declined, end here.
 
 ---
@@ -488,7 +488,7 @@ Specific error messages by situation:
 
 | Situation | Message |
 |---|---|
-| Config file missing | "Configuration required. Please run `/setup-issue` first." |
+| Config file missing | "Configuration required. Please run `/mekaknight:link` first." |
 | Invalid API key (401) | "Notion API key is invalid. Please verify your token." |
 | DB access denied (403/404) | "Cannot access DB. Verify the Integration is connected to the target DB." |
 | Required property missing | "DB schema validation failed: required property missing: [{property}] ([{type}]) — required options: [{options}]" |
@@ -516,5 +516,5 @@ Specific error messages by situation:
    b. PATCH /blocks/children (add body)
 10. Retry failed issues once
 11. Output result summary
-12. Ask about /resolve-issue
+12. Ask about /mekaknight:strike
 ```
