@@ -1,11 +1,11 @@
-# jameskill v2.0 — Roadmap
+# mekaknight v2.0 — Roadmap
 
 > 3-4개월 풀집중 + 본업(i-screammedia) dogfooding 활용.
 > 출시 패턴: 매 3주마다 한 스킬 단위 trickle release + 최종 v2.0.0 통합 출시.
 
 ## 핵심 원칙
 
-1. **가장 화제성 높은 것부터** — `/ship-ready?` + `/auth-check` + `/polish` 순서. 트위터/HN에서 매 3주마다 새 이슈 만들기.
+1. **가장 화제성 높은 것부터** — `/launch` + `/auth-check` + `/polish` 순서. 트위터/HN에서 매 3주마다 새 이슈 만들기.
 2. **dogfooding 우선** — 본업 프로젝트에 즉시 적용. 사례·스크린샷 누적이 곧 마케팅 콘텐츠.
 3. **lite workflow는 마지막** — 의존성 제거는 시간 부담 큼. 화제성 큰 스킬을 먼저 만들고, workflow 자체는 v2.0 직전에 깎음.
 4. **출시는 v2.0.0 통합 1회** — 매 스킬 점진 release(v1.12, v1.13)하면 마케팅 모멘텀 분산. 대신 트위터/디스코드에서 **개발 과정 자체를 콘텐츠화** (build in public).
@@ -13,7 +13,7 @@
 ## 타임라인
 
 ```
-Week 1-3   ──┬──  🔒 /auth-check + /ship-ready? skeleton
+Week 1-3   ──┬──  🔒 /auth-check + /launch skeleton
              │     "vibe coded app 보안 사고 자동 점검" 1차 데모
              │
 Week 4-6   ──┼──  🎨 /polish (AI Score)
@@ -22,8 +22,8 @@ Week 4-6   ──┼──  🎨 /polish (AI Score)
 Week 7-9   ──┼──  🧹 /dedupe + /cohesion-check
              │     "내 AI가 같은 함수 5개 만들었다" 사례
              │
-Week 10-12 ──┼──  🚦 /ship-check 통합 + 우산 명령 완성
-             │     /ship-ready-security 통합
+Week 10-12 ──┼──  🚦 /launch-check 통합 + 우산 명령 완성
+             │     /launch-security 통합
              │
 Week 13-14 ──┼──  🛠 lite workflow 자체 구현
              │     superpowers/Matt Pocock 의존 제거
@@ -34,7 +34,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 
 ## 마일스톤 상세
 
-### M1 (Week 1-3) — `/auth-check` + `/ship-ready?` skeleton
+### M1 (Week 1-3) — `/auth-check` + `/launch` skeleton
 
 **목표**: 가장 화제성 높은 스킬 2개의 MVP. 트위터에서 첫 화제 만들기.
 
@@ -48,15 +48,15 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
   - Supabase RLS 정책 dump 파싱
   - service key 클라이언트 노출 grep
   - Stripe webhook signature 검증 패턴 AST
-- `/ship-ready?` v0.1 — `/auth-check` 결과 → GO/NO-GO 1줄 판정
+- `/launch` v0.1 — `/auth-check` 결과 → GO/NO-GO 1줄 판정
 
 **작업 (Week 3)**:
 - `/auth-check` v0.2: Clerk/NextAuth env 강도, frontend-only auth
-- `/ship-ready?` v0.2: 막힌 항목 리스트 + auto-fix 제안 흉내
+- `/launch` v0.2: 막힌 항목 리스트 + auto-fix 제안 흉내
 - **본업 dogfooding** — i-screammedia 프로젝트 1개 적용. 발견 항목 스크린샷.
 
 **완료 기준**:
-- 본업 프로젝트 1개에서 `/ship-ready?` 호출 → 실제 결함 1개 이상 발견
+- 본업 프로젝트 1개에서 `/launch` 호출 → 실제 결함 1개 이상 발견
 - 트위터 데모 영상 1개 녹화
 
 **dogfooding 대상**:
@@ -126,29 +126,29 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 - LLM 의도 클러스터링의 false positive. 사용자 확인 UI 강제
 - Extraction plan의 호출처 변경 안전성 — Auto-apply 보수적으로 (옵트인)
 
-### M4 (Week 10-12) — `/ship-check` 통합 + `/ship-ready-security`
+### M4 (Week 10-12) — `/launch-check` 통합 + `/launch-security`
 
 **목표**: 우산 명령 완성. 보안 + 디자인 + 품질을 하나의 흐름으로.
 
 **작업 (Week 10)**:
-- `/ship-check` v0.1: 보안/디자인/품질 3개 영역 한 번에 호출 + 1분 요약
+- `/launch-check` v0.1: 보안/디자인/품질 3개 영역 한 번에 호출 + 1분 요약
 - 출력 형식 디자인 — 트위터에 공유하고 싶은 모양
 
 **작업 (Week 11)**:
-- `/ship-ready-security` 완성:
+- `/launch-security` 완성:
   - semgrep MCP wrap (Claude Code plugin 호출)
   - GitGuardian wrap (또는 fallback regex)
   - `/auth-check` 호출 + 종합 GO/NO-GO
 - 우선순위 정책 (Critical만 차단 default, --strict 옵션)
 
 **작업 (Week 12)**:
-- 이슈 트래커 통합: `/ship-check` 발견 항목 자동 Notion 등록
-- `/resolve-issue` 완료 시 `/ship-ready?` 자동 호출
+- 이슈 트래커 통합: `/launch-check` 발견 항목 자동 Notion 등록
+- `/strike` 완료 시 `/launch` 자동 호출
 - **본업 dogfooding** — 본업 프로젝트 1개의 출하 전 점검 전체 사이클
 
 **완료 기준**:
-- 본업 프로젝트 1개에서 `/ship-check` → 발견 → Notion 등록 → `/resolve-issue` → `/ship-ready?` PASS 한 사이클 완주
-- 트위터 영상 1개 ("from /ship-check to /ship-ready PASS")
+- 본업 프로젝트 1개에서 `/launch-check` → 발견 → Notion 등록 → `/strike` → `/launch` PASS 한 사이클 완주
+- 트위터 영상 1개 ("from /launch-check to /launch PASS")
 
 **dogfooding 대상**:
 - 본업의 출시 직전 프로젝트
@@ -164,7 +164,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 
 **작업 (Week 14)**:
 - `peer-review` 자체 구현 (간단 subagent 리뷰)
-- `/workflow`가 `/ship-check`를 마무리 직전에 자동 호출하도록 통합
+- `/workflow`가 `/launch-check`를 마무리 직전에 자동 호출하도록 통합
 - 기존 workflow phase -1 (superpowers 의존 체크) 제거
 
 **완료 기준**:
@@ -182,7 +182,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 **작업 (Week 15)**:
 - README 전면 재작성 (영어 우선, AI 보조 편집)
 - 핵심 데모 영상 3개:
-  - `/ship-ready?` 30초 데모
+  - `/launch` 30초 데모
   - `/polish` Before/After
   - 본업 dogfooding 사례 1개 (1-2분)
 - marketplace 등록 신청 (Anthropic 공식 + claudemarketplaces.com)
@@ -195,7 +195,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
   - PH 등록
   - Reddit r/ClaudeAI, r/programming
   - X (트위터) 출시 thread
-  - Korean Dev community: 인프런/디스코드/디스코드 jameskill 채널
+  - Korean Dev community: 인프런/디스코드/디스코드 mekaknight 채널
 - 출시 후 1주일 트위터 일일 후속 (사용자 반응 → 즉시 수정 → 트윗)
 
 **완료 기준**:
@@ -205,7 +205,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 
 ## 본업 dogfooding 전략
 
-**전제**: 본업(i-screammedia)에서 jameskill 적용 가능 = 페이스 ×2 효과.
+**전제**: 본업(i-screammedia)에서 mekaknight 적용 가능 = 페이스 ×2 효과.
 
 **적용 패턴**:
 
@@ -214,7 +214,7 @@ Week 15-16 ──┴──  📦 v2.0.0 통합 출시
 | M1 (`/auth-check`) | 본업의 최근 vibe coding 프로젝트 1개 |
 | M2 (`/polish`) | 본업의 최근 출시한 화면 2-3개 |
 | M3 (`/dedupe`) | 본업의 가장 큰 컴포넌트 / 가장 오래된 모듈 |
-| M4 (`/ship-check`) | 본업의 출시 직전 프로젝트 |
+| M4 (`/launch-check`) | 본업의 출시 직전 프로젝트 |
 | M5 (lite workflow) | 본업의 신규 기능 개발 |
 
 **dogfooding이 만드는 콘텐츠**:

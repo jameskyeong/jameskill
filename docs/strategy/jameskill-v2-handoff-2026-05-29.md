@@ -1,5 +1,7 @@
 # jameskill v2.0 — Handoff Document
 
+> ⚠️ Historical document — written under v1 names. See [ADR 0002](../adr/0002-mekaknight-rebrand.md) for the v2 rebrand. Command mapping: `temper`→`forge`, `harden`→`lock`, `ship-ready`→`launch`, `setup-issue`→`link`, `report-issue`→`tag`, `resolve-issue`→`strike`.
+
 > **From**: 개인 PC (`yjg.local`, 2026-05-28~29 세션)
 > **To**: 회사 PC (다음 세션, 동일 사용자)
 > **Picked up at**: M1 (Week 1-3) 작업 시작 직전

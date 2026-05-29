@@ -1,5 +1,7 @@
 # jameskill v2.0 — Handoff (Week 1-2 완료 시점)
 
+> ⚠️ Historical document — written under v1 names. See [ADR 0002](../adr/0002-mekaknight-rebrand.md) for the v2 rebrand. Command mapping: `temper`→`forge`, `harden`→`lock`, `ship-ready`→`launch`, `setup-issue`→`link`, `report-issue`→`tag`, `resolve-issue`→`strike`.
+
 > **작성**: 2026-05-29 오후 세션 (회사 PC, Opus 4.8)
 > **이전 핸드오프**: `jameskill-v2-handoff-2026-05-29.md` (전략 산출물 완료 시점)
 > **현재 위치**: M1 Week 2 완료 → **Week 3 시작 직전**

@@ -1,11 +1,11 @@
-# jameskill v2.0 — Vision
+# mekaknight v2.0 — Vision
 
 > 작성일: 2026-05-28
 > 상태: Draft (사용자 결정 기반, 모호 항목은 TBD로 표시)
 
 ## 한 줄 정체성
 
-> **jameskill — The production-readiness layer for AI-built apps.**
+> **mekaknight — The production-readiness layer for AI-built apps.**
 
 한국어 부캐: *"AI가 만든 화면을, 운영 들어가도 안 죽게 만든다."*
 
@@ -24,7 +24,7 @@
 
 ### 경쟁 지형의 자리
 
-| 진영 | 자리 | jameskill과의 관계 |
+| 진영 | 자리 | mekaknight과의 관계 |
 |---|---|---|
 | obra/superpowers (210k★) | 방법론 스택 (brainstorm → plan → tdd → review) | 그들은 *개발 중* 루프. 우리는 *출하 직전* 게이트 |
 | Matt Pocock (110k★) | 엔지니어용 작고 조합 가능한 스킬 | 그들은 엔지니어 페르소나. 우리는 **vibe coder + 시니어 양쪽** |
@@ -53,12 +53,12 @@
 - 표준화된 audit 체크리스트가 필요
 
 ### 페르소나가 동시에 만족되는 이유
-- vibe coder가 `/ship-ready?` 한 번 누르면 → 시니어가 PR에서 다시 점검할 필요 없음
+- vibe coder가 `/launch` 한 번 누르면 → 시니어가 PR에서 다시 점검할 필요 없음
 - "AI Score 87/100" 같은 정량화는 둘 다에게 유효
 
 ## 게임 모드: 영향력 + 카탈로그 하이브리드
 
-- **영향력 축 (의견 있는 핵심 스킬)**: `/ship-ready?`, `/polish`, `/auth-check` — 매일 외우는 슬로건이 됨
+- **영향력 축 (의견 있는 핵심 스킬)**: `/launch`, `/polish`, `/auth-check` — 매일 외우는 슬로건이 됨
 - **카탈로그 축 (보조 스킬)**: 영역별 깊은 스킬 — v2.1, v2.2에서 누적
 
 ## 시장 규모 (추정)
@@ -74,7 +74,7 @@
 | 언어 | 글로벌 우선 (영어 README/이슈) + 한국어 부캐 (블로그/디스코드) |
 | 페이스 | 3-4개월 풀집중 |
 | 의존성 | superpowers / Matt Pocock 의존 제거 (자체 스킬셋) |
-| 이름 | jameskill 유지 + 강한 서브타이틀 |
+| 이름 | mekaknight 유지 + 강한 서브타이틀 |
 | MVP | ~10개 스킬 (영역당 1-2개 + 우산 + lite 워크플로우) |
 | 트래커 | Notion + GitHub Issues + Linear 백엔드 확장, 깊은 통합 |
 
@@ -85,7 +85,7 @@
 | 영어 콘텐츠 작성 방식 (AI 보조 vs 직접) | v2-marketing.md |
 | 본업(i-screammedia) dogfooding 범위/사례 | v2-roadmap.md |
 | `/polish`의 Vision 모델 호출 비용/속도 | v2-skill-catalog.md |
-| `/ship-ready?` 판정 기준의 정량적 임계값 | v2-skill-catalog.md |
+| `/launch` 판정 기준의 정량적 임계값 | v2-skill-catalog.md |
 | 트래커 백엔드 확장 시점 (v2.0 vs v2.1) | v2-roadmap.md |
 | 마케팅 채널 우선순위 (HN/PH/Reddit/Twitter) | v2-marketing.md |
 
@@ -94,7 +94,7 @@
 | 위험 | 완화 |
 |---|---|
 | Anthropic이 통합 production-readiness 플러그인을 직접 출시 | 6-12개월 안에 카테고리 인지 굳히기. Anthropic의 인접 출시는 오히려 카테고리 검증 신호로 활용 |
-| 청중 0에서 시작 — 콘텐츠 마케팅 부담 | product-led growth, `/ship-ready?` 결과 자체가 공유되는 메커니즘 설계 |
+| 청중 0에서 시작 — 콘텐츠 마케팅 부담 | product-led growth, `/launch` 결과 자체가 공유되는 메커니즘 설계 |
 | 영어 콘텐츠 작성 자신감 부족 | README/이슈는 AI 보조, 트위터는 product 결과물 스크린샷 위주 |
 | superpowers / Matt Pocock 사용자의 "왜 또 다른 스킬?" 회의 | "그들이 안 하는 것" 명확화 — *그들은 개발 중, 우리는 출하 직전 게이트* |
-| jameskill의 기존 4개 스킬 사용자에게 v2.0 전환 부담 | 트래커 스킬은 유지, workflow만 점진적 재설계, Major bump (2.0.0) 명시 |
+| mekaknight의 기존 4개 스킬 사용자에게 v2.0 전환 부담 | 트래커 스킬은 유지, workflow만 점진적 재설계, Major bump (2.0.0) 명시 |

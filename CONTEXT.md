@@ -1,48 +1,62 @@
-# jameskill
+# mekaknight
 
-Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/jameskill:<skill-name>` in Claude Code sessions.
+Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/mekaknight:<skill-name>` in Claude Code sessions.
 
 ## Language
 
 ### Orchestration
 
-**Temper**:
-The development orchestrator skill (`/jameskill:temper`). Takes raw requirements through a disciplined pipeline — clarify → build → review → verify → finish — to produce hardened, production-grade code. Named after the metallurgical process of repeatedly heating and cooling metal to maximize strength.
-_Avoid_: workflow (ambiguous — see Flagged Ambiguities)
+**Forge**:
+The development orchestrator skill (`/mekaknight:forge`). Takes raw requirements through a disciplined pipeline — clarify → build → review → verify → finish — to produce production-grade code. Named after the act of forging at the anvil: each phase hammers the code into shape, one strike at a time.
+_Avoid_: workflow (ambiguous — see Flagged Ambiguities), temper (v1 name, retired)
 
 **Production-readiness gate**:
-The architectural concept spanning the entire jameskill v2.0 pipeline: **temper** builds the code, **ship-check** inspects it across dimensions, **ship-ready** issues the final verdict. Not a single skill — the emergent property of all three working in sequence.
+The architectural concept spanning the entire mekaknight v2.0 pipeline: **forge** builds the code, **launch-check** inspects it across dimensions (planned), **launch** issues the final verdict. Not a single skill — the emergent property of all three working in sequence.
 _Avoid_: workflow, pipeline (too generic)
 
 **Cross-cutting verify gate**:
-A discipline enforced at every phase boundary within **temper**: no phase may declare completion without running verification commands and directly observing the output. "Should work" and "seems to pass" are treated as "not verified."
+A discipline enforced at every phase boundary within **forge**: no phase may declare completion without running verification commands and directly observing the output. "Should work" and "seems to pass" are treated as "not verified."
 _Avoid_: check, validation (too vague)
 
 ### Routing
 
 **DIRECT**:
-A **temper** routing decision for small, contained changes (1-4 commits, tightly-grouped files). Skips plan file creation and proceeds straight to build.
+A **forge** routing decision for small, contained changes (1-4 commits, tightly-grouped files). Skips plan file creation and proceeds straight to build.
 _Avoid_: simple, small (subjective)
 
 **PLAN**:
-A **temper** routing decision for medium-scope features (5-15 commits, 2-4 files with shared state). Produces a plan file in `docs/plans/` before sequential task execution.
+A **forge** routing decision for medium-scope features (5-15 commits, 2-4 files with shared state). Produces a plan file in `docs/plans/` before sequential task execution.
 _Avoid_: roadmap, spec (different things)
 
 ### Inspection
 
-**Harden**:
-Inspection engine (`/jameskill:harden`) that checks a target project for vibe-stack service-configuration security holes — Supabase RLS gaps, secret-key client exposure, missing webhook signature verification. Catches what code scanners (semgrep) miss: configuration mistakes, not code patterns. Named for metallurgical hardening, continuing the temper theme.
-_Avoid_: auth-check (too narrow — most checks are not auth), secure (implies it covers all security; it covers ~1/3, the rest is semgrep + secret scanning)
+**Lock**:
+Inspection engine (`/mekaknight:lock`) that checks a target project for service-configuration security holes — Supabase RLS gaps, secret-key client exposure, missing webhook signature verification. Catches what code scanners (semgrep) miss: configuration mistakes, not code patterns. Named for the lockdown step before a mech sortie — sealing every hatch before launch.
+_Avoid_: auth-check (too narrow — most checks are not auth), secure (implies it covers all security; it covers ~1/3, the rest is semgrep + secret scanning), harden (v1 name, retired)
 
-### Ship ecosystem
+### Launch ecosystem
 
-**Ship-check**:
-Umbrella inspection skill that runs security + design + quality checks and produces a 1-minute summary. Invoked automatically by **temper** before the finish phase. Does not exist yet — planned for M4 once design and quality skills land.
-_Avoid_: audit, review (ship-check is automated and multi-dimensional)
+**Launch-check** (planned):
+Umbrella inspection skill that runs security + design + quality checks and produces a 1-minute summary. Invoked automatically by **forge** before the finish phase. Does not exist yet — planned for M4 once design and quality skills land.
+_Avoid_: audit, review (launch-check is automated and multi-dimensional)
 
-**Ship-ready**:
-The GO / NO-GO verdict skill (`/jameskill:ship-ready`). Aggregates inspection findings (currently **harden**; later **ship-check**) into a single binary answer to "can I deploy this?". The `?` is dropped from the skill name to stay filesystem-safe; the output still reads "SHIP READY?".
-_Avoid_: deploy check, release gate, ship-ready? (the literal question mark)
+**Launch**:
+The GO / NO-GO verdict skill (`/mekaknight:launch`). Aggregates inspection findings (currently **lock**; later **launch-check**) into a single binary answer to "can I deploy this?". The output reads "LAUNCH READY?".
+_Avoid_: deploy check, release gate, ship-ready (v1 name, retired)
+
+### Issue tracking
+
+**Link**:
+The tracker uplink skill (`/mekaknight:link`). One-time Notion connection — API key, database, property mapping, defaults.
+_Avoid_: setup-issue (v1 name, retired)
+
+**Tag**:
+The issue flagging skill (`/mekaknight:tag`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
+_Avoid_: report-issue (v1 name, retired)
+
+**Strike**:
+The issue resolution skill (`/mekaknight:strike`). Fetches pending issues, brainstorms solutions via **forge**, implements fixes, updates Notion status.
+_Avoid_: resolve-issue (v1 name, retired)
 
 ### Legacy
 
@@ -52,11 +66,11 @@ _Avoid_: old workflow, legacy workflow
 
 ## Flagged ambiguities
 
-**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **temper**; the concept is **production-readiness gate**. The word "workflow" should only appear when referring to the preserved **workflow-external**.
+**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of mekaknight's pipeline. Resolved: the skill is now **forge**; the concept is **production-readiness gate**. The word "workflow" should only appear when referring to the preserved **workflow-external**.
 
 ## Example dialogue
 
-> **Dev**: "I want to add harden to the temper pipeline."
-> **Domain expert**: "You mean adding it to the ship-check slot inside temper? Ship-check is where all inspection skills plug in. Temper itself just orchestrates the build flow — it doesn't inspect."
-> **Dev**: "Right. So when temper reaches the ship-check phase, it invokes ship-check, which then calls harden?"
-> **Domain expert**: "Eventually, yes — but ship-check doesn't exist yet. For now harden runs standalone, and ship-ready reads harden's output directly to issue GO or NO-GO."
+> **Dev**: "I want to add lock to the forge pipeline."
+> **Domain expert**: "You mean adding it to the launch-check slot inside forge? Launch-check is where all inspection skills plug in. Forge itself just orchestrates the build flow — it doesn't inspect."
+> **Dev**: "Right. So when forge reaches the launch-check phase, it invokes launch-check, which then calls lock?"
+> **Domain expert**: "Eventually, yes — but launch-check doesn't exist yet. For now lock runs standalone, and launch reads lock's output directly to issue GO or NO-GO."

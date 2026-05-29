@@ -1,5 +1,7 @@
 # Plan: temper lite orchestrator (v2.0 M1 Week 1)
 
+> ⚠️ Historical document — written under v1 names. See [ADR 0002](../adr/0002-mekaknight-rebrand.md) for the v2 rebrand. Command mapping: `temper`→`forge`, `harden`→`lock`, `ship-ready`→`launch`, `setup-issue`→`link`, `report-issue`→`tag`, `resolve-issue`→`strike`.
+
 ## Goal
 Replace the external-dependency workflow orchestrator with a self-contained `temper` skill that embeds core development philosophies directly.
 

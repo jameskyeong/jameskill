@@ -6,17 +6,17 @@
 ## TL;DR
 
 - **방법론 스택**(superpowers) + **엔지니어용 작은 스킬**(Matt Pocock) 자리는 굳어졌다. 직접 도전 X.
-- **출하 직전 통합 게이트** + **vibe coder 페르소나 명시 타깃** + **closed-loop issue tracker**가 무인 지대 — jameskill의 자리.
+- **출하 직전 통합 게이트** + **vibe coder 페르소나 명시 타깃** + **closed-loop issue tracker**가 무인 지대 — mekaknight의 자리.
 - ⚠️ Anthropic이 **security-guidance** (2026-05-27) + **frontend-design** 플러그인 직접 출시 — 인접 진입. 단일 축 경쟁은 불리, **통합 워크플로**로 차별화.
 
 ## 1. 직접 비교 — 방법론/스킬 진영
 
-| 항목 | obra/superpowers | mattpocock/skills | jameskill (현재) | jameskill v2.0 (목표) |
+| 항목 | obra/superpowers | mattpocock/skills | mekaknight (현재) | mekaknight v2.0 (목표) |
 |---|---|---|---|---|
 | Stars | 210,695 | 109,742 | (미공개/소수) | — |
 | 슬로건 | "agentic skills framework & SW dev methodology" | "Skills for Real Engineers — not vibe coding" | "Issue tracking + workflow orchestrator" | "Production-readiness layer for AI-built apps" |
 | 타겟 페르소나 | 엔지니어 | **엔지니어 (명시적으로 vibe X)** | (애매) | **vibe coder + 시니어 양쪽** |
-| 진입점 | brainstorm/spec → plan → execute | grill-me / grill-with-docs / tdd | resolve-issue / workflow | ship-check / ship-ready? |
+| 진입점 | brainstorm/spec → plan → execute | grill-me / grill-with-docs / tdd | strike / workflow | launch-check / launch |
 | 영역 | 개발 *중* 루프 | 개발 *중* 루프 + 글쓰기 | 워크플로 + 이슈 | **출하 직전 게이트** |
 | 의존성 | 자립 | 자립 | superpowers + Matt Pocock 의존 | **자립 (v2.0 목표)** |
 | 공식 마켓 | ✓ 등재 | ✗ (자체 skills.sh) | ✗ | 등재 추진 |
@@ -32,10 +32,10 @@
 
 ## 2. Anthropic 직접 출시 플러그인 — 인접 경쟁자
 
-| 플러그인 | 출시 | 영역 | jameskill에 미치는 영향 |
+| 플러그인 | 출시 | 영역 | mekaknight에 미치는 영향 |
 |---|---|---|---|
-| **security-guidance** | 2026-05-27 | 패턴 경고 + Stop 시 LLM 리뷰 + 커밋 리뷰 (injection/XSS/SSRF/시크릿 25+ 클래스) | ⚠️ **단일 축(보안) 경쟁자.** PR 코멘트 30-40% 감소 효과 입증. jameskill은 보안 단일이 아닌 **통합 게이트**로 차별 |
-| **frontend-design** | 2026.초 | 디자인 *생성 전* 가이드 (Purpose/Tone/Constraints/Differentiation 4-질문) | ✋ **생성 전 예방**. jameskill `/polish`는 **생성 후 측정·진단·수정** — 보완 관계 |
+| **security-guidance** | 2026-05-27 | 패턴 경고 + Stop 시 LLM 리뷰 + 커밋 리뷰 (injection/XSS/SSRF/시크릿 25+ 클래스) | ⚠️ **단일 축(보안) 경쟁자.** PR 코멘트 30-40% 감소 효과 입증. mekaknight은 보안 단일이 아닌 **통합 게이트**로 차별 |
+| **frontend-design** | 2026.초 | 디자인 *생성 전* 가이드 (Purpose/Tone/Constraints/Differentiation 4-질문) | ✋ **생성 전 예방**. mekaknight `/polish`는 **생성 후 측정·진단·수정** — 보완 관계 |
 | **semgrep** | (큐레이션) | Semgrep SAST 실시간 | 우리는 wrap해서 사용 |
 | **sonarqube** | (큐레이션) | 7,000+ 룰 PostToolUse | 우리는 vibe coder에 sonarqube가 너무 무거움 — wrap 또는 패스 |
 | **code-review / pr-review-toolkit** | (큐레이션) | PR 멀티에이전트 리뷰 | 우리는 PR 시점이 아닌 **출하 직전** 게이트 |
@@ -62,7 +62,7 @@
 
 | 이름 | 영역 | 비고 |
 |---|---|---|
-| blader/humanizer | AI 흔적 제거 (writing) | 21,349★. "디자인" 버전이 없음 — **jameskill `/polish` 기회** |
+| blader/humanizer | AI 흔적 제거 (writing) | 21,349★. "디자인" 버전이 없음 — **mekaknight `/polish` 기회** |
 | dominikmartn/nothing-design-skill | 단일 디자인 시스템 (Nothing) | 2,392★ |
 | FlineDev/ContextKit | "production-ready code on first try" | 0.2.0 단계, 인지 낮음 |
 | maxritter/ClaudeCodePro | TDD 강제 + quality hooks | v7.5.7 |
@@ -73,18 +73,18 @@
 
 ## 4. 경쟁 강도 매트릭스
 
-| jameskill 영역 | superpowers 중복 | Matt Pocock 중복 | Anthropic 마켓 중복 | 빈 영역 |
+| mekaknight 영역 | superpowers 중복 | Matt Pocock 중복 | Anthropic 마켓 중복 | 빈 영역 |
 |---|---|---|---|---|
 | brainstorm / spec → plan | 풀 중복 | grill-me/grill-with-docs 중복 | feature-dev | — |
 | TDD red-green | 중복 | tdd | playground | — |
 | 체계적 디버깅 | 중복 | diagnose | — | — |
 | 코드 리뷰 | 중복 | review (in-progress) | code-review, pr-review-toolkit, coderabbit | — |
 | 아키텍처 진단 | 없음 | improve-codebase-architecture | — | 보안+품질+디자인 결합 진단 |
-| Issue tracking | 없음 | to-issues, to-prd, triage (GitHub/Linear 중심) | — | **Notion + 출하 후 closed-loop ← jameskill 영역** |
-| **Production-readiness 통합 게이트** | 없음 | 없음 | 단일 축만 (security-guidance / semgrep / frontend-design 따로) | **무인 지대 ← jameskill 핵심 자리** |
+| Issue tracking | 없음 | to-issues, to-prd, triage (GitHub/Linear 중심) | — | **Notion + 출하 후 closed-loop ← mekaknight 영역** |
+| **Production-readiness 통합 게이트** | 없음 | 없음 | 단일 축만 (security-guidance / semgrep / frontend-design 따로) | **무인 지대 ← mekaknight 핵심 자리** |
 | **vibe coder 페르소나 명시 타깃** | 안 함 | 안 함 (명시적 비대상) | 안 함 | **무인 지대** |
 | 한국어/현지 컨텍스트 | 없음 | 없음 | 없음 | **무인 지대** |
-| 토큰 절감 모드 | 없음 | caveman 65k★ | — | 이미 jameskill에 caveman 존재 |
+| 토큰 절감 모드 | 없음 | caveman 65k★ | — | 이미 mekaknight에 caveman 존재 |
 
 ## 5. Vibe coding / production-readiness 시장 측면
 
@@ -100,13 +100,13 @@
 
 ### 자체 production 도구 보유 여부
 
-| 도구 | 자체 production 기능 | jameskill과의 관계 |
+| 도구 | 자체 production 기능 | mekaknight과의 관계 |
 |---|---|---|
 | Replit | **Security Agent** (2026-05, Semgrep+HoundDog.ai, 15분 스캔) | 플랫폼 lock-in. Lovable/v0 사용자 못 씀 |
 | Vercel | **Deepsec** (오픈소스, 2026-05) | 마찬가지 lock-in |
 | Lovable | 2026.5 보안 가이드라인 (BOLA/RLS 사고 후 대응) | 사후 대응 수준 |
 | Bolt | 명시적 production 보안 없음 | — |
-| Cursor | Marketplace (skills/MCP/hooks/rules) | 자체 콘텐츠 부족, jameskill이 들어갈 자리 |
+| Cursor | Marketplace (skills/MCP/hooks/rules) | 자체 콘텐츠 부족, mekaknight이 들어갈 자리 |
 
 **결론**: 플랫폼 내장 도구는 자기 플랫폼만 지원. **cross-platform 자동화 도구 자리는 비어 있음** (사람 컨설팅 VIBECODE AUDIT $199-599만 진입).
 
@@ -126,7 +126,7 @@
 
 ## 6. "AI 결과물 → production 다리" 카테고리 — 이미 진입한 플레이어
 
-| 플레이어 | 형태 | 가격 | jameskill 차별 |
+| 플레이어 | 형태 | 가격 | mekaknight 차별 |
 |---|---|---|---|
 | **VIBECODE AUDIT** | 사람 컨설팅 (엔지니어 20명) | Security $199, Quality $249, Production Readiness $349, Bundle $599 | 자동화 + Claude Code 네이티브 |
 | Beesoul/ALEA/Geminate | 사람 컨설팅 | $500-3,000/회 | 같음 |
@@ -134,7 +134,7 @@
 | Replit Security Agent / Vercel Deepsec | 플랫폼 내장 | 플랫폼 가격 | cross-platform |
 | **Anthropic security-guidance** | Claude Code 플러그인 (무료) | $0 | **통합 게이트** vs 단일 보안축 |
 
-## 7. 무인 지대 (jameskill v2.0의 자리)
+## 7. 무인 지대 (mekaknight v2.0의 자리)
 
 1. **출하 직전 통합 게이트** — 보안(semgrep wrap + RLS/auth 도메인) + 품질(jscpd wrap + 의미 중복) + 디자인(결정론 + Vision 판정)을 **하나의 GO/NO-GO 판정**으로
 2. **vibe coder 페르소나 명시 타깃** — "Supabase RLS가 뭔지 모름" 전제 UX
