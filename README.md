@@ -72,7 +72,7 @@ The router fans out by task type. **Tracker-free** — forge itself never reads 
 ## Installation
 
 ```bash
-claude plugins marketplace add https://github.com/jameskyeong/jameskill.git
+claude plugins marketplace add https://github.com/jameskyeong/mekaknight.git
 claude plugins install mekaknight
 ```
 
