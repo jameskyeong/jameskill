@@ -1,5 +1,7 @@
 # Plan: harden + ship-ready v0.1 (v2.0 M1 Week 2)
 
+> ⚠️ Historical document — written under v1 names. See [ADR 0002](../adr/0002-mekaknight-rebrand.md) for the v2 rebrand. Command mapping: `temper`→`forge`, `harden`→`lock`, `ship-ready`→`launch`, `setup-issue`→`link`, `report-issue`→`tag`, `resolve-issue`→`strike`.
+
 ## Goal
 Build two security skills: `harden` (vibe-stack config inspection engine) and `ship-ready` (GO/NO-GO verdict interface).
 

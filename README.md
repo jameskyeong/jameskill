@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.jpg" alt="jameskill" />
+  <img src="docs/banner.jpg" alt="mekaknight" />
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 <p align="center">
   <a href="#installation"><img src="https://img.shields.io/badge/install-claude%20plugin-1a1a1a?style=flat-square" alt="install" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square" alt="MIT" /></a>
-  <img src="https://img.shields.io/badge/skills-4-1a1a1a?style=flat-square" alt="4 skills" />
+  <img src="https://img.shields.io/badge/skills-7-1a1a1a?style=flat-square" alt="7 skills" />
 </p>
 
 ---
@@ -27,48 +27,53 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 
 | Command | Purpose |
 |---|---|
-| `/setup-issue` | One-time Notion connection — API key, database, property mapping, defaults |
-| `/report-issue` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
-| `/resolve-issue` | Pick a pending issue, brainstorm a fix, implement, update status with a human-readable outcome note |
+| `/link` | One-time Notion connection — API key, database, property mapping, defaults |
+| `/tag` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
+| `/strike` | Pick a pending issue, brainstorm a fix, implement, update status with a human-readable outcome note |
 
 **Why it's different** — issue titles are written as user-visible problems, not git commit messages. Cross-functional readers (PMs, support, customers) can scan the tracker without engineering context.
 
 ### 🛠  Workflow
 
-Structured development flow that orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) and [superpowers](https://github.com/obra/superpowers) into a single chain: from problem statement to merged implementation.
+Self-contained development orchestrator. Takes raw requirements through a disciplined pipeline — clarify → build → review → verify → finish — without depending on any external skill plugins.
 
 | Command | Purpose |
 |---|---|
-| `/workflow` | Full development flow — clarify, build, review, verify, finish |
+| `/forge` | Full development flow — clarify, build, review, verify, finish |
 
-**Phases** — clarify → grill → **route** → build → architecture → quality/security → independent code review → verify → finish.
+**Phases** — preflight → clarify → **route** → build (strict TDD) → peer-review → ship-check (slot) → verify → finish.
 
-The router fans out by task type. **Tracker-free** — the workflow itself never reads or writes Notion (use `/resolve-issue` separately if Notion integration is needed). Every artifact lives in the repo.
+The router fans out by task type. **Tracker-free** — forge itself never reads or writes Notion (use `/strike` separately if Notion integration is needed). Every artifact lives in the repo.
 
-> **Resume across sessions**: `/workflow docs/plans/<feature>.md` (or `docs/prd/...md`) — re-enters the plan and picks up from incomplete tasks.
+> **Resume across sessions**: `/forge docs/plans/<feature>.md` — re-enters the plan and picks up from incomplete tasks.
 
-| Route | When | Skill chain |
+| Route | When | Path |
 |---|---|---|
-| **DIAGNOSE** | Reproducible broken behavior | `diagnose` |
-| **PROTOTYPE** | UI shape or data model unclear | `prototype` |
-| **PRD** | Large feature, requirements need formalization | local PRD → `writing-plans` → `subagent-driven-development` |
-| **PLAN** | Coherent feature, multiple dependent tasks, one session | `writing-plans` → `subagent-driven-development` |
-| **DIRECT** | Single contained change | Direct TDD |
+| **DIRECT** | Small, contained change (1-4 commits, tightly-grouped files) | Build immediately, no plan file |
+| **PLAN** | Medium feature (5-15 commits, 2-4 files with shared state) | Plan file → user confirms → sequential build |
 
 **What's different from a plain TDD chain**
 
-- Domain documentation (`CONTEXT.md`, ADRs) gets refined every run — not as a one-off effort.
-- Reviews run as isolated reviewer subagents (`requesting-code-review`), so the reviewer has no recency bias from writing the code.
-- "Done" is gated by `verification-before-completion` — soft language like "should work" doesn't pass.
-- The branch finish (`finishing-a-development-branch`) is an explicit step, not an afterthought.
+- Relentless clarification before building — the 5-category ambiguity checklist must reach 0 items before Route.
+- Strict TDD enforced — RED → GREEN → REFACTOR for every unit of work, no skipped tests.
+- Independent peer-review subagent — fresh perspective on the diff, free from author recency bias.
+- "Done" is gated by no-soft-language verification — phrases like "should work" are banned in completion claims.
+- The branch finish is an explicit step (local merge / open PR / keep branch / discard) — not an afterthought.
 
-> Requires both [Matt Pocock skills](https://github.com/mattpocock/skills) and [superpowers](https://github.com/obra/superpowers) installed at `~/.claude/skills/` or as plugins. The workflow halts at Phase −1 (Preflight) if any required skill is missing — no silent skips.
+> v2.0 forge is self-contained — no Matt Pocock / superpowers dependency. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md) for the decision rationale. The v1.x workflow is preserved as `/workflow-external` for reference.
+
+### 🔒  Security inspection + Launch verdict
+
+| Command | Purpose |
+|---|---|
+| `/lock` | Inspect a project for service-configuration security holes (Supabase RLS, secret-key client exposure, Stripe webhook signatures). Reports PASS/WARN/BLOCK with fix suggestions. |
+| `/launch` | One-line GO / NO-GO deploy verdict. Aggregates inspection findings into a single binary decision. |
 
 ## Installation
 
 ```bash
 claude plugins marketplace add https://github.com/jameskyeong/jameskill.git
-claude plugins install jameskill
+claude plugins install mekaknight
 ```
 
 ## Requirements

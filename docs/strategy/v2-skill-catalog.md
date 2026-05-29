@@ -1,18 +1,18 @@
-# jameskill v2.0 — Skill Catalog
+# mekaknight v2.0 — Skill Catalog
 
 > v2.0 MVP 스킬 분해. 영역별 추천 스킬 + 우산 명령 + lite 워크플로우.
 
 ## 구조 요약
 
 ```
-jameskill v2.0 (MVP — ~10개 스킬)
+mekaknight v2.0 (MVP — ~10개 스킬)
 ├── 우산 명령 (영향력 축)
-│   ├── /ship-check        # 종합 점검 (보안+디자인+품질 1분 요약)
-│   └── /ship-ready?       # GO / NO-GO 판정 + 사유
+│   ├── /launch-check        # 종합 점검 (보안+디자인+품질 1분 요약)
+│   └── /launch       # GO / NO-GO 판정 + 사유
 │
 ├── 🔒 보안 (2개)
 │   ├── /auth-check        # engine — vibe stack 도메인 구성 점검
-│   └── /ship-ready-security  # interface — semgrep + GitGuardian + /auth-check 종합 GO/NO-GO
+│   └── /launch-security  # interface — semgrep + GitGuardian + /auth-check 종합 GO/NO-GO
 │
 ├── 🎨 디자인 (1개)
 │   └── /polish            # AI 디자인 클리셰 측정·진단·수정 (AI Score)
@@ -22,7 +22,7 @@ jameskill v2.0 (MVP — ~10개 스킬)
 │   └── /cohesion-check    # 한 파일 다중 책임 감지 + split 제안
 │
 ├── 🔄 이슈 트래커 (기존 유지)
-│   ├── /setup-issue, /report-issue, /resolve-issue (Notion + GitHub + Linear 백엔드 확장)
+│   ├── /link, /tag, /strike (Notion + GitHub + Linear 백엔드 확장)
 │
 └── 🛠 lite workflow (자체)
     └── /workflow          # 자체 구현 (superpowers/Matt Pocock 의존 제거)
@@ -54,9 +54,9 @@ jameskill v2.0 (MVP — ~10개 스킬)
 **입력**: 프로젝트 루트
 **출력**: 각 항목 PASS/WARN/BLOCK + 수정 코드 patch 제안
 
-**차별점**: semgrep은 SQL/XSS 같은 코드 패턴만, jameskill은 **Supabase RLS 정책 의미론, Clerk env 강도, webhook 파싱 순서** 같은 도메인 깊이.
+**차별점**: semgrep은 SQL/XSS 같은 코드 패턴만, mekaknight은 **Supabase RLS 정책 의미론, Clerk env 강도, webhook 파싱 순서** 같은 도메인 깊이.
 
-### `/ship-ready-security` — interface (GO/NO-GO 판정)
+### `/launch-security` — interface (GO/NO-GO 판정)
 
 **역할**: `/auth-check` + semgrep MCP wrap + GitGuardian wrap을 **하나의 GO/NO-GO 판정**으로 묶음.
 
@@ -72,7 +72,7 @@ jameskill v2.0 (MVP — ~10개 스킬)
 **출력 예시**:
 
 ```
-🚦 SHIP READY?  NO-GO
+🚦 LAUNCH?  NO-GO
 
 Blocking (3):
   ❌ Supabase RLS off on table `users`
@@ -83,23 +83,23 @@ Warning (2):
   ⚠️  No webhook idempotency check (api/webhooks/stripe.ts)
   ⚠️  Frontend-only plan-limit enforcement in components/UpgradeModal.tsx
 
-Run `/harden` to apply auto-fixes for 2 of 3 blocking items.
+Run `/lock` to apply auto-fixes for 2 of 3 blocking items.
 ```
 
 **차별점**: 다른 도구는 "issue 목록 출력". 우리는 **"지금 배포해도 되나? Yes/No"** 단순 판정 + 무엇이 막는지 명시. vibe coder의 결정 부담 제거.
 
 ### 보안 영역 - 도구 통합 정책
 
-> "Semgrep이 잡는 건 Semgrep에게. 도메인 의미론은 jameskill이."
+> "Semgrep이 잡는 건 Semgrep에게. 도메인 의미론은 mekaknight이."
 
 | 레이어 | 누가 |
 |---|---|
 | SAST (XSS, SQLi, header) | Semgrep MCP wrap |
 | Secret 탐지 | GitGuardian wrap, fallback regex |
-| RLS 정책 분석 | jameskill 자체 |
-| Auth provider 구성 | jameskill 자체 |
-| Webhook signature 패턴 | jameskill 자체 (AST) |
-| Frontend-only auth 탐지 | jameskill 자체 + Semgrep custom rule |
+| RLS 정책 분석 | mekaknight 자체 |
+| Auth provider 구성 | mekaknight 자체 |
+| Webhook signature 패턴 | mekaknight 자체 (AST) |
+| Frontend-only auth 탐지 | mekaknight 자체 + Semgrep custom rule |
 | 의존성 CVE | `npm audit` wrap |
 
 ---
@@ -158,7 +158,7 @@ Apply auto-fix? Y/n
 
 **차별점**:
 - **Anthropic frontend-design**: 생성 *전* prescriptive 가이드 ("Don't use Inter")
-- **jameskill `/polish`**: 생성 *후* diagnostic 측정·점수화·수정. 결정론 + Vision 하이브리드 (frontend-design은 순수 LLM 가이드라인)
+- **mekaknight `/polish`**: 생성 *후* diagnostic 측정·점수화·수정. 결정론 + Vision 하이브리드 (frontend-design은 순수 LLM 가이드라인)
 - **자동화 한계**: ~70% 결정론, 30% Vision 판정. Score는 점수화 가능
 
 **TBD**: Vision 모델 호출 비용·속도. Claude 4.7 Vision API 비용 산정 필요. 옵션:
@@ -214,7 +214,7 @@ Cluster 2: Fetch with auth (2 functions)
 
 **차별점**:
 - **obra/simplify**: 변경된 파일만, 3 agent 병렬
-- **jameskill `/dedupe`**: codebase-wide × 의미론적 ("같은 의도 다른 구현"). simplify는 토큰 일치만, 우리는 의도 일치
+- **mekaknight `/dedupe`**: codebase-wide × 의미론적 ("같은 의도 다른 구현"). simplify는 토큰 일치만, 우리는 의도 일치
 - **jscpd 단순 wrap이 아님**: jscpd 결과를 받아 LLM이 의도 클러스터링 + extraction plan까지
 
 ### `/cohesion-check` — 한 파일 다중 책임 감지 + split 제안
@@ -261,31 +261,31 @@ components/Dashboard.tsx (487 lines)
 
 ## 🚦 우산 명령
 
-### `/ship-check` — 종합 점검 (1분 요약)
+### `/launch-check` — 종합 점검 (1분 요약)
 
 **역할**: 보안 + 디자인 + 품질 한 번에 점검 + 1분 요약 출력.
 
 ```
-🚦 SHIP CHECK SUMMARY
+🚦 LAUNCH CHECK SUMMARY
 
 🔒 Security:   ❌ 3 blocking, 2 warning
 🎨 Design:     ⚠️  AI Score 87/100
 🧹 Quality:    ⚠️  7 semantic duplicates, 3 cohesion issues
 
 Run individual deep audits:
-  /auth-check    /ship-ready-security
+  /auth-check    /launch-security
   /polish
   /dedupe        /cohesion-check
 
-Or get verdict: /ship-ready?
+Or get verdict: /launch
 ```
 
-### `/ship-ready?` — GO / NO-GO 판정
+### `/launch` — GO / NO-GO 판정
 
 **역할**: 종합 점수 + 단순 yes/no + 막는 항목 리스트. 트위터 화제성 1순위 명령.
 
 ```
-🚦 SHIP READY?  NO-GO
+🚦 LAUNCH?  NO-GO
 
 Blocking (3):
   ❌ [Security] Supabase RLS off on table `users`
@@ -296,7 +296,7 @@ After fixing blockers:
   Design AI Score 87/100 → consider /polish
   Quality 7 dupes → consider /dedupe
 
-Run /harden to auto-fix 2 of 3 blockers.
+Run /lock to auto-fix 2 of 3 blockers.
 ```
 
 **판정 기준 (TBD — 구현 단계 결정):**
@@ -313,7 +313,7 @@ Run /harden to auto-fix 2 of 3 blockers.
 
 ## 🛠 lite workflow (자체 구현)
 
-**역할**: superpowers / Matt Pocock 의존 제거. jameskill 자체 워크플로우.
+**역할**: superpowers / Matt Pocock 의존 제거. mekaknight 자체 워크플로우.
 
 **기존 workflow 차이점**:
 
@@ -325,13 +325,13 @@ Run /harden to auto-fix 2 of 3 blockers.
 | 빌드 | Matt `tdd` | 자체 `build-with-tests` (TDD 강제 약화) |
 | 리뷰 | superpowers `requesting-code-review` | 자체 `peer-review` (간단 subagent 리뷰) |
 | 검증 | superpowers `verification-before-completion` | 자체 `verify` |
-| 출하 전 | (없음) | **`/ship-check` 자동 호출** |
+| 출하 전 | (없음) | **`/launch-check` 자동 호출** |
 | 마무리 | superpowers `finishing-a-development-branch` | 자체 `finish` 또는 사용자 직접 |
 
-**핵심 차별점**: v2.0 워크플로우는 **마무리 직전 `/ship-check`를 자동 호출**해서 production-readiness 게이트를 강제. 다른 워크플로우는 없는 단계.
+**핵심 차별점**: v2.0 워크플로우는 **마무리 직전 `/launch-check`를 자동 호출**해서 production-readiness 게이트를 강제. 다른 워크플로우는 없는 단계.
 
 **구현 우선순위**:
-- Phase 1: `clarify` → `build-with-tests` → `verify` → `/ship-check` → `finish` (최소)
+- Phase 1: `clarify` → `build-with-tests` → `verify` → `/launch-check` → `finish` (최소)
 - Phase 2: 라우팅, peer-review 추가
 - Phase 3: 도메인 검증, CONTEXT.md
 
@@ -350,8 +350,8 @@ Run /harden to auto-fix 2 of 3 blockers.
 | Notion 백엔드 → adapter pattern으로 추상화 | v2.0 |
 | GitHub Issues 백엔드 추가 | v2.0 또는 v2.1 (TBD) |
 | Linear 백엔드 추가 | v2.1 |
-| `/ship-check` 발견 항목 자동 이슈 등록 (deep 통합) | v2.0 |
-| `/resolve-issue` 완료 시 `/ship-ready?` 자동 호출 | v2.0 |
+| `/launch-check` 발견 항목 자동 이슈 등록 (deep 통합) | v2.0 |
+| `/strike` 완료 시 `/launch` 자동 호출 | v2.0 |
 
 **TBD**: GitHub Issues 백엔드가 v2.0 MVP 안인지 v2.1로 미루는지 — 시간 부담 vs 글로벌 진입.
 
@@ -361,12 +361,12 @@ Run /harden to auto-fix 2 of 3 blockers.
 
 | 스킬 | 가치 | 난이도 | 차별화 | 화제성 | 우선순위 |
 |---|---|---|---|---|---|
-| `/ship-ready?` | ★★★★★ | ★★ | ★★★★★ | ★★★★★ | **1순위** (한 줄 슬로건) |
+| `/launch` | ★★★★★ | ★★ | ★★★★★ | ★★★★★ | **1순위** (한 줄 슬로건) |
 | `/auth-check` | ★★★★★ | ★★★ | ★★★★★ | ★★★★ | **1순위** (vibe coder 사고 1위) |
 | `/polish` | ★★★★ | ★★★★ | ★★★★ | ★★★★★ | **1순위** (트위터 폭발) |
-| `/ship-check` | ★★★★ | ★★ | ★★★★ | ★★★★ | **2순위** (우산) |
+| `/launch-check` | ★★★★ | ★★ | ★★★★ | ★★★★ | **2순위** (우산) |
 | `/dedupe` | ★★★★ | ★★★ | ★★★★ | ★★★ | **2순위** |
-| `/ship-ready-security` | ★★★★ | ★★ | ★★★ | ★★★ | **2순위** (`/auth-check` + wrap) |
+| `/launch-security` | ★★★★ | ★★ | ★★★ | ★★★ | **2순위** (`/auth-check` + wrap) |
 | `/cohesion-check` | ★★★ | ★★★ | ★★★★ | ★★ | **3순위** |
 | lite workflow | ★★★ | ★★★★★ | ★★ | ★★ | **3순위** (의존성 제거 비용 큼) |
 
@@ -379,7 +379,7 @@ v2.0 MVP에 모두 포함. lite workflow는 가장 마지막에 작업.
 | 항목 | 영향 |
 |---|---|
 | `/polish` Vision 모델 호출 비용·속도 | 사용자 경험 (1초 vs 30초) |
-| `/ship-ready?` 정량 임계값 (Critical=NO-GO?) | 판정 명확성 |
+| `/launch` 정량 임계값 (Critical=NO-GO?) | 판정 명확성 |
 | GitHub Issues 백엔드 v2.0 포함 여부 | 글로벌 진입 시점 |
 | lite workflow의 의존성 제거 깊이 | 작업 시간 (1주 vs 4주) |
 | 이름 confirmation: `/polish` vs `/de-ai-ify` | 마케팅 메시지 강도 |

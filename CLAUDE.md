@@ -1,19 +1,19 @@
-# jameskill
+# mekaknight
 
 Notion issue tracker integration for Claude Code.
 
 ## Available Skills
 
-- `/temper` — Self-contained development orchestrator: clarify → build-with-tests → verify → finish. Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
-- `/harden` — Inspect a project for vibe-stack security holes (Supabase RLS gaps, secret-key client exposure, missing webhook signature verification). Reports PASS/WARN/BLOCK with fix suggestions.
-- `/ship-ready` — One-line GO / NO-GO deploy verdict. Aggregates inspection findings (currently `/harden`) into a single binary decision.
-- `/report-issue` — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
-- `/resolve-issue` — Fetch pending issues, brainstorm solutions, implement fixes, update status.
-- `/setup-issue` — Configure Notion API key, connect databases, detect templates, set defaults.
+- `/forge` — Self-contained development orchestrator: clarify → build-with-tests → verify → finish. Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
+- `/lock` — Inspect a project for service-configuration security holes (Supabase RLS gaps, secret-key client exposure, missing webhook signature verification). Reports PASS/WARN/BLOCK with fix suggestions.
+- `/launch` — One-line GO / NO-GO deploy verdict. Aggregates inspection findings (currently `/lock`) into a single binary decision.
+- `/tag` — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
+- `/strike` — Fetch pending issues, brainstorm solutions, implement fixes, update status.
+- `/link` — Configure Notion API key, connect databases, detect templates, set defaults.
 
 ## Configuration
 
-Each project stores its config in `.claude/tracking-issue.json` (gitignored). Run `/setup-issue` to create it.
+Each project stores its config in `.claude/tracking-issue.json` (gitignored). Run `/link` to create it.
 
 See `CONTEXT.md` for domain glossary and `docs/adr/` for architectural decisions.
 

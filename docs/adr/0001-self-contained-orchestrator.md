@@ -1,5 +1,7 @@
 # Self-contained orchestrator (temper) replacing external skill dependencies
 
+> ⚠️ Historical document — written under v1 names. See [ADR 0002](0002-mekaknight-rebrand.md) for the v2 rebrand. Command mapping: `temper`→`forge`, `harden`→`lock`, `ship-ready`→`launch`, `setup-issue`→`link`, `report-issue`→`tag`, `resolve-issue`→`strike`.
+
 The v1.x workflow orchestrator depended on 11 external skills from superpowers (obra) and Matt Pocock to function — if any were missing, it halted entirely. We decided to replace it with a self-contained orchestrator (`temper`) that embeds the core philosophies of those skills directly in its SKILL.md, rather than invoking them at runtime. This trades depth (the external skills had years of accumulated discipline) for independence (temper works without any plugin dependencies).
 
 ## Considered Options
