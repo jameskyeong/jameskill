@@ -28,15 +28,21 @@ _Avoid_: simple, small (subjective)
 A **temper** routing decision for medium-scope features (5-15 commits, 2-4 files with shared state). Produces a plan file in `docs/plans/` before sequential task execution.
 _Avoid_: roadmap, spec (different things)
 
+### Inspection
+
+**Harden**:
+Inspection engine (`/jameskill:harden`) that checks a target project for vibe-stack service-configuration security holes — Supabase RLS gaps, secret-key client exposure, missing webhook signature verification. Catches what code scanners (semgrep) miss: configuration mistakes, not code patterns. Named for metallurgical hardening, continuing the temper theme.
+_Avoid_: auth-check (too narrow — most checks are not auth), secure (implies it covers all security; it covers ~1/3, the rest is semgrep + secret scanning)
+
 ### Ship ecosystem
 
 **Ship-check**:
-Umbrella inspection skill that runs security + design + quality checks and produces a 1-minute summary. Invoked automatically by **temper** before the finish phase.
+Umbrella inspection skill that runs security + design + quality checks and produces a 1-minute summary. Invoked automatically by **temper** before the finish phase. Does not exist yet — planned for M4 once design and quality skills land.
 _Avoid_: audit, review (ship-check is automated and multi-dimensional)
 
 **Ship-ready**:
-Final GO / NO-GO verdict based on **ship-check** results. One-line answer to "can I deploy this?"
-_Avoid_: deploy check, release gate
+The GO / NO-GO verdict skill (`/jameskill:ship-ready`). Aggregates inspection findings (currently **harden**; later **ship-check**) into a single binary answer to "can I deploy this?". The `?` is dropped from the skill name to stay filesystem-safe; the output still reads "SHIP READY?".
+_Avoid_: deploy check, release gate, ship-ready? (the literal question mark)
 
 ### Legacy
 
@@ -50,7 +56,7 @@ _Avoid_: old workflow, legacy workflow
 
 ## Example dialogue
 
-> **Dev**: "I want to add auth-check to the temper pipeline."
+> **Dev**: "I want to add harden to the temper pipeline."
 > **Domain expert**: "You mean adding it to the ship-check slot inside temper? Ship-check is where all inspection skills plug in. Temper itself just orchestrates the build flow — it doesn't inspect."
-> **Dev**: "Right. So when temper reaches the ship-check phase, it invokes ship-check, which then calls auth-check?"
-> **Domain expert**: "Exactly. And ship-ready reads ship-check's output to issue GO or NO-GO."
+> **Dev**: "Right. So when temper reaches the ship-check phase, it invokes ship-check, which then calls harden?"
+> **Domain expert**: "Eventually, yes — but ship-check doesn't exist yet. For now harden runs standalone, and ship-ready reads harden's output directly to issue GO or NO-GO."
