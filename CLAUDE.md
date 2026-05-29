@@ -4,6 +4,7 @@ Notion issue tracker integration for Claude Code.
 
 ## Available Skills
 
+- `/temper` — Self-contained development orchestrator: clarify → build-with-tests → verify → finish. Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
 - `/report-issue` — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
 - `/resolve-issue` — Fetch pending issues, brainstorm solutions, implement fixes, update status.
 - `/setup-issue` — Configure Notion API key, connect databases, detect templates, set defaults.
@@ -11,6 +12,8 @@ Notion issue tracker integration for Claude Code.
 ## Configuration
 
 Each project stores its config in `.claude/tracking-issue.json` (gitignored). Run `/setup-issue` to create it.
+
+See `CONTEXT.md` for domain glossary and `docs/adr/` for architectural decisions.
 
 ## Requirements
 
