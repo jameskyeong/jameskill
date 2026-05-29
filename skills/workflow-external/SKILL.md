@@ -1,5 +1,5 @@
 ---
-name: jameskill:workflow
+name: jameskill:workflow-external
 description: >-
   Skill orchestrator combining Matt Pocock and superpowers, tracker-free and git-only.
   Routes by task type — DIAGNOSE (bug), PROTOTYPE (exploration), PRD (large spec),
