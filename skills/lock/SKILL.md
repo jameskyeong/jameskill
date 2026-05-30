@@ -190,3 +190,17 @@ If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Ne
 - **Be conservative with BLOCK.** A false BLOCK erodes trust faster than a missed WARN. When evidence is ambiguous (e.g. can't tell if a file is client-reachable), downgrade to WARN and say why.
 - **Always cite file:line.** A finding without evidence the user can open is not actionable.
 - This skill is read-only — it inspects and reports. It does not edit files. (Auto-fix arrives in a later version.)
+
+## Output style — inline-gloss discipline
+
+When findings or summaries mention service-specific terms, env vars, or abbreviations (`RLS`, `anon-key`, `service-role key`, `STRIPE_SECRET`, `webhook-sig`, etc.), append a short parenthetical gloss (5–15 chars in the response language) on first mention. The user must be able to act on a finding without grepping.
+
+```
+✗ [RLS] Table `users` has RLS disabled
+✓ [RLS] Table `users` has RLS(행 단위 권한) disabled
+
+✗ STRIPE_SECRET referenced in client component
+✓ STRIPE_SECRET(서버 전용 결제 시크릿) referenced in client component
+```
+
+Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Forge's [`communication-style.md`](../forge/references/communication-style.md) holds the full discipline.

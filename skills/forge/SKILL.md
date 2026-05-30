@@ -63,6 +63,50 @@ The following phrases are **banned** in any completion claim. If you catch yours
 
 ---
 
+## Cross-cutting gate: user-facing communication style
+
+Every user-facing summary forge produces — phase reports, change explanations, diff walkthroughs, completion notes — **MUST** gloss non-obvious identifiers inline on first mention. Dense identifier-only output that forces the user to read code to follow your summary is rejected.
+
+> **For the deeper discipline — what counts as non-obvious, gloss-length budget, when to skip glossing, per-phase examples (Build / Peer-review / DIAGNOSE / Retrospective), anti-patterns (identifier soup, jargon cascades, glossing the obvious), and edge cases (user pre-established terms, code-block-only content, long names) — see [`references/communication-style.md`](references/communication-style.md).**
+
+### The rule
+
+On **first mention** in a user-facing message, append a short parenthetical gloss to:
+
+- Internal function names (`combineQuality`, `analyzeStroke`)
+- Internal variables and parameters (`dirCos`, `curvDiffAbs`, `zeroPx`)
+- Abbreviations and symbols (`κ`, `RLS`, `anon-key`, `RED/GREEN`)
+- Project-specific domain terms not yet established in this conversation
+
+Gloss length: **5–15 characters** in the user's response language. Match the tone of CONTEXT.md if it exists.
+
+```
+✗ combineQuality 에서 curvature 분기 제거
+✓ combineQuality(품질 등급 결합 함수) 에서 curvature(곡률) 분기 제거
+
+✗ analyzeStroke 의 user κ 계산 제거
+✓ analyzeStroke(stroke 지표 분석 함수) 의 user κ(사용자 stroke 곡률) 계산 제거
+```
+
+Subsequent mentions of the same term in the same response: no gloss needed.
+
+### Skip conditions
+
+- Standard programming terms (`test`, `import`, `commit`, `null`)
+- Terms the user introduced or used earlier in the conversation
+- Content inside code blocks (gloss in the surrounding prose, not inside the block)
+- Public API names the user is expected to know in their stack (`useState`, `fetch`)
+
+### Forbidden output shapes
+
+- **Identifier soup**: three or more consecutive un-glossed internal identifiers in one bullet
+- **Jargon cascades**: an explanation whose only English-prose words are connectives (`에서`, `의`, `로`)
+- **Pseudo-explanation**: glossing an identifier with the identifier itself (`combineQuality(combineQuality 함수)`)
+
+If you catch yourself writing any of these, rewrite before sending.
+
+---
+
 ## Preflight: Environment check
 
 **Goal:** Confirm the project can support forge's disciplined pipeline before starting.
