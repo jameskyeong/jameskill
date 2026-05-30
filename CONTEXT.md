@@ -18,6 +18,10 @@ _Avoid_: workflow, pipeline (too generic)
 A discipline enforced at every phase boundary within **forge**: no phase may declare completion without running verification commands and directly observing the output. "Should work" and "seems to pass" are treated as "not verified."
 _Avoid_: check, validation (too vague)
 
+**Discipline references**:
+The modular library at `skills/forge/references/`. Each module deepens one forge phase (or one cross-cutting concern) — principles, anti-patterns, edge cases — so forge's depth does not depend on external skills. `SKILL.md` is the orchestrator; each phase carries a pointer to its reference. See [ADR 0005](docs/adr/0005-forge-depth-references.md) for the rationale.
+_Avoid_: helpers, support files (too vague — these are load-bearing discipline)
+
 ### Routing
 
 **DIRECT**:

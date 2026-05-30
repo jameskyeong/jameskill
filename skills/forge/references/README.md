@@ -1,0 +1,50 @@
+# Forge — Discipline References
+
+This folder is forge's **discipline library**. `SKILL.md` is the orchestrator (which phase comes next, what the exit gate is). Each module here goes deeper on the discipline of a specific phase — the principles, the patterns, the anti-patterns, the edge cases — so that forge's depth no longer depends on external skills.
+
+See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationale.
+
+## Phase mapping
+
+| Forge phase | Reference module | One-line summary |
+|---|---|---|
+| Preflight | _(inline in SKILL.md)_ | Mechanical environment check; no separate discipline |
+| **Clarify** | [`grilling.md`](grilling.md) | Ambiguity as load-bearing signal; one-question discipline; 5-category checklist deepened |
+| **Route → PLAN** | [`planning.md`](planning.md) | Plan file as contract; task sizing; dependencies; out-of-scope as scope guard |
+| **Build** | [`tdd-discipline.md`](tdd-discipline.md) | RED/GREEN/REFACTOR exit conditions; anti-patterns; legacy / incidents / UI / integration edges |
+| **Peer-review** | [`peer-review.md`](peer-review.md) | Independence vs author bias; two-axis review; sharpened severity definitions |
+| Ship-check | _(slot, deferred)_ | Activates when production-readiness skills are wired in |
+| **Verify** (cross-cutting) | [`verification.md`](verification.md) | Evidence before assertion; expanded forbidden language; per-phase evidence catalog |
+| **Finish** | [`finishing.md`](finishing.md) | The four branch options sharpened; commit discipline; git-safety anti-patterns |
+| _Cross-cutting_ | [`subagent-patterns.md`](subagent-patterns.md) | When and how to dispatch subagents without abdicating responsibility |
+
+## Reading order
+
+If you are new to forge, read in this order:
+
+1. **`SKILL.md`** (in the parent directory) — get the overall orchestration shape.
+2. **[`verification.md`](verification.md)** — the cross-cutting gate that every other phase consults.
+3. **[`grilling.md`](grilling.md)**, then **[`tdd-discipline.md`](tdd-discipline.md)** — the two phases daily development hits most often.
+4. **[`peer-review.md`](peer-review.md)** — the independence discipline; pairs with `subagent-patterns.md`.
+5. **[`planning.md`](planning.md)**, then **[`finishing.md`](finishing.md)** — the phases that bracket a longer change.
+6. **[`subagent-patterns.md`](subagent-patterns.md)** — the cross-cutting dispatch discipline.
+
+If you are auditing a completed `/forge` run, the relevant module is the one for whichever phase you are auditing — each module ends with a section explaining how that phase relates to the others.
+
+## What makes a reference module a reference module
+
+- **One phase, one document.** Cross-cutting modules (verification, subagent-patterns) are clearly marked as such.
+- **Principles, not procedures.** `SKILL.md` has the procedure; the references explain why each step exists.
+- **Anti-patterns are first-class.** Every module names the failure modes the discipline exists to prevent.
+- **Edge cases have recommended responses.** Not "do what feels right" — specific guidance for the awkward shape.
+- **Evidence-based exit sentences.** Each phase's exit gate is stated as a single sentence the orchestrator must produce.
+
+## Future modules
+
+Tracked in `docs/plans/forge-depth-references-vN.md`. Currently open:
+
+- `diagnosis.md` — gated on a decision to add a `DIAGNOSE` route to forge.
+- `prototyping.md` — gated on a decision to promote prototype work from unsupported to supported.
+- `architecture.md` — gated on a decision to promote architecture work similarly.
+
+These modules will not be added until forge has a phase that consumes them. A module with no caller is documentation orphan; the references folder exists to back forge's orchestration, not to host orphaned discipline.
