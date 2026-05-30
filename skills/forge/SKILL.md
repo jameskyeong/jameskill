@@ -83,6 +83,8 @@ Run these checks and report results:
 
 **Goal:** Reach shared understanding with zero ambiguity remaining.
 
+> **For the deeper discipline — one-question-at-a-time grilling, recommended-answer-with-reasoning patterns, deepened 5-category checklist, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
+
 If invoked from `mekaknight:strike`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
@@ -232,6 +234,8 @@ If more behavior is needed, return to Step 1 with the next test.
 ## Peer-review: Independent diff review
 
 **Goal:** A fresh perspective on the code, free from the author's recency bias.
+
+> **For the deeper discipline — why independence matters, sharpened Critical/Important/Minor definitions, when to push back on a finding, subagent prompt construction, and anti-patterns (performative agreement, fabricated findings, severity inflation, self-review) — see [`references/peer-review.md`](references/peer-review.md).**
 
 Spawn a review agent using the Agent tool with this prompt template:
 
