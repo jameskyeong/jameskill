@@ -15,6 +15,8 @@ Named after the act of forging at the anvil — each phase hammers the code into
 
 **For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/mekaknight:workflow-external`.**
 
+> **Discipline depth lives in [`references/`](references/README.md).** Each phase below carries a pointer to the module that deepens it (principles, anti-patterns, edge cases). The orchestrator below stays slim; the references hold the full discipline.
+
 ---
 
 ## Cross-cutting gate: verification before completion
@@ -238,6 +240,8 @@ If more behavior is needed, return to Step 1 with the next test.
 **Goal:** A fresh perspective on the code, free from the author's recency bias.
 
 > **For the deeper discipline — why independence matters, sharpened Critical/Important/Minor definitions, when to push back on a finding, subagent prompt construction, and anti-patterns (performative agreement, fabricated findings, severity inflation, self-review) — see [`references/peer-review.md`](references/peer-review.md).**
+>
+> **For the cross-cutting subagent dispatch discipline used here and in any other forge phase that fans out work — see [`references/subagent-patterns.md`](references/subagent-patterns.md).**
 
 Spawn a review agent using the Agent tool with this prompt template:
 
