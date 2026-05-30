@@ -21,6 +21,8 @@ Named after the act of forging at the anvil — each phase hammers the code into
 
 Every phase that ends with a "done", "passing", or "fixed" claim **MUST** pass its exit gate first. This applies everywhere — it is non-negotiable.
 
+> **For the deeper discipline — disguised-verification anti-patterns, per-phase evidence patterns, and how to handle cases where the standard check cannot be run — see [`references/verification.md`](references/verification.md).**
+
 ### Forbidden language
 
 The following phrases are **banned** in any completion claim. If you catch yourself writing any of them, STOP — you have not verified:
@@ -190,6 +192,8 @@ If the session ends mid-execution, the user resumes by running `/forge` with the
 ## Build: Strict TDD
 
 **Goal:** Implement the solution with test-driven development. No exceptions.
+
+> **For the deeper discipline — RED/GREEN/REFACTOR exit conditions, anti-patterns (test-after, mock-overuse, scope creep at GREEN, refactor-on-red), and edge cases (legacy code, incidents, UI changes, integration boundaries) — see [`references/tdd-discipline.md`](references/tdd-discipline.md).**
 
 For each unit of work (single task in PLAN, or the entire change in DIRECT):
 
