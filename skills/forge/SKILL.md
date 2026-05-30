@@ -138,6 +138,8 @@ Proceed to **Build** immediately. No plan file, no docs checkpoint.
 
 ### Route: PLAN
 
+> **For the deeper discipline — what makes a plan file a contract vs a wish list, task sizing rules, dependency patterns, the value of Out-of-scope, anti-patterns (vague task, hidden dependencies, plan-as-document drift, mid-flight scope creep), and cross-session resume — see [`references/planning.md`](references/planning.md).**
+
 #### PLAN.1: Write the plan file
 
 Generate a plan file at `docs/plans/<slug>.md` with this structure:
@@ -328,6 +330,8 @@ For now, proceed directly to Verify.
 ## Finish: Commit and decide
 
 **Goal:** Capture the work and let the user decide what to do with the branch.
+
+> **For the deeper discipline — when each of the four branch options actually fits, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, strike caller integration) — see [`references/finishing.md`](references/finishing.md).**
 
 ### Step 1: Final commit
 
