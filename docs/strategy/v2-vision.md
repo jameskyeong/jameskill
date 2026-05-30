@@ -34,7 +34,7 @@ ADR 0003은 v2.0을 16주 deep build에서 6-8주 lite wrap (lock이 semgrep/git
 ### 차별화의 세 축
 
 1. **discipline-first** — forge의 strict TDD + no-soft-language verification + 4-way auto-routing (DIRECT/PLAN/DIAGNOSE/PROTOTYPE). "works on my machine" / "should be fine" 같은 soft language를 verification 경계에서 거부. 한 명령 self-contained — superpowers / Matt Pocock 같은 외부 plugin 조합 불필요.
-2. **compound-engineering-first** — 매 forge 세션이 repo의 5개 채널(plan files, regression tests, ADR, discipline references, CONTEXT.md domain glossary)에 영구 아티팩트를 deposit. plan + regression test는 자동, ADR/reference/glossary는 Retrospective phase에서 auto-prompt. superpowers처럼 invocation-local로 휘발하지 않음 — codebase가 시간이 갈수록 *easier to work in*.
+2. **compound-engineering-first (single-orchestrator variant)** — 매 forge 세션이 repo의 5개 채널(plan files, regression tests, ADR, discipline references, CONTEXT.md domain glossary)에 영구 아티팩트를 deposit. plan + regression test는 자동, ADR/reference/glossary는 Retrospective phase에서 auto-prompt. superpowers처럼 invocation-local로 휘발하지 않음 — codebase가 시간이 갈수록 *easier to work in*. **Term은 mekaknight 발명 아님**: EveryInc/compound-engineering-plugin (37 skills, 17k★)이 Claude Code 생태계의 dominant claim-holder. mekaknight는 *같은 원리를 단일 self-contained orchestrator로 묶은* 아키텍처적 변종 — 차별점은 term 자체가 아니라 *번들링 방식*. ADR 0008.
 3. **humane-tracking-first** — tracker의 이슈가 commit 메시지("fix: X")가 아닌 **문제 진술**("사용자가 X를 시도했을 때 Y 상태가 됨")로 읽히도록 프롬프트/blob을 파싱. 코드베이스에 대조 후 검증.
 
 ## 타겟 페르소나

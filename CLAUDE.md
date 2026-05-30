@@ -3,7 +3,7 @@
 Developer productivity skills for Claude Code. Built on two pillars:
 
 1. **`/forge`** — signature skill. Self-contained development orchestrator with auto-routing. One command drives the full flow.
-2. **Compound engineering** — every session deposits durable artifacts in the repo across five channels: plan files (auto, PLAN route), regression tests (auto, DIAGNOSE route), ADRs / discipline references / CONTEXT.md domain glossary (auto-prompted by the Retrospective phase). The codebase gets *easier to work in* over time. Distinguishes mekaknight from per-invocation discipline libraries like superpowers.
+2. **Compound engineering, in one skill** — every session deposits durable artifacts in the repo across five channels: plan files (auto, PLAN route), regression tests (auto, DIAGNOSE route), ADRs / discipline references / CONTEXT.md domain glossary (auto-prompted by the Retrospective phase). Bundled into one orchestrator — no skill composition required. The codebase gets *easier to work in* over time.
 
 The other skills (issue tracking, inspection) are supplementary utilities you can opt into.
 

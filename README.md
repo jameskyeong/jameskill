@@ -35,9 +35,9 @@ Most skill packs (superpowers, Matt Pocock, etc.) hand you a toolbox of discrete
 5. **Tracker-free core.** Forge itself never reads or writes Notion. Issue tracking is a separate, opt-in surface.
 6. **Self-contained.** Zero dependency on superpowers, Matt Pocock, or any other skill pack — every discipline lives inside `skills/forge/references/`. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
 
-### Pillar 2 — Compound engineering, built in
+### Pillar 2 — Compound engineering, in one skill
 
-Other skill packs give you discipline *per invocation* — each session starts fresh, learnings evaporate when the session ends. `/forge` is structurally designed so every session deposits durable artifacts in your repo that lift the next session. **Five channels, all automated:**
+Each `/forge` session deposits durable artifacts in your repo so future sessions start ahead. **Five channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
 
 | Channel | How forge deposits | What compounds |
 |---|---|---|

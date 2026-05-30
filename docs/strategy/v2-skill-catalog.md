@@ -62,9 +62,10 @@ v2.0 marketing surface는 **forge + link + tag + strike** 4개. polish / dedupe 
 ```
 
 **차별점**:
-- **superpowers (210k★)**: 작은 합성 가능한 스킬 스택. forge는 self-contained 한 명령으로 같은 discipline 제공 — 외부 plugin install 없이 바로 사용. **+ Compound engineering**: 매 세션이 repo에 영구 아티팩트(plan/regression test/ADR/reference/glossary) 누적 — superpowers는 invocation-local로 휘발.
+- **superpowers (210k★)**: 작은 합성 가능한 스킬 스택. forge는 self-contained 한 명령으로 같은 discipline 제공 — 외부 plugin install 없이 바로 사용. + 매 세션이 repo에 영구 아티팩트(plan/regression test/ADR/reference/glossary) 누적 — superpowers는 invocation-local로 휘발.
 - **Matt Pocock**: 엔지니어용 작고 조합 가능한 스킬. forge는 한 명령으로 라우터 기반 묶음 — 결정 비용 낮춤.
-- **strict TDD + no-soft-language verification + 4-way auto-routing + 5채널 compound engineering**: 다른 orchestrator가 가지지 않은 4가지 엄격함. 이게 리드 메시지.
+- **EveryInc/compound-engineering-plugin (17k★)**: 같은 "compound engineering" 원리를 37-skill suite로 제공 — term의 dominant claim-holder. forge는 *동일 원리의 single-orchestrator 변종* — 하나의 명령에 5채널 deposit이 phase로 내장. 차별점은 원리 발명이 아니라 *번들링 아키텍처*. ADR 0008.
+- **리드 메시지**: strict TDD + no-soft-language verification + 4-way auto-routing + *compound engineering in one skill*. 다른 orchestrator가 가지지 않은 묶음.
 
 **dogfooding**: 저자가 mekaknight 자체와 사이드 프로젝트에서 매일 사용. 마케팅 영상은 합성 시나리오가 아닌 실제 세션 클립.
 
