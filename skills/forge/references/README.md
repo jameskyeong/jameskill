@@ -20,6 +20,7 @@ See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationa
 | **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — three channels (ADR / references / CONTEXT.md), per-channel thresholds, performative-deposit anti-patterns |
 | **Finish** | [`finishing.md`](finishing.md) | The four branch options sharpened; commit discipline; git-safety anti-patterns |
 | _Cross-cutting_ | [`subagent-patterns.md`](subagent-patterns.md) | When and how to dispatch subagents without abdicating responsibility |
+| _Cross-cutting_ | [`communication-style.md`](communication-style.md) | Inline-gloss discipline for user-facing summaries — what to gloss, length budget, per-phase patterns, anti-patterns |
 
 ## Reading order
 
@@ -31,6 +32,7 @@ If you are new to forge, read in this order:
 4. **[`peer-review.md`](peer-review.md)** — the independence discipline; pairs with `subagent-patterns.md`.
 5. **[`planning.md`](planning.md)**, then **[`finishing.md`](finishing.md)** — the phases that bracket a longer change.
 6. **[`subagent-patterns.md`](subagent-patterns.md)** — the cross-cutting dispatch discipline.
+7. **[`communication-style.md`](communication-style.md)** — the cross-cutting user-facing inline-gloss discipline.
 
 If you are auditing a completed `/forge` run, the relevant module is the one for whichever phase you are auditing — each module ends with a section explaining how that phase relates to the others.
 

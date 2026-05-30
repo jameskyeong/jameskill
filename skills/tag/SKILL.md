@@ -520,3 +520,16 @@ Specific error messages by situation:
 11. Output result summary
 12. Ask about /mekaknight:strike
 ```
+
+---
+
+## Output style — inline-gloss discipline
+
+Codebase-verification summaries, issue parsing reports, and the final result summary must gloss non-obvious internal identifiers (function names, internal variables, project abbreviations) inline on first mention — a short parenthetical (5–15 chars in the response language) so the user can follow without grepping.
+
+```
+✗ analyzeStroke 에서 user κ 계산 누락 — 1 issue 등록됨
+✓ analyzeStroke(stroke 분석 함수) 에서 user κ(사용자 stroke 곡률) 계산 누락 — 1 issue 등록됨
+```
+
+Skip glossing terms the user already used in the prompt, terms inside code blocks, and standard programming words. Forge's [`communication-style.md`](../forge/references/communication-style.md) holds the full discipline.

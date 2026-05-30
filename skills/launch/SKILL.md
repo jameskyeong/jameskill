@@ -86,3 +86,17 @@ Nothing is blocking, but lock v0.1 had nothing to inspect in this project.
 - Advisory items are shown but never change a GO to NO-GO in v0.1.
 - Do not re-derive findings independently — launch is an **aggregator**. The inspection skills own the detection logic; launch owns the decision.
 - Never fabricate a GO. If an inspection skill errored or could not run, report that the verdict is **incomplete**, not GO.
+
+## Output style — inline-gloss discipline
+
+When the verdict or advisory mentions a service-specific term, environment variable, or abbreviation (`RLS`, `anon-key`, `STRIPE_SECRET`, `webhook-sig`, etc.), append a short parenthetical gloss (5–15 chars in the response language) on first mention so the user can act without grepping.
+
+```
+✗ Supabase RLS off on table `users`
+✓ Supabase RLS(행 단위 권한) off on table `users`
+
+✗ STRIPE_SECRET reachable from client bundle
+✓ STRIPE_SECRET(서버 전용 결제 시크릿) reachable from client bundle
+```
+
+Skip glossing terms the user already used in the prompt, terms inside code blocks, and standard programming words. Forge's [`communication-style.md`](../forge/references/communication-style.md) holds the full discipline.

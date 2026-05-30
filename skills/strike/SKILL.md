@@ -383,3 +383,16 @@ If the user interrupts mid-work:
 - NEVER echo, print, or output the `NOTION_KEY` value
 - Pass it only as a shell variable (`$NOTION_KEY`) in curl calls
 - Ensure error logs do not contain the token
+
+---
+
+## Output style — inline-gloss discipline
+
+Issue summaries, group reports, and the per-issue Outcome lines must gloss non-obvious internal identifiers (function names, internal variables, project abbreviations) inline on first mention — a short parenthetical (5–15 chars in the response language) so the user can follow without grepping.
+
+```
+✗ combineQuality 의 curvature 분기 제거로 P1 버그 해소
+✓ combineQuality(품질 등급 결합 함수) 의 curvature(곡률) 분기 제거로 P1 버그 해소
+```
+
+When `/strike` invokes `/forge` internally, forge's own cross-cutting communication gate applies during that session. Strike-level summaries above and below the forge call follow the same rule. Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Forge's [`communication-style.md`](../forge/references/communication-style.md) holds the full discipline.
