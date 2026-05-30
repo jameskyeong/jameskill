@@ -52,7 +52,7 @@
 | obra/superpowers | 210,695 | 위 참조 |
 | affaan-m/ECC (Everything Claude Code) | 196,875 | 거대 메타-팩 |
 | K-Dense-AI/scientific-agent-skills | 26,381 | 과학 도메인 |
-| EveryInc/compound-engineering-plugin | 17,656 | "Compound engineering" — **⚠ 포지셔닝 충돌 가능**: v2.0이 forge의 Pillar 2를 "compound engineering"으로 호명 (README/CLAUDE.md/CONTEXT.md, ADR 0007). EveryInc가 같은 term을 17k★급으로 선점한 상태라 "원조 vs 파생" 인식 리스크 있음. **TODO**: EveryInc 플러그인 실제 메커니즘 조사 → 우리 5채널 deposit (plan/test/ADR/reference/glossary)와 비교 → 차별점 명확화 or 우리 term 재명명 결정. 미해결 시 마케팅 출시 전에 입장 정해야 함. |
+| EveryInc/compound-engineering-plugin | 17,656 | "Compound engineering" — **✅ 포지셔닝 결정 완료 (ADR 0008)**: 조사 결과 그쪽은 STRATEGY.md / brainstorms / pulse-reports / code-review patterns / plans 5채널 deposit + 37-skill suite 아키텍처. 우리는 동일 원리를 *single self-contained orchestrator + 5채널 (plan/test/ADR/reference/glossary)*로 번들. **결정**: term 유지하되 dominant claim-holder로 EveryInc 명시 attribution, Pillar 2 헤드라인 *"Compound engineering, in one skill"*로 리프레이밍. 차별점은 term이 아니라 *번들링 방식*. 마케팅 카피는 "EveryInc는 larger-suite treatment, forge는 single-orchestrator variant"로 통일. |
 | Jeffallan/claude-skills | 9,445 | 일반 팩 |
 | **trailofbits/skills** | 5,449 | **보안 표준 (CodeQL + Semgrep + variant analysis)** |
 | zarazhangrui/codebase-to-course | 4,489 | 비-개발자용 (역방향) |
