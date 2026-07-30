@@ -114,7 +114,7 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 ## Installation
 
 ```bash
-claude plugins marketplace add https://github.com/jameskyeong/mekaknight.git
+claude plugins marketplace add https://github.com/jameskyeong/jameskill.git
 claude plugins install jsk
 ```
 
