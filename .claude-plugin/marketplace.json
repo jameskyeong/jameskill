@@ -15,7 +15,7 @@
         "source": "url",
         "url": "https://github.com/jameskyeong/jameskill.git"
       },
-      "description": "Developer productivity skills for Claude Code — issue tracking, structured workflows, and more",
+      "description": "Developer productivity skills for Claude Code — a self-contained development orchestrator (/powertasking) with optional inspection and Notion issue tracking utilities",
       "version": "2.0.0-alpha.15",
       "strict": true
     }
