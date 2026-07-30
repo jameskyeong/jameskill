@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.jpg" alt="mekaknight" />
+  <img src="docs/banner.jpg" alt="jameskill" />
 </p>
 
 <p align="center">
