@@ -1,5 +1,5 @@
 ---
-name: mekaknight:powertasking
+name: powertasking
 description: >-
   Self-contained development orchestrator: clarify → route → build-with-tests → review → verify → retrospective → finish.
   4-way router (DIRECT/PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration).

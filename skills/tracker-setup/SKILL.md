@@ -1,5 +1,5 @@
 ---
-name: mekaknight:tracker-setup
+name: tracker-setup
 description: >-
   Configure Notion issue tracker integration. Guides you through API key setup,
   database connection, property mapping, template detection, and defaults.

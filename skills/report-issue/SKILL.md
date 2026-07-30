@@ -1,5 +1,5 @@
 ---
-name: mekaknight:report-issue
+name: report-issue
 description: >-
   Report issues to a Notion database from a prompt. Parses multiple issues,
   verifies against the codebase, creates pages with proper template blocks.

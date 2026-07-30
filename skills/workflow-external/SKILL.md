@@ -1,5 +1,5 @@
 ---
-name: mekaknight:workflow-external
+name: workflow-external
 description: >-
   [Legacy v1.x] Skill orchestrator that depends on Matt Pocock and superpowers skills.
   Preserved for reference. For the current self-contained orchestrator, use /mekaknight:powertasking.

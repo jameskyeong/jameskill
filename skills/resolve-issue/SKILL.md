@@ -1,5 +1,5 @@
 ---
-name: mekaknight:resolve-issue
+name: resolve-issue
 description: >-
   Fetch pending issues from Notion, brainstorm solutions, implement fixes,
   and update issue status. Use when: 'resolve-issue', 'engage', 'resolve issues',
