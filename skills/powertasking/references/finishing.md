@@ -207,7 +207,7 @@ The user explicitly wants to leave a half-written file uncommitted (often a scra
 
 ### Resolve-issue caller integration
 
-When powertasking is invoked from `mekaknight:resolve-issue`, Finish has one extra responsibility: signal back to resolve-issue for Notion status transition. The discipline:
+When powertasking is invoked from `jsk:resolve-issue`, Finish has one extra responsibility: signal back to resolve-issue for Notion status transition. The discipline:
 
 - Powertasking still presents the four options to the user.
 - After the user's choice, powertasking passes control back to resolve-issue with the outcome.

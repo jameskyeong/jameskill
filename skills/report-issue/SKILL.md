@@ -22,7 +22,7 @@ Check that `.claude/tracking-issue.json` exists. If missing, stop immediately.
 
 ```bash
 if [ ! -f .claude/tracking-issue.json ]; then
-  echo "Configuration required. Please run /mekaknight:tracker-setup first."
+  echo "Configuration required. Please run /jsk:tracker-setup first."
   exit 1
 fi
 ```
@@ -460,10 +460,10 @@ Omit the failed section if all succeed. Omit the succeeded section if all fail.
 After outputting the result summary, ask about implementation:
 
 ```
-Would you like to proceed with implementation? (/mekaknight:resolve-issue)
+Would you like to proceed with implementation? (/jsk:resolve-issue)
 ```
 
-If the user agrees, invoke the `/mekaknight:resolve-issue` skill.
+If the user agrees, invoke the `/jsk:resolve-issue` skill.
 If declined, end here.
 
 ---
@@ -490,7 +490,7 @@ Specific error messages by situation:
 
 | Situation | Message |
 |---|---|
-| Config file missing | "Configuration required. Please run `/mekaknight:tracker-setup` first." |
+| Config file missing | "Configuration required. Please run `/jsk:tracker-setup` first." |
 | Invalid API key (401) | "Notion API key is invalid. Please verify your token." |
 | DB access denied (403/404) | "Cannot access DB. Verify the Integration is connected to the target DB." |
 | Required property missing | "DB schema validation failed: required property missing: [{property}] ([{type}]) — required options: [{options}]" |
@@ -518,7 +518,7 @@ Specific error messages by situation:
    b. PATCH /blocks/children (add body)
 10. Retry failed issues once
 11. Output result summary
-12. Ask about /mekaknight:resolve-issue
+12. Ask about /jsk:resolve-issue
 ```
 
 ---

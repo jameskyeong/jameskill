@@ -2,7 +2,7 @@
 name: ship-check
 description: >-
   One-line security GO / NO-GO verdict on whether a project is safe to deploy.
-  Runs mekaknight:security-check and translates its findings into a single binary answer:
+  Runs jsk:security-check and translates its findings into a single binary answer:
   can I ship this right now? Use when: 'ship-check', 'can I ship',
   'is this safe to deploy', 'ready to ship', 'cleared for launch'.
 ---
@@ -11,17 +11,17 @@ description: >-
 
 Answers one question: **"Is there a known security configuration issue blocking deploy?"** — Yes or No, plus exactly what's blocking.
 
-`mekaknight:security-check` reports findings; ship-check turns those findings into a single binary decision. That decision is the entire value — no other inspection axis ships in v0.1.
+`jsk:security-check` reports findings; ship-check turns those findings into a single binary decision. That decision is the entire value — no other inspection axis ships in v0.1.
 
-**v0.1 scope: security only.** Ship-check runs `mekaknight:security-check` and nothing else. There is no design check, no quality check, no performance check. Multi-axis aggregation (design / quality / performance / dependencies) is post-v0.1 work and not promised — see [ADR 0010](../../docs/adr/0010-launch-v0.1-security-only.md) for the rationale.
+**v0.1 scope: security only.** Ship-check runs `jsk:security-check` and nothing else. There is no design check, no quality check, no performance check. Multi-axis aggregation (design / quality / performance / dependencies) is post-v0.1 work and not promised — see [ADR 0010](../../docs/adr/0010-launch-v0.1-security-only.md) for the rationale.
 
 ---
 
 ## How to run
 
-### Step 1: Run `mekaknight:security-check`
+### Step 1: Run `jsk:security-check`
 
-Invoke `mekaknight:security-check` against the project and collect its BLOCK and WARN items.
+Invoke `jsk:security-check` against the project and collect its BLOCK and WARN items.
 
 If `lock` is unavailable, tell the user it must be installed and stop — there is nothing to base a verdict on.
 
@@ -45,7 +45,7 @@ Blocking (2):
   ❌ [Security] STRIPE_SECRET reachable from client bundle
        components/Checkout.tsx:8
 
-Fix the blockers above, then run /mekaknight:ship-check again.
+Fix the blockers above, then run /jsk:ship-check again.
 
 Advisory (not blocking):
   ⚠️  [Security] Stripe webhook parses JSON before signature verification — api/webhooks/stripe.ts:14

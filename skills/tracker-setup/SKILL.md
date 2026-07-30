@@ -536,8 +536,8 @@ Notion Issue Tracker Setup Complete
   Default assignee:     {name or "not set"}
   .gitignore:           {included}
 
-You can now use /mekaknight:report-issue to file issues,
-and /mekaknight:resolve-issue to process them.
+You can now use /jsk:report-issue to file issues,
+and /jsk:resolve-issue to process them.
 ```
 
 **WARNING: Never include the API key value in the summary.**

@@ -1,17 +1,17 @@
 # mekaknight
 
-Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/mekaknight:<skill-name>` in Claude Code sessions.
+Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/jsk:<skill-name>` in Claude Code sessions.
 
 ## Language
 
 ### Orchestration
 
 **Powertasking**:
-The development orchestrator skill (`/mekaknight:powertasking`). Takes raw requirements through a disciplined pipeline — clarify → route → build → review → verify → finish — to produce production-grade code. The router branches 4-way: **DIRECT** / **PLAN** for feature work, **DIAGNOSE** for bugs, **PROTOTYPE** for throwaway exploration. Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
+The development orchestrator skill (`/jsk:powertasking`). Takes raw requirements through a disciplined pipeline — clarify → route → build → review → verify → finish — to produce production-grade code. The router branches 4-way: **DIRECT** / **PLAN** for feature work, **DIAGNOSE** for bugs, **PROTOTYPE** for throwaway exploration. Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
 _Avoid_: workflow (ambiguous — see Flagged Ambiguities), temper (v1 name, retired), forge (v2.0 name, retired)
 
 **Production-readiness gate**:
-The architectural concept spanning the mekaknight v2.0 pipeline: **powertasking** builds the code, an **inspection layer** (currently `mekaknight:security-check` alone) checks service-configuration security, **ship-check** issues the final verdict. Not a single skill — the emergent property of these working in sequence. v2.0 ships the inspection layer as security-only; multi-axis inspection (design / quality / performance / dependencies) is post-v2.0 work, deliberately not promised — see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md).
+The architectural concept spanning the mekaknight v2.0 pipeline: **powertasking** builds the code, an **inspection layer** (currently `jsk:security-check` alone) checks service-configuration security, **ship-check** issues the final verdict. Not a single skill — the emergent property of these working in sequence. v2.0 ships the inspection layer as security-only; multi-axis inspection (design / quality / performance / dependencies) is post-v2.0 work, deliberately not promised — see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md).
 _Avoid_: workflow, pipeline (too generic), launch-check (a never-shipped umbrella name — the actual layer is "the inspection skills launch invokes")
 
 **Cross-cutting verify gate**:
@@ -61,27 +61,27 @@ _Avoid_: spike (too informal — PROTOTYPE has explicit phase order and exit gat
 ### Inspection
 
 **Security-check**:
-Alpha utility (`/mekaknight:security-check`) for service-configuration security inspection — Supabase RLS gaps, secret-key client exposure, missing Stripe webhook signatures. v0.1 ships in v2.0 but is **off the marketing surface** (see ADR 0004): the author does not rely on it daily, and three live company codebases returned zero BLOCK findings during dogfooding. Reachable for users who want it; future direction (wrap, deep, or sunset) is deferred to v2.1+. Named for the lockdown step before a mech sortie.
+Alpha utility (`/jsk:security-check`) for service-configuration security inspection — Supabase RLS gaps, secret-key client exposure, missing Stripe webhook signatures. v0.1 ships in v2.0 but is **off the marketing surface** (see ADR 0004): the author does not rely on it daily, and three live company codebases returned zero BLOCK findings during dogfooding. Reachable for users who want it; future direction (wrap, deep, or sunset) is deferred to v2.1+. Named for the lockdown step before a mech sortie.
 _Avoid_: harden (v1 name, retired), lock (v2.0 name, retired), production-readiness gate (security-check is not the gate in v2.0; see ADR 0004).
 
 ### Ship-check ecosystem
 
 **Ship-check**:
-Alpha utility (`/mekaknight:ship-check`) that issues a **security** GO / NO-GO verdict from `security-check`'s findings. v0.1 is deliberately security-only — there is no design / quality / performance axis, and multi-axis aggregation is not promised (see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)). Ships in v2.0 but is **off the marketing surface** for the same reason as security-check (see ADR 0004). The output reads "LAUNCH READY?". Future direction tied to whether post-launch users ask for it.
+Alpha utility (`/jsk:ship-check`) that issues a **security** GO / NO-GO verdict from `security-check`'s findings. v0.1 is deliberately security-only — there is no design / quality / performance axis, and multi-axis aggregation is not promised (see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)). Ships in v2.0 but is **off the marketing surface** for the same reason as security-check (see ADR 0004). The output reads "LAUNCH READY?". Future direction tied to whether post-launch users ask for it.
 _Avoid_: ship-ready (v1 name, retired), launch (v2.0 name, retired), production-readiness gate (deferred from v2.0 surface), multi-axis aggregator (overclaims v0.1 — that framing was retired in ADR 0010).
 
 ### Issue tracking
 
 **Tracker-setup**:
-The tracker uplink skill (`/mekaknight:tracker-setup`). One-time Notion connection — API key, database, property mapping, defaults.
+The tracker uplink skill (`/jsk:tracker-setup`). One-time Notion connection — API key, database, property mapping, defaults.
 _Avoid_: setup-issue (v1 name, retired), link (v2.0 name, retired)
 
 **Report-issue**:
-The issue flagging skill (`/mekaknight:report-issue`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
+The issue flagging skill (`/jsk:report-issue`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
 _Avoid_: tag (v2.0 name, retired)
 
 **Resolve-issue**:
-The issue resolution skill (`/mekaknight:resolve-issue`). Fetches pending issues, brainstorms solutions via **powertasking**, implements fixes, updates Notion status.
+The issue resolution skill (`/jsk:resolve-issue`). Fetches pending issues, brainstorms solutions via **powertasking**, implements fixes, updates Notion status.
 _Avoid_: strike (v2.0 name, retired)
 
 ### Legacy

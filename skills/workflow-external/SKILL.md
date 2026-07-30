@@ -2,7 +2,7 @@
 name: workflow-external
 description: >-
   [Legacy v1.x] Skill orchestrator that depends on Matt Pocock and superpowers skills.
-  Preserved for reference. For the current self-contained orchestrator, use /mekaknight:powertasking.
+  Preserved for reference. For the current self-contained orchestrator, use /jsk:powertasking.
   Use when: 'workflow-external', 'use v1 workflow', 'use external workflow'.
 ---
 
@@ -10,7 +10,7 @@ description: >-
 
 Orchestrates [Matt Pocock skills](https://github.com/mattpocock/skills) and [superpowers](https://github.com/obra/superpowers) into a complete development flow: understand the problem, build it right, review it independently, verify it works, and finish the branch cleanly.
 
-**Tracker-free.** This workflow has no external dependencies beyond git. All artifacts (specs, plans, PRDs, ADRs, CONTEXT.md) live in the repository. Cross-session work resumes by re-running `/mekaknight:workflow-external` with the relevant plan or PRD file path as context.
+**Tracker-free.** This workflow has no external dependencies beyond git. All artifacts (specs, plans, PRDs, ADRs, CONTEXT.md) live in the repository. Cross-session work resumes by re-running `/jsk:workflow-external` with the relevant plan or PRD file path as context.
 
 **Compound engineering guarantee:** Every workflow run improves domain docs, test coverage, and codebase structure — not just the immediate deliverable.
 
@@ -42,7 +42,7 @@ Skills may be installed as plugins, in `~/.claude/skills/`, or in `.claude/skill
 > - Matt Pocock skills — see [mattpocock/skills](https://github.com/mattpocock/skills) for installation instructions.
 > - superpowers — see [obra/superpowers](https://github.com/obra/superpowers) for installation instructions.
 >
-> Re-run `/mekaknight:workflow-external` after installation completes.
+> Re-run `/jsk:workflow-external` after installation completes.
 
 Proceed to Phase 0 only when all required skills are confirmed available.
 
@@ -67,7 +67,7 @@ This gate is referenced explicitly in Phase 3, 3.5, 4.5, and 5.
 **MUST invoke `grill-me` via the Skill tool.** If invocation fails or the skill is unavailable, STOP and report to the user — do NOT proceed manually.
 
 - Interview the user until every branch of the decision tree is resolved
-- If invoked from `mekaknight:strike`, use the issue title + body as the starting context
+- If invoked from `jsk:strike`, use the issue title + body as the starting context
 - If invoked standalone, use whatever the user provided
 
 **Skip conditions:**
@@ -207,7 +207,7 @@ After all tasks complete, proceed to **Phase 3.5** (skip Phase 3 — subagent-dr
 
 #### Cross-session pickup
 
-If the session ends mid-execution, the user resumes by running `/mekaknight:workflow-external` with the plan file path as context. Phase 0 (grill-me) is skipped when the plan file already encodes the agreed problem statement. Re-invoking `subagent-driven-development` on the same plan picks up from incomplete tasks.
+If the session ends mid-execution, the user resumes by running `/jsk:workflow-external` with the plan file path as context. Phase 0 (grill-me) is skipped when the plan file already encodes the agreed problem statement. Re-invoking `subagent-driven-development` on the same plan picks up from incomplete tasks.
 
 ### Route PLAN — Medium in-session feature → `writing-plans` → `subagent-driven-development`
 
@@ -296,7 +296,7 @@ Review results and act:
 |---|---|
 | In scope of current work | Fix immediately (loop back to Phase 3 tdd, or PRD.3 / PLAN.2 subagent execution) |
 | Out of scope, small (1-2 lines) | Fix immediately |
-| Out of scope, large | Note for the user — suggest `/mekaknight:tag` to track separately in Notion |
+| Out of scope, large | Note for the user — suggest `/jsk:tag` to track separately in Notion |
 
 If any fixes are applied, invoke `verification-before-completion` before proceeding.
 
@@ -325,7 +325,7 @@ Triage findings:
 |---|---|
 | **Critical** | Fix immediately, loop back to Phase 3 (or PRD.3 / PLAN.2), then re-run Phase 4 |
 | **Important** | Fix unless the user explicitly defers |
-| **Minor** | Note in the Phase 5.2 commit body, suggest `/mekaknight:tag` for follow-up |
+| **Minor** | Note in the Phase 5.2 commit body, suggest `/jsk:tag` for follow-up |
 
 If you believe a reviewer finding is technically wrong, follow `receiving-code-review`'s `push back with technical reasoning` guidance — do NOT performatively agree. If `receiving-code-review` is available, invoke it to structure the response.
 
@@ -368,7 +368,7 @@ Merge findings, deduplicated by file:line.
 |---|---|
 | Critical / High | Fix immediately, loop back to Phase 3 (TDD-driven fix), then re-run 4.5.2 |
 | Medium | Present to user, default = fix unless the user explicitly defers |
-| Low / Info | Note in the Phase 5.2 commit body, suggest `/mekaknight:tag` for follow-up |
+| Low / Info | Note in the Phase 5.2 commit body, suggest `/jsk:tag` for follow-up |
 
 If any fixes are applied, invoke `verification-before-completion` before proceeding to Phase 5.
 
@@ -431,7 +431,7 @@ If the skill is unavailable, STOP and ask the user — do NOT auto-merge or auto
 
 ## Caller integration
 
-### From `mekaknight:strike`
+### From `jsk:strike`
 
 When invoked from strike:
 - Phase 0 receives the issue title + body as starting context
@@ -442,7 +442,7 @@ The workflow itself never reads from or writes to Notion — `strike` handles th
 
 ### Standalone usage
 
-When invoked directly via `/mekaknight:workflow-external`:
+When invoked directly via `/jsk:workflow-external`:
 - User provides the problem/feature description as the argument (or a path to an existing PRD / plan file for resuming cross-session work)
 - All phases proceed normally
 - On completion, summarize what was done
@@ -453,5 +453,5 @@ When invoked directly via `/mekaknight:workflow-external`:
 
 If the user interrupts at any phase:
 - Work completed in prior phases (docs updates, tests, code) persists in the working tree
-- The user can resume by running `/mekaknight:workflow-external` again with the same context (or with the PRD / plan file path for Routes PRD / PLAN)
+- The user can resume by running `/jsk:workflow-external` again with the same context (or with the PRD / plan file path for Routes PRD / PLAN)
 - No automatic state tracking — the user decides where to pick up

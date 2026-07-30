@@ -178,7 +178,7 @@ Check 3 — Stripe webhook:        <status>
 ⚠️  Warnings (<n>):
   • ...
 
-For a GO/NO-GO verdict, run /mekaknight:ship-check.
+For a GO/NO-GO verdict, run /jsk:ship-check.
 ```
 
 If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Never invent findings — only report what the evidence shows.
