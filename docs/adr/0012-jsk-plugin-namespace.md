@@ -23,3 +23,7 @@ Commands become `/jsk:powertasking`, `/jsk:security-check`, `/jsk:ship-check`, `
 - The `jameskill-marketplace` listing (separate repo) still names the plugin `mekaknight`; installs from there would resurrect the old namespace until that repo's marketplace.json is updated or the listing is removed.
 - Historical docs (ADRs 0001–0011, plans, strategy) intentionally keep `/mekaknight:` references — they record the commands as they were at the time.
 - Executed in alpha (`2.0.0-alpha.13` → `2.0.0-alpha.14`), commit prefix `feat!:` per the versioning policy on renames.
+
+## Addendum (same day)
+
+The brand consolidation went further than this ADR's original decision: the GitHub repo was renamed `mekaknight` → `jameskill` (reclaiming the pre-rebrand name; GitHub redirects the old URL), and the README banner now carries the Jameskill artwork. What still carries the mekaknight name: the npm package name, the marketplace name (`mekaknight-marketplace`), the local working-directory name, and the docs' product references.
