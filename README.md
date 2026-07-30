@@ -14,7 +14,7 @@
 
 ---
 
-<img align="right" src="docs/mekaknight-hero.jpg" width="220" alt="mekaknight character" />
+<img align="right" src="docs/jameskill-hero.jpg" width="220" alt="jameskill character" />
 
 Built on two pillars: **`/powertasking`** — a self-contained development orchestrator that drives the full flow from one command — and **compound engineering** baked into the structure, so every session deposits artifacts that lift the next one.
 
