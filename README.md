@@ -115,7 +115,7 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 
 ```bash
 claude plugins marketplace add https://github.com/jameskyeong/mekaknight.git
-claude plugins install mekaknight
+claude plugins install jsk
 ```
 
 ## Requirements

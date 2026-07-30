@@ -17,7 +17,7 @@ Self-contained development orchestrator that takes raw requirements through a di
 
 Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
 
-**For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/mekaknight:workflow-external`.**
+**For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/jsk:workflow-external`.**
 
 > **Discipline depth lives in [`references/`](references/README.md).** Each phase below carries a pointer to the module that deepens it (principles, anti-patterns, edge cases). The orchestrator below stays slim; the references hold the full discipline. **Loading them is not optional — see the reference-loading gate below.**
 
@@ -168,7 +168,7 @@ Run these checks and report results:
 
 > **Required reading at phase entry — one-question-at-a-time grilling, recommended-answer-with-reasoning patterns, deepened 5-category checklist, approach-proposal discipline, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
 
-If invoked from `mekaknight:resolve-issue`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
+If invoked from `jsk:resolve-issue`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
 
@@ -595,7 +595,7 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 
 ## Caller integration
 
-### From `mekaknight:resolve-issue`
+### From `jsk:resolve-issue`
 
 - Clarify receives the issue title + body as starting context
 - All phases proceed normally

@@ -10,7 +10,7 @@
   },
   "plugins": [
     {
-      "name": "mekaknight",
+      "name": "jsk",
       "source": {
         "source": "url",
         "url": "https://github.com/jameskyeong/mekaknight.git"
