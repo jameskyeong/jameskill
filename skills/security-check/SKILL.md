@@ -1,5 +1,5 @@
 ---
-name: mekaknight:security-check
+name: security-check
 description: >-
   Inspect a project for service-configuration security holes that
   code scanners (semgrep, Snyk) miss: Supabase RLS gaps, secret-key client

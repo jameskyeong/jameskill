@@ -1,5 +1,5 @@
 ---
-name: mekaknight:ship-check
+name: ship-check
 description: >-
   One-line security GO / NO-GO verdict on whether a project is safe to deploy.
   Runs mekaknight:security-check and translates its findings into a single binary answer:
