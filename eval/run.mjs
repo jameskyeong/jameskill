@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// mekaknight eval runner — v1 (static checks + golden fixtures)
+// jameskill eval runner — v1 (static checks + golden fixtures)
 //
 // See eval/README.md for what each check does and how to extend.
 

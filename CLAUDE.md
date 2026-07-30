@@ -1,4 +1,4 @@
-# mekaknight
+# jameskill
 
 Developer productivity skills for Claude Code. Built on two pillars:
 

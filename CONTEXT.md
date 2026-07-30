@@ -1,4 +1,4 @@
-# mekaknight
+# jameskill
 
 Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/jsk:<skill-name>` in Claude Code sessions.
 
@@ -11,7 +11,7 @@ The development orchestrator skill (`/jsk:powertasking`). Takes raw requirements
 _Avoid_: workflow (ambiguous — see Flagged Ambiguities), temper (v1 name, retired), forge (v2.0 name, retired)
 
 **Production-readiness gate**:
-The architectural concept spanning the mekaknight v2.0 pipeline: **powertasking** builds the code, an **inspection layer** (currently `jsk:security-check` alone) checks service-configuration security, **ship-check** issues the final verdict. Not a single skill — the emergent property of these working in sequence. v2.0 ships the inspection layer as security-only; multi-axis inspection (design / quality / performance / dependencies) is post-v2.0 work, deliberately not promised — see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md).
+The architectural concept spanning the jameskill v2.0 pipeline: **powertasking** builds the code, an **inspection layer** (currently `jsk:security-check` alone) checks service-configuration security, **ship-check** issues the final verdict. Not a single skill — the emergent property of these working in sequence. v2.0 ships the inspection layer as security-only; multi-axis inspection (design / quality / performance / dependencies) is post-v2.0 work, deliberately not promised — see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md).
 _Avoid_: workflow, pipeline (too generic), launch-check (a never-shipped umbrella name — the actual layer is "the inspection skills launch invokes")
 
 **Cross-cutting verify gate**:
@@ -33,12 +33,12 @@ _Avoid_: tests (overlaps with code tests; eval discipline is for skill prose), l
 ### Positioning
 
 **Compound engineering**:
-The architectural principle — the second of mekaknight's two pillars alongside the **powertasking** orchestrator — that each session must deposit durable artifacts in the repo so future sessions start ahead. The five compounding channels and how they fill: **plan files** in `docs/plans/<github-id>/` (auto, PLAN route), **DIAGNOSE regression tests** in the test suite (auto, DIAGNOSE route), **ADRs** in `docs/adr/` (auto-prompted by Retrospective phase, Channel 1), **discipline references** in `skills/powertasking/references/` (auto-prompted by Retrospective, Channel 2), **CONTEXT.md** domain glossary (auto-prompted by Retrospective, Channel 3).
+The architectural principle — the second of jameskill's two pillars alongside the **powertasking** orchestrator — that each session must deposit durable artifacts in the repo so future sessions start ahead. The five compounding channels and how they fill: **plan files** in `docs/plans/<github-id>/` (auto, PLAN route), **DIAGNOSE regression tests** in the test suite (auto, DIAGNOSE route), **ADRs** in `docs/adr/` (auto-prompted by Retrospective phase, Channel 1), **discipline references** in `skills/powertasking/references/` (auto-prompted by Retrospective, Channel 2), **CONTEXT.md** domain glossary (auto-prompted by Retrospective, Channel 3).
 
-The term is **not mekaknight's coinage** — EveryInc's [compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) is the dominant claim-holder in the Claude Code ecosystem (37 skills, "Official Compound Engineering plugin"). mekaknight ships an architectural variant: same principle (cross-session artifact deposit so the codebase gets easier to work in), bundled into a single self-contained orchestrator rather than a multi-skill suite the user composes. EveryInc's channels (STRATEGY.md, brainstorms, pulse-reports, code-review patterns, implementation plans) overlap in spirit with ours but are organized differently. See [ADR 0008](docs/adr/0008-compound-engineering-positioning.md) for the positioning decision.
+The term is **not jameskill's coinage** — EveryInc's [compound-engineering-plugin](https://github.com/EveryInc/compound-engineering-plugin) is the dominant claim-holder in the Claude Code ecosystem (37 skills, "Official Compound Engineering plugin"). jameskill ships an architectural variant: same principle (cross-session artifact deposit so the codebase gets easier to work in), bundled into a single self-contained orchestrator rather than a multi-skill suite the user composes. EveryInc's channels (STRATEGY.md, brainstorms, pulse-reports, code-review patterns, implementation plans) overlap in spirit with ours but are organized differently. See [ADR 0008](docs/adr/0008-compound-engineering-positioning.md) for the positioning decision.
 
 Deeper process-learning compounding (DIRECT-route Clarify-answer reuse, Peer-review meta-pattern extraction, cross-session retrospective accumulation) is **open work** — out of scope for v2.0 per ADR 0007's status note.
-_Avoid_: continuous integration (overloaded term), AI feedback loop (too vague — compound engineering specifically means artifact deposit into the repo), context engineering (different — that's about runtime prompt assembly, not durable repo artifacts), claiming the term as mekaknight's coinage (it isn't — attribute EveryInc as the wider home).
+_Avoid_: continuous integration (overloaded term), AI feedback loop (too vague — compound engineering specifically means artifact deposit into the repo), context engineering (different — that's about runtime prompt assembly, not durable repo artifacts), claiming the term as jameskill's coinage (it isn't — attribute EveryInc as the wider home).
 
 ### Routing
 
@@ -92,7 +92,7 @@ _Avoid_: old workflow, legacy workflow
 
 ## Flagged ambiguities
 
-**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of mekaknight's pipeline. Resolved: the skill is now **powertasking**; the concept is **production-readiness gate**. The word "workflow" should only appear when referring to the preserved **workflow-external**.
+**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **powertasking**; the concept is **production-readiness gate**. The word "workflow" should only appear when referring to the preserved **workflow-external**.
 
 ## Example dialogue
 

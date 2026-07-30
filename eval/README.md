@@ -1,4 +1,4 @@
-# mekaknight — eval discipline (v1)
+# jameskill — eval discipline (v1)
 
 A **static check + golden fixture** regression net for the skill prose. Catches drift between what each skill *declares* it does (cross-cutting gates, inline-gloss rule, banned-language list) and what its content actually contains.
 
