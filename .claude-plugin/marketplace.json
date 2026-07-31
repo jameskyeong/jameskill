@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Developer productivity skills by James Kyeong",
-    "version": "2.0.0-alpha.16"
+    "version": "2.0.0-alpha.17"
   },
   "plugins": [
     {
@@ -16,7 +16,7 @@
         "url": "https://github.com/jameskyeong/jameskill.git"
       },
       "description": "Developer productivity skills for Claude Code — a self-contained development orchestrator (/develop) with optional inspection and Notion issue tracking utilities",
-      "version": "2.0.0-alpha.16",
+      "version": "2.0.0-alpha.17",
       "strict": true
     }
   ]
