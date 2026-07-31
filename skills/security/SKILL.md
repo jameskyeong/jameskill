@@ -1,18 +1,18 @@
 ---
-name: security-check
+name: security
 description: >-
   Inspect a project for service-configuration security holes that
   code scanners (semgrep, Snyk) miss: Supabase RLS gaps, secret-key client
   exposure, and missing webhook signature verification. Reports PASS/WARN/BLOCK
-  with fix suggestions. Use when: 'security-check', 'security check', 'check my app',
+  with fix suggestions. Use when: 'security', 'security check', 'security-check' (legacy name), 'check my app',
   'is this safe to ship'.
 ---
 
-# Security-check — Service Configuration Security Inspection
+# Security — Service Configuration Security Inspection
 
 Inspects **the current project** for service-configuration security holes that code-pattern scanners cannot catch.
 
-**What this is NOT:** This does not scan for code-level vulnerabilities like XSS or SQL injection — that's semgrep's job. Security-check catches the *configuration* mistakes that pattern scanners cannot see: a database table left world-readable, a secret key bundled into the browser, a payment webhook that trusts forged requests.
+**What this is NOT:** This does not scan for code-level vulnerabilities like XSS or SQL injection — that's semgrep's job. Security catches the *configuration* mistakes that pattern scanners cannot see: a database table left world-readable, a secret key bundled into the browser, a payment webhook that trusts forged requests.
 
 **Target:** the project in the current working directory (a user's app), not jameskill itself.
 
@@ -178,7 +178,7 @@ Check 3 — Stripe webhook:        <status>
 ⚠️  Warnings (<n>):
   • ...
 
-For a GO/NO-GO verdict, run /jsk:ship-check.
+For a GO/NO-GO verdict, run /jsk:ship.
 ```
 
 If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Never invent findings — only report what the evidence shows.
@@ -203,4 +203,4 @@ When findings or summaries mention service-specific terms, env vars, or abbrevia
 ✓ STRIPE_SECRET(서버 전용 결제 시크릿) referenced in client component
 ```
 
-Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Powertasking's [`communication-style.md`](../powertasking/references/communication-style.md) holds the full discipline.
+Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Develop's [`communication-style.md`](../develop/references/communication-style.md) holds the full discipline.

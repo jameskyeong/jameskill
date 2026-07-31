@@ -1,12 +1,12 @@
 ---
-name: tracker-resolve
+name: resolve
 description: >-
   Fetch pending issues from Notion, brainstorm solutions, implement fixes,
-  and update issue status. Use when: 'tracker-resolve', 'engage', 'resolve issues',
+  and update issue status. Use when: 'resolve', 'tracker-resolve' (legacy name), 'engage', 'resolve issues',
   'work on pending issues'.
 ---
 
-# Resolve-issue — Notion Issue Resolve
+# Resolve — Notion Issue Resolve
 
 Queries pending issues from the Notion issue tracker DB, then walks through brainstorming, implementation, and status transitions for the issue(s) the user selects.
 
@@ -21,7 +21,7 @@ Read `.claude/tracking-issue.json` from the project root and extract mapped prop
 ```bash
 CONFIG=".claude/tracking-issue.json"
 if [ ! -f "$CONFIG" ]; then
-  echo "Configuration required. Please run /jsk:tracker-setup first."
+  echo "Configuration required. Please run /jsk:tracker first."
   exit 1
 fi
 
@@ -40,7 +40,7 @@ IN_PROGRESS_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.in
 DEPLOY_STATUS=$(cat "$CONFIG" | jq -r '.databases.issueTracker.statusMap.readyToDeploy')
 ```
 
-If the config file is missing, **stop immediately** and direct the user to run `/jsk:tracker-setup`.
+If the config file is missing, **stop immediately** and direct the user to run `/jsk:tracker`.
 
 **Security:** NEVER echo, print, or output the `NOTION_KEY` value. Pass it only as a shell variable in curl calls.
 
@@ -253,14 +253,14 @@ Extract `rich_text[].plain_text` from each block in `.results[]` to compose the 
 
 ### 6b. Invoke workflow
 
-**Single issue** — invoke `jsk:powertasking` with:
+**Single issue** — invoke `jsk:develop` with:
 ```
 [Issue title]
 
 [Issue body — text from block children]
 ```
 
-**Grouped issues (2+)** — invoke `jsk:powertasking` once for the entire group with a structured multi-issue prompt:
+**Grouped issues (2+)** — invoke `jsk:develop` once for the entire group with a structured multi-issue prompt:
 ```
 Below are N related issues to handle together.
 
@@ -274,9 +274,9 @@ Derive the group's common context in Clarify,
 but address every individual issue in Build without omission.
 ```
 
-The powertasking skill handles the full cycle: clarify → route → build-with-tests → peer-review → verify → finish. The router picks DIRECT/PLAN for feature work, DIAGNOSE for bug-shaped issues (reproduction steps, error messages), or PROTOTYPE for design-exploration issues — Clarify shapes which.
+The develop skill handles the full cycle: clarify → route → build-with-tests → peer-review → verify → finish. The router picks DIRECT/PLAN for feature work, DIAGNOSE for bug-shaped issues (reproduction steps, error messages), or PROTOTYPE for design-exploration issues — Clarify shapes which.
 
-**If `jsk:powertasking` is not available:** Inform the user that the powertasking skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
+**If `jsk:develop` is not available:** Inform the user that the develop skill is unavailable, then proceed with a standard brainstorming approach — present the issue context directly in the conversation and work through the solution interactively with the user.
 
 Once the workflow completes and the user confirms "done", proceed to Step 7.
 
@@ -362,7 +362,7 @@ If there are remaining groups, proceed to the next group (back to Step 5c → St
 
 If the user interrupts mid-work:
 - The current issue's status **remains "In Progress"** (already changed in Step 5 before brainstorming)
-- On the next `/jsk:tracker-resolve` call, the issue will appear in the **⏳ In Progress section** so work can resume
+- On the next `/jsk:resolve` call, the issue will appear in the **⏳ In Progress section** so work can resume
 - No special abort handler is needed
 
 ---
@@ -371,7 +371,7 @@ If the user interrupts mid-work:
 
 | Situation | Message |
 |---|---|
-| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/jsk:tracker-setup` first." |
+| `.claude/tracking-issue.json` missing | "Configuration required. Please run `/jsk:tracker` first." |
 | Invalid API key (401 response) | "Notion API key is invalid. Please verify your token." |
 | DB inaccessible (403/404 response) | "Cannot access the database. Please verify the integration is connected to this DB." |
 | 0 issues found | "No pending issues found." |
@@ -395,4 +395,4 @@ Issue summaries, group reports, and the per-issue Outcome lines must gloss non-o
 ✓ combineQuality(품질 등급 결합 함수) 의 curvature(곡률) 분기 제거로 P1 버그 해소
 ```
 
-When `/tracker-resolve` invokes `/powertasking` internally, powertasking's own cross-cutting communication gate applies during that session. The tracker-resolve summaries above and below the powertasking call follow the same rule. Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Powertasking's [`communication-style.md`](../powertasking/references/communication-style.md) holds the full discipline.
+When `/resolve` invokes `/develop` internally, develop's own cross-cutting communication gate applies during that session. The resolve summaries above and below the develop call follow the same rule. Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Develop's [`communication-style.md`](../develop/references/communication-style.md) holds the full discipline.

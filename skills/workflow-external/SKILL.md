@@ -2,7 +2,7 @@
 name: workflow-external
 description: >-
   [Legacy v1.x] Skill orchestrator that depends on Matt Pocock and superpowers skills.
-  Preserved for reference. For the current self-contained orchestrator, use /jsk:powertasking.
+  Preserved for reference. For the current self-contained orchestrator, use /jsk:develop.
   Use when: 'workflow-external', 'use v1 workflow', 'use external workflow'.
 ---
 
