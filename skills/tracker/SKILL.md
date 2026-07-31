@@ -1,13 +1,13 @@
 ---
-name: tracker-setup
+name: tracker
 description: >-
   Configure Notion issue tracker integration. Guides you through API key setup,
   database connection, property mapping, template detection, and defaults.
-  Use when: 'tracker-setup', 'connect tracker', or when tracker-report/tracker-resolve detects missing
+  Use when: 'tracker', 'tracker-setup' (legacy name), 'connect tracker', or when report/resolve detects missing
   configuration.
 ---
 
-# Tracker-setup — Notion Issue Tracker Setup
+# Tracker — Notion Issue Tracker Setup
 
 Creates a per-project `.claude/tracking-issue.json` configuration file, step by step.
 
@@ -536,8 +536,8 @@ Notion Issue Tracker Setup Complete
   Default assignee:     {name or "not set"}
   .gitignore:           {included}
 
-You can now use /jsk:tracker-report to file issues,
-and /jsk:tracker-resolve to process them.
+You can now use /jsk:report to file issues,
+and /jsk:resolve to process them.
 ```
 
 **WARNING: Never include the API key value in the summary.**
