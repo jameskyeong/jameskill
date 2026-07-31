@@ -76,13 +76,13 @@ _Avoid_: ship-ready (v1 name, retired), launch (v2.0 name, retired), production-
 The tracker uplink skill (`/jsk:tracker-setup`). One-time Notion connection — API key, database, property mapping, defaults.
 _Avoid_: setup-issue (v1 name, retired), link (v2.0 name, retired)
 
-**Report-issue**:
-The issue flagging skill (`/jsk:report-issue`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
-_Avoid_: tag (v2.0 name, retired)
+**Tracker-report**:
+The issue flagging skill (`/jsk:tracker-report`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
+_Avoid_: tag (v2.0 name, retired), report-issue (alpha.13–15 name, retired — ADR 0014)
 
-**Resolve-issue**:
-The issue resolution skill (`/jsk:resolve-issue`). Fetches pending issues, brainstorms solutions via **powertasking**, implements fixes, updates Notion status.
-_Avoid_: strike (v2.0 name, retired)
+**Tracker-resolve**:
+The issue resolution skill (`/jsk:tracker-resolve`). Fetches pending issues, brainstorms solutions via **powertasking**, implements fixes, updates Notion status.
+_Avoid_: strike (v2.0 name, retired), resolve-issue (alpha.13–15 name, retired — ADR 0014)
 
 ### Legacy
 

@@ -1,9 +1,9 @@
 ---
-name: report-issue
+name: tracker-report
 description: >-
   Report issues to a Notion database from a prompt. Parses multiple issues,
   verifies against the codebase, creates pages with proper template blocks.
-  Use when: 'report-issue', 'report issues', 'log issues'.
+  Use when: 'tracker-report', 'report issues', 'log issues'.
 ---
 
 # Report-issue — Notion Issue Report
@@ -460,10 +460,10 @@ Omit the failed section if all succeed. Omit the succeeded section if all fail.
 After outputting the result summary, ask about implementation:
 
 ```
-Would you like to proceed with implementation? (/jsk:resolve-issue)
+Would you like to proceed with implementation? (/jsk:tracker-resolve)
 ```
 
-If the user agrees, invoke the `/jsk:resolve-issue` skill.
+If the user agrees, invoke the `/jsk:tracker-resolve` skill.
 If declined, end here.
 
 ---
@@ -518,7 +518,7 @@ Specific error messages by situation:
    b. PATCH /blocks/children (add body)
 10. Retry failed issues once
 11. Output result summary
-12. Ask about /jsk:resolve-issue
+12. Ask about /jsk:tracker-resolve
 ```
 
 ---

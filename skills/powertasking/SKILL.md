@@ -8,7 +8,7 @@ description: >-
   Use when: 'powertasking', 'start working on', 'implement this', 'build this' (feature),
   'fix this', 'debug this', 'diagnose this' (DIAGNOSE),
   'prototype this', 'try a design', 'explore options' (PROTOTYPE).
-  Also invoked by resolve-issue after issue selection.
+  Also invoked by tracker-resolve after issue selection.
 ---
 
 # Powertasking — Development Orchestrator
@@ -168,7 +168,7 @@ Run these checks and report results:
 
 > **Required reading at phase entry — one-question-at-a-time grilling, recommended-answer-with-reasoning patterns, deepened 5-category checklist, approach-proposal discipline, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
 
-If invoked from `jsk:resolve-issue`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
+If invoked from `jsk:tracker-resolve`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
 
@@ -474,7 +474,7 @@ For now, proceed directly to Verify.
 
 **Goal:** Capture this session's learnings into the repo's compound-engineering channels so future sessions start ahead.
 
-> **Required reading at phase entry — why three explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, resolve-issue-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
+> **Required reading at phase entry — why three explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, tracker-resolve-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
 
 Run after Verify exits green, before Finish. Check three channels in order. For each, propose a deposit *only if* its threshold is met. Do not invent deposits to make the phase feel productive — silent exit is the correct outcome when no channel qualifies.
 
@@ -558,7 +558,7 @@ Not a glossary update: existing entries, throwaway phrases, standard programming
 
 **Goal:** Capture the work and let the user decide what to do with the branch.
 
-> **Required reading at phase entry — when each of the four branch options actually fits, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, resolve-issue caller integration) — see [`references/finishing.md`](references/finishing.md).**
+> **Required reading at phase entry — when each of the four branch options actually fits, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, tracker-resolve caller integration) — see [`references/finishing.md`](references/finishing.md).**
 
 ### Step 1: Final commit
 
@@ -569,7 +569,7 @@ git add <implementation files>
 git commit -m "<type>: <description>"
 ```
 
-If invoked from `resolve-issue`, include the issue reference in the commit message.
+If invoked from `tracker-resolve`, include the issue reference in the commit message.
 
 Skip if: not a git repo, no changes to commit, or PLAN route already produced per-task commits.
 
@@ -582,7 +582,7 @@ Present 4 options to the user:
 3. **Keep branch** — Work is paused or not ready to merge. Leave the branch as-is.
 4. **Discard** — Work is throwaway (e.g., informed a decision but won't be shipped). Delete the branch.
 
-If invoked from `resolve-issue`, note that resolve-issue will handle status transition after this step.
+If invoked from `tracker-resolve`, note that tracker-resolve will handle status transition after this step.
 
 Do NOT auto-merge or auto-push without the user's explicit choice.
 
@@ -595,11 +595,11 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 
 ## Caller integration
 
-### From `jsk:resolve-issue`
+### From `jsk:tracker-resolve`
 
 - Clarify receives the issue title + body as starting context
 - All phases proceed normally
-- On completion, control returns to resolve-issue for Notion status transition
+- On completion, control returns to tracker-resolve for Notion status transition
 
 ### Standalone usage
 

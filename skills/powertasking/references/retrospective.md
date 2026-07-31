@@ -175,7 +175,7 @@ If `/powertasking docs/plans/<github-id>/<feature>.md` resumes a prior session, 
 
 ### Resolve-issue-caller integration
 
-When `/powertasking` is invoked by `/resolve-issue`, the Retrospective still runs. Deposits proposed here are independent of the Notion status update resolve-issue performs after Finish. An ADR or reference deposit may happen even if the issue itself is rejected by the user during resolve-issue.
+When `/powertasking` is invoked by `/tracker-resolve`, the Retrospective still runs. Deposits proposed here are independent of the Notion status update tracker-resolve performs after Finish. An ADR or reference deposit may happen even if the issue itself is rejected by the user during tracker-resolve.
 
 ### PROTOTYPE Discard
 

@@ -50,6 +50,6 @@ If you are auditing a completed `/powertasking` run, the relevant module is the 
 
 Tracked in `docs/plans/jameskyeong/forge-depth-references-vN.md`. Currently open:
 
-- `architecture.md` — gated on a decision to promote PRD-scale architecture work to a supported route. ADR 0006 rejected ARCHITECT for v2.0 because PRD-level work overlaps with the existing tracker (`/resolve-issue`, `/report-issue`) and exceeds powertasking's single-session responsibility scope. Revisitable if post-launch usage signals demand.
+- `architecture.md` — gated on a decision to promote PRD-scale architecture work to a supported route. ADR 0006 rejected ARCHITECT for v2.0 because PRD-level work overlaps with the existing tracker (`/tracker-resolve`, `/tracker-report`) and exceeds powertasking's single-session responsibility scope. Revisitable if post-launch usage signals demand.
 
 These modules will not be added until powertasking has a phase that consumes them. A module with no caller is documentation orphan; the references folder exists to back powertasking's orchestration, not to host orphaned discipline.

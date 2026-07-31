@@ -1,8 +1,8 @@
 ---
-name: resolve-issue
+name: tracker-resolve
 description: >-
   Fetch pending issues from Notion, brainstorm solutions, implement fixes,
-  and update issue status. Use when: 'resolve-issue', 'engage', 'resolve issues',
+  and update issue status. Use when: 'tracker-resolve', 'engage', 'resolve issues',
   'work on pending issues'.
 ---
 
@@ -362,7 +362,7 @@ If there are remaining groups, proceed to the next group (back to Step 5c → St
 
 If the user interrupts mid-work:
 - The current issue's status **remains "In Progress"** (already changed in Step 5 before brainstorming)
-- On the next `/jsk:resolve-issue` call, the issue will appear in the **⏳ In Progress section** so work can resume
+- On the next `/jsk:tracker-resolve` call, the issue will appear in the **⏳ In Progress section** so work can resume
 - No special abort handler is needed
 
 ---
@@ -395,4 +395,4 @@ Issue summaries, group reports, and the per-issue Outcome lines must gloss non-o
 ✓ combineQuality(품질 등급 결합 함수) 의 curvature(곡률) 분기 제거로 P1 버그 해소
 ```
 
-When `/resolve-issue` invokes `/powertasking` internally, powertasking's own cross-cutting communication gate applies during that session. The resolve-issue summaries above and below the powertasking call follow the same rule. Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Powertasking's [`communication-style.md`](../powertasking/references/communication-style.md) holds the full discipline.
+When `/tracker-resolve` invokes `/powertasking` internally, powertasking's own cross-cutting communication gate applies during that session. The tracker-resolve summaries above and below the powertasking call follow the same rule. Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Powertasking's [`communication-style.md`](../powertasking/references/communication-style.md) holds the full discipline.
