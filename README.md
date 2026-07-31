@@ -29,7 +29,7 @@ Most skill packs (superpowers, Matt Pocock, etc.) hand you a toolbox of discrete
 ### Pillar 1 — One command, smart pipeline
 
 1. **One command, full pipeline.** You type `/develop` (or `/develop fix the login bug`). Develop runs the whole flow — you never pick which sub-skill to call next.
-2. **Auto-routing by intent.** After Clarify, develop *infers* what kind of work this is and picks one of 4 routes. You don't choose; it decides.
+2. **Auto-routing by intent.** After Clarify, `/develop` *infers* what kind of work this is and picks one of 4 routes. You don't choose; it decides.
 3. **Different phase shapes per route.** DIAGNOSE writes the reproduction test before the fix. PROTOTYPE relaxes TDD on purpose. These aren't relabeled flows — they're different phase orders.
 4. **No-soft-language verification.** Every phase boundary rejects "should work", "seems fine", "looks good". Verification means running the command and observing the output.
 5. **Tracker-free core.** Develop itself never reads or writes Notion. Issue tracking is a separate, opt-in surface.
@@ -39,7 +39,7 @@ Most skill packs (superpowers, Matt Pocock, etc.) hand you a toolbox of discrete
 
 Each `/develop` session deposits durable artifacts in your repo so future sessions start ahead. **Five channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
 
-| Channel | How develop deposits | What compounds |
+| Channel | How `/develop` deposits | What compounds |
 |---|---|---|
 | **Plan files** | Auto — PLAN route writes `docs/plans/<github-id>/<feature>.md` | Resumable contracts. `/develop docs/plans/<github-id>/<feature>.md` re-enters from the first incomplete task across sessions. |
 | **Regression tests** | Auto — DIAGNOSE route adds the *minimized* reproduction test to the suite permanently | Bugs compound into protection. The net grows with every fix. |
@@ -55,7 +55,7 @@ The Retrospective phase runs between Verify and Finish, checks each channel agai
 
 ### The 4-way router
 
-After Clarify, develop picks **one** route based on the kind of work. Each route is a meaningfully different phase shape — not the same flow renamed.
+After Clarify, `/develop` picks **one** route based on the kind of work. Each route is a meaningfully different phase shape — not the same flow renamed.
 
 | Route | When | Phase shape | Why it's different |
 |---|---|---|---|
@@ -95,9 +95,9 @@ Ships in v2.0 but not the v2.0 headline — the author doesn't use them daily an
 | Command | What it does |
 |---|---|
 | `/security` | v0.1 inspection for Supabase RLS gaps, secret-key client exposure (Next.js `"use client"` paradigm), missing Stripe webhook signatures |
-| `/ship` | v0.1 security GO / NO-GO deploy verdict from security's findings (security-only by design — multi-axis aggregation is not promised, see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)) |
+| `/ship` | v0.1 security GO / NO-GO deploy verdict from `/security`'s findings (security-only by design — multi-axis aggregation is not promised, see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)) |
 
-> **Framework note**: security's secret-key check assumes a Next.js-style client/server boundary. SvelteKit / Nuxt / Remix may receive false PASSes on that specific check — manual review recommended for those stacks until framework-specific detection lands.
+> **Framework note**: `/security`'s secret-key check assumes a Next.js-style client/server boundary. SvelteKit / Nuxt / Remix may receive false PASSes on that specific check — manual review recommended for those stacks until framework-specific detection lands.
 
 ### 🗂 Notion issue tracking (optional integration)
 

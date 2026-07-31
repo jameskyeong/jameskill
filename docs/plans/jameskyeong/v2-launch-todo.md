@@ -1,7 +1,7 @@
 # v2.0 launch TODO
 
 > **Created**: 2026-05-30 (집)
-> **Status**: scope finalized per [ADR 0004](../adr/0004-narrow-v2-to-forge-and-tracker.md); version regressed from `rc.1` to the `alpha.4-6` cycle to ship genuine depth before claiming release-candidate readiness; currently `2.0.0-alpha.6`.
+> **Status**: scope finalized per [ADR 0004](../../adr/0004-narrow-v2-to-forge-and-tracker.md); version regressed from `rc.1` to the `alpha.4-6` cycle to ship genuine depth before claiming release-candidate readiness; currently `2.0.0-alpha.6`.
 > **What's left**: marketing assets + launch execution (depth work below is now done).
 > **Open this file when**: returning to launch prep work
 
