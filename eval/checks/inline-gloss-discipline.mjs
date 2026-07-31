@@ -2,7 +2,7 @@ const ALLOWLIST = new Set([
   'test', 'tests', 'import', 'export', 'commit', 'branch', 'main', 'null',
   'true', 'false', 'undefined', 'fetch', 'console.log', 'useState', 'useEffect',
   'package.json', 'README.md', 'CONTEXT.md', 'SKILL.md', 'CLAUDE.md',
-  'powertasking', 'security-check', 'ship-check', 'resolve-issue', 'report-issue', 'tracker-setup',
+  'powertasking', 'security-check', 'ship-check', 'tracker-resolve', 'tracker-report', 'tracker-setup',
   'RED', 'GREEN', 'REFACTOR', 'TDD', 'PR', 'ADR', 'CI',
   'npm', 'git', 'bash', 'jq', 'curl', 'grep', 'sed', 'awk',
 ]);

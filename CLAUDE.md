@@ -21,8 +21,8 @@ The other skills (issue tracking, inspection) are supplementary utilities you ca
 ### Notion issue tracking (optional integration)
 
 - **`/tracker-setup`** — Configure Notion API key, connect databases, detect templates, set defaults.
-- **`/report-issue`** — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
-- **`/resolve-issue`** — Fetch pending issues, brainstorm solutions (invokes `/powertasking` internally), implement fixes, update status.
+- **`/tracker-report`** — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
+- **`/tracker-resolve`** — Fetch pending issues, brainstorm solutions (invokes `/powertasking` internally), implement fixes, update status.
 
 ## Configuration
 
@@ -34,7 +34,7 @@ See `CONTEXT.md` for domain glossary and `docs/adr/` for architectural decisions
 
 - **`/powertasking`** — no external dependencies.
 - **`/security-check`, `/ship-check`** — no external dependencies.
-- **`/tracker-setup`, `/report-issue`, `/resolve-issue`** (Notion integration only) — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
+- **`/tracker-setup`, `/tracker-report`, `/tracker-resolve`** (Notion integration only) — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
 
 ## Versioning policy
 

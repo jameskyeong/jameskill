@@ -11,7 +11,7 @@ const FORGE_REQUIRED = [
   { needle: 'user-facing communication style', name: '"user-facing communication style" gate' },
 ];
 
-const SUPPLEMENTARY = ['security-check', 'ship-check', 'resolve-issue', 'report-issue'];
+const SUPPLEMENTARY = ['security-check', 'ship-check', 'tracker-resolve', 'tracker-report'];
 const SUPP_REQUIRED = [
   { needle: 'inline-gloss', name: 'inline-gloss mention' },
   { needle: 'communication-style.md', name: 'communication-style.md link' },

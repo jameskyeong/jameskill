@@ -68,7 +68,7 @@ After Clarify, powertasking picks **one** route based on the kind of work. Each 
 
 - **Resume mid-flow** — `/powertasking docs/plans/<github-id>/<feature>.md` re-enters the plan, skips Clarify+Route, picks up from the first incomplete task.
 - **Skip Clarify** — say "skip clarify" or "requirements are clear" when you've already specced the work.
-- **Called from `/resolve-issue`** — the Notion issue title + body seeds Clarify automatically.
+- **Called from `/tracker-resolve`** — the Notion issue title + body seeds Clarify automatically.
 
 ### Phases at a glance
 
@@ -106,8 +106,8 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 | Command | What it does |
 |---|---|
 | `/tracker-setup` | One-time Notion connection — API key, database, property mapping, defaults |
-| `/report-issue` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
-| `/resolve-issue` | Pick a pending issue, call `/powertasking` to implement, update status with a human-readable outcome note |
+| `/tracker-report` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
+| `/tracker-resolve` | Pick a pending issue, call `/powertasking` to implement, update status with a human-readable outcome note |
 
 **Why it's different** — issue titles are written as user-visible problems, not git commit messages. Cross-functional readers (PMs, support, customers) can scan the tracker without engineering context.
 
@@ -122,7 +122,7 @@ claude plugins install jsk
 
 - [Claude Code](https://claude.ai/claude-code) — required for all skills.
 - **`/powertasking`, `/security-check`, `/ship-check`** — no external dependencies.
-- **`/tracker-setup`, `/report-issue`, `/resolve-issue`** — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
+- **`/tracker-setup`, `/tracker-report`, `/tracker-resolve`** — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
 
 ## License
 

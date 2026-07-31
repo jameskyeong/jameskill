@@ -1,6 +1,6 @@
 # Finish Discipline — Commit and Branch Decision
 
-Reference for powertasking's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present four branch options, no auto-merge or auto-push). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened, resolve-issue caller).
+Reference for powertasking's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present four branch options, no auto-merge or auto-push). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened, tracker-resolve caller).
 
 The non-negotiable: **the branch decision is the user's, not the agent's.** Powertasking's job is to surface the four options clearly and capture the choice; it does not auto-merge, auto-push, or auto-delete.
 
@@ -207,13 +207,13 @@ The user explicitly wants to leave a half-written file uncommitted (often a scra
 
 ### Resolve-issue caller integration
 
-When powertasking is invoked from `jsk:resolve-issue`, Finish has one extra responsibility: signal back to resolve-issue for Notion status transition. The discipline:
+When powertasking is invoked from `jsk:tracker-resolve`, Finish has one extra responsibility: signal back to tracker-resolve for Notion status transition. The discipline:
 
 - Powertasking still presents the four options to the user.
-- After the user's choice, powertasking passes control back to resolve-issue with the outcome.
+- After the user's choice, powertasking passes control back to tracker-resolve with the outcome.
 - Resolve-issue (not powertasking) handles the Notion update.
 
-The branch decision and the issue tracker update are separate steps owned by separate skills. Powertasking does not touch Notion directly; resolve-issue does not make the branch decision.
+The branch decision and the issue tracker update are separate steps owned by separate skills. Powertasking does not touch Notion directly; tracker-resolve does not make the branch decision.
 
 ---
 
