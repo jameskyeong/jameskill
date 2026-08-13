@@ -32,7 +32,7 @@ This framing prevents the most common prototype failure: the user looks at the o
 
 ### Throwaway by default
 
-Every prototype starts with the assumption that the code is discarded after the answer is known. Promote-to-Plan is the exception, not the default — and even Promote starts a *fresh PLAN run*, not "keep building on the prototype branch."
+Every prototype starts with the assumption that the code leaves the delivery path once the answer is known — preserved under `prototype/<name>` as a primary source, never shipped. Promote-to-Plan is the exception, not the default — and even Promote starts a *fresh PLAN run*, not "keep building on the prototype branch."
 
 ---
 
@@ -119,12 +119,15 @@ The agent's role is to surface; the user's role is to choose.
 
 ## Discard vs Promote-to-Plan
 
-### Discard (the default)
+### Discard (the default) — preserve, don't delete
 
-After review, the answer the prototype produced enters the user's mental model; the prototype code is deleted. The branch is discarded (per `references/finishing.md`'s Discard option).
+After review, the answer the prototype produced enters the user's mental model and the prototype leaves the delivery path — but the code is **preserved, not deleted**. Rename (or re-point) the branch to `prototype/<name>` and leave it. The prototype becomes a **primary source**: when a later PLAN run implements the chosen direction, its plan file or issue points at `prototype/<name>` — "approach B looked like this" — instead of re-describing the approach from memory.
+
+Preserved is not promoted: nothing on a `prototype/` branch ever merges. The namespace is the marker that this code answers a question and carries no delivery discipline.
 
 The discipline before Discard:
-- Capture what the prototype taught you. The answer goes in `CONTEXT.md`, an issue comment, a doc, or wherever future work would benefit from knowing it. The point of the prototype is the *answer*; the answer must survive the code's deletion.
+- Capture the *answer* where future work will find it — `CONTEXT.md`, an issue comment, a doc. The branch preserves the how; the answer still needs a home of its own.
+- Record the pointer: wherever the answer lands, name the `prototype/<name>` branch next to it.
 - Confirm with the user.
 
 ### Promote-to-Plan
@@ -133,7 +136,7 @@ The chosen variation is the right direction; build it for production. The discip
 
 - **Do not keep building on the prototype branch.** The prototype's code does not graduate.
 - **Start a fresh PLAN run.** Use the prototype's chosen approach as input to Clarify; let PLAN produce its plan file the normal way; execute with full TDD, Peer-review, Verify.
-- **The prototype branch is discarded after Promote completes.** Its work has been absorbed into the PLAN; the branch itself has no further purpose.
+- **The prototype branch is parked under `prototype/<name>` after Promote completes.** Its work has been absorbed into the PLAN; the branch remains only as the primary source the plan file points at.
 
 Promote is an explicit handoff. The boundary between exploration and delivery is at the handoff, not somewhere in the middle of a single branch.
 
@@ -226,8 +229,8 @@ PROTOTYPE has a different exit gate from DIRECT/PLAN/DIAGNOSE because the work p
 > **Artifacts built**: `<LOGIC: the harness and the cases it exercised | UI: variations with one-line summaries>`.
 > **Time-box**: `<budget>` (actual: `<time taken>`).
 > **User review**: presented at `<timestamp>`. User chose: `<Discard | Promote variation N | Re-Clarify>`.
-> **If Discard**: branch deleted; finding captured at `<location>`.
-> **If Promote**: fresh PLAN run started at `<plan file path>`; prototype branch discarded.
+> **If Discard**: branch preserved as `prototype/<name>`; finding captured at `<location>` with a pointer to the branch.
+> **If Promote**: fresh PLAN run started at `<plan file path>`; prototype branch parked as `prototype/<name>`.
 > **If Re-Clarify**: original question replaced with `<new question>`; restart Clarify.
 
 If the sentence cannot be stated with the user's choice and its follow-on action, PROTOTYPE has not exited.

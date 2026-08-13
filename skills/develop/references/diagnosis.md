@@ -36,6 +36,8 @@ The goal: a signal that fails *because of the bug* — not because of setup, not
 
 **Iterate on the loop itself.** Once a loop exists, sharpen it: faster (cache setup, narrow the scope), sharper signal (assert on the specific symptom, not "didn't crash"), more deterministic (pin time, seed RNG, isolate the filesystem). A 2-second deterministic loop is a different tool than a 30-second flaky one.
 
+**Redact as you build.** Reproduction loops get pasted into reports, commit messages, and issue comments — never bake secrets into them. Credentials and tokens enter the loop through environment variables, not literals; when output containing a secret must be shown, show `<REDACTED>` in its place.
+
 **Non-deterministic bugs:** the goal is a *higher reproduction rate*, not instant cleanliness. Loop the trigger 100×, add stress, narrow timing windows. A 50%-reproduction bug is debuggable; a 1% bug is not — raise the rate first. (See the intermittent-bug edge case below.)
 
 **If no loop can be built:** stop and say so explicitly — list what was tried, then ask the user for environment access, a captured artifact (HAR file, log dump, recording), or permission for temporary instrumentation. Do not proceed to Investigate without a loop; hypotheses without a signal to test against are vibes.
@@ -57,15 +59,17 @@ The minimized test is the regression net. After the fix, this test stays in the 
 
 **Exit condition**: the test still fails, and no further removal would keep it failing without changing the bug-relevant surface. The minimized test should be readable in under 60 seconds.
 
-### 3. Investigate — hypothesis-driven code reading
+### 3. Investigate — ranked hypotheses, then code reading
 
-With the minimized failing test in hand, the next step is *not* to change code. It is to form a hypothesis about why the bug occurs, then read the code to confirm or refute the hypothesis.
+With the minimized failing test in hand, the next step is *not* to change code. It is to enumerate hypotheses, rank them, and read the code to confirm or refute — starting from the top.
 
 The discipline:
-- State the hypothesis explicitly. "The bug happens because function X returns a stale value when input Y is reset between calls."
-- Read the relevant code to check the hypothesis. Use the minimized test as the breadcrumb — follow the code path the test exercises.
-- If the hypothesis is confirmed: proceed to Fix.
-- If the hypothesis is refuted: form a new hypothesis (do not start changing code to "see what happens"). Repeat.
+- **List 3-5 candidate hypotheses before testing any.** Committing to the first plausible story is anchoring — the first idea colonizes the investigation and disconfirming evidence gets rationalized away. Forcing alternatives up front is what keeps the reading honest. Each hypothesis is stated explicitly: "the bug happens because function X returns a stale value when input Y is reset between calls."
+- **Each hypothesis is falsifiable, with a stated prediction.** "If X is the cause, then Y" — "if the cache is stale, clearing it between the two calls makes the test pass." A hypothesis with no prediction cannot be refuted, only believed.
+- **Rank by likelihood and show the list to the user** (non-blocking — investigation continues while they read; a user who knows the system often re-ranks in one sentence).
+- Read the relevant code top-ranked first. Use the minimized test as the breadcrumb — follow the code path the test exercises.
+- If the top hypothesis is confirmed: proceed to Fix. If refuted: strike it and move down the list; if the list empties, re-enumerate with what the refutations taught you (do not start changing code to "see what happens").
+- **When reading alone cannot settle a hypothesis**, bounded temporary instrumentation is allowed: targeted logging at the exact points the prediction names — one variable at a time, never "log everything and grep." Tag every temporary line with a per-session marker (`[DEBUG-a4f2]`) so cleanup before the Fix commit is a single grep. Instrumented evidence counts as reading, not as fixing.
 
 A diagnosis without a hypothesis is guess-and-check. The model tries fix A; if it does not work, tries fix B; eventually one of them makes the symptom go away. This often "works" — but the root cause has not been understood. The fix may mask the symptom rather than address the underlying issue, and the bug returns in a different form later.
 
@@ -86,6 +90,8 @@ Standard GREEN discipline from `references/tdd-discipline.md`. The change is the
 ### 5. Regression-prevent — the test stays
 
 The minimized Reproduce test enters the suite permanently. It is the only thing that prevents the exact same bug from recurring.
+
+**The revert ritual — prove the test guards the bug.** With the fix in place and the test green: temporarily revert the fix (stash the fix hunks), run the test, **observe it fail**; restore the fix, run again, observe it pass. Thirty seconds, and it is the only direct evidence that the test fails *because of this bug* rather than passing vacuously — a regression test that never demonstrated red against the real bug is a hope, not a net.
 
 The discipline:
 - If the Reproduce loop was not a test (HTTP script, harness, bisection run), convert the minimized reproduction into a test at the closest seam now. If no seam can host it, that absence is itself a finding — record it alongside the fix as an architecture gap.
@@ -204,11 +210,11 @@ Per `references/verification.md` evidence form:
 >
 > **Minimize**: removed `<X removals>`; remaining test exercises only `<bug-relevant surface>`. Final test runs in `<time>`.
 >
-> **Investigate**: hypothesis (confirmed by reading `<files:lines>`): `<one sentence>`.
+> **Investigate**: ranked `<N>` hypotheses; confirmed (by reading `<files:lines>`): `<one sentence>`. Instrumentation tags removed (`grep DEBUG-` clean).
 >
 > **Fix**: changed `<files:lines>`. Ran the minimized test. Observed: `<pass output>`. Ran full suite. Observed: `<pass output>`.
 >
-> **Regression-prevent**: minimized test committed at `<sha>` alongside the fix.
+> **Regression-prevent**: revert ritual — reverted fix, observed `<failure output>`; restored, observed `<pass output>`. Minimized test committed at `<sha>` alongside the fix.
 
 If any of the five sentences cannot be stated, the corresponding step has not exited.
 
@@ -220,4 +226,4 @@ If any of the five sentences cannot be stated, the corresponding step has not ex
 - **Build** is folded into DIAGNOSE's Fix step (which is GREEN discipline applied to the minimized Reproduce test). The TDD discipline from `references/tdd-discipline.md` fully applies.
 - **Peer-review** still runs after the fix, with the diff being the fix + the regression test. The reviewer's spec axis is the bug report; the standards axis is unchanged.
 - **Verify** runs the full suite plus the new regression test. The minimized test joins the full suite permanently from this point on.
-- **Finish** has the same four branch options. Local merge / Open PR / Keep / Discard apply identically to bug fixes as to feature work.
+- **Finish** has the same branch menu. Local merge / Open PR / Keep branch (plus request-only discard) apply identically to bug fixes as to feature work.

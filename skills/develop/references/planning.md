@@ -21,7 +21,7 @@ The cost of not writing a plan when one is warranted: mid-flight redirections th
 
 ## Anatomy of a good plan file
 
-The PLAN sub-step in `SKILL.md` names five sections: Goal, Tasks, Dependencies, Out of scope. Plus per-task structure (What / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
+The PLAN sub-step in `SKILL.md` names the sections: Goal, Global constraints, Tasks, Dependencies, Out of scope. Plus per-task structure (What / Interfaces / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
 
 ### Goal — one sentence
 
@@ -30,19 +30,27 @@ Not a paragraph. Not a list. One sentence that names the outcome of the change. 
 Good: "Add password reset via email link with 1-hour expiry."
 Bad: "Improve the auth system to be more user-friendly and add some new flows."
 
+### Global constraints — exact values, verbatim
+
+Project-wide rules the whole plan must respect: naming schemes, error-response formats, size limits, forbidden dependencies. Two rules make this section load-bearing:
+
+- **Verbatim, not paraphrased.** "Errors follow the standard format" transmits nothing; `errors are {code: string, message: string}, HTTP 4xx, no stack traces` transmits the actual constraint. Paraphrase is where project-wide rules silently die between Clarify and Build.
+- **This is the delivery mechanism.** When a task is executed — by the orchestrator focused on one task, or by a dispatched subagent that sees only its task — the Global constraints block is how the rule reaches the execution point. A rule that lives only in the Clarify transcript reaches nothing.
+
 ### Tasks — each task is one TDD cycle on a contained surface
 
 Each task should produce one passing test (or a small cluster of related passing tests for the same behavior). If a task description sounds like multiple cycles, split. If two adjacent tasks sound like the same cycle, merge.
 
-Each task carries five fields:
+Each task carries six fields:
 
 - **What** — one sentence describing the change.
+- **Interfaces** — what this task consumes from other tasks and produces for them, as exact signatures (`consumes: createToken(userId: string): Token from Task 2; produces: validateToken(raw: string): Claims`). A task is executed with attention on that task alone — this block is how it learns its neighbors' names and types. Vague interfaces ("uses the token helper") are how two tasks each invent half of a mismatched contract.
 - **Test** — the failing test (or test name) that drives this task.
 - **Implement** — the surface that will change to make the test pass.
 - **Verify** — the specific command and the observed output that proves the task is done.
 - **Commit** — the commit message for this task (per `references/finishing.md` conventions).
 
-Skipping any of these fields produces a task that cannot be executed without re-Clarify. A task with no "Test" is a wish; a task with no "Verify" cannot have its done-ness audited.
+Skipping any of these fields produces a task that cannot be executed without re-Clarify. A task with no "Test" is a wish; a task with no "Verify" cannot have its done-ness audited; a task with no "Interfaces" invents its neighbors' contracts.
 
 ### Dependencies — explicit, not implicit
 
@@ -108,6 +116,28 @@ Other patterns:
 
 Independent tasks (no shared state, no consumed API) can be executed in any order. The plan can note "Tasks 3 and 4 are independent" — useful for parallel work or for resuming from either side mid-session.
 
+### Wide refactors — expand–contract sequencing
+
+When the change replaces something with many call sites (a function signature, a module, a data format), the naive plan — "change it and fix all callers in one task" — produces one giant red-to-green gap where nothing compiles. The expand–contract pattern keeps every intermediate state green:
+
+1. **Expand** — one task adds the new form *beside* the old one. Nothing breaks; both forms coexist.
+2. **Migrate** — call sites move to the new form in batches, each batch one task, sized by blast radius (how much can break in one step — a batch is small enough that its failure is diagnosable in one sitting). Each batch commits green.
+3. **Contract** — the final task removes the old form. It depends on *every* migration batch, and the dependency is declared.
+
+The payoff compounds with develop's own machinery: any session boundary between batches lands on a green build, so cross-session pickup resumes cleanly; and a mid-migration discovery ("batch 3 revealed callers that need the old semantics") is a plan update, not a broken tree.
+
+---
+
+## Inline self-review — the last step before presenting
+
+After writing the plan and before presenting it to the user, the orchestrator reviews its own document. Three sweeps:
+
+1. **Placeholder scan** — search for "TBD", "TODO", "appropriate", "as needed", "similar to Task", "etc." — each hit is an unfinished decision to resolve or take back to Clarify.
+2. **Interface consistency** — every signature a task *consumes* is *produced*, with the same name and types, by a task it depends on. Mismatches here are precisely the bugs that surface three tasks later.
+3. **Coverage sweep** — every requirement from Clarify's output maps to some task. An uncovered requirement is a plan gap; an unmapped task is scope creep at write-time.
+
+This is done inline, never by a dispatched subagent. The upstream result is worth recording: subagent review of plan *documents* was measured (5×5 regression trials) to double wall-clock time at identical quality — inline self-review catches the same real defects in seconds. (This says nothing about *code* review, where the independence of a fresh reviewer earns its cost — see `references/peer-review.md`.)
+
 ---
 
 ## Anti-patterns
@@ -129,6 +159,12 @@ The fix: read the task description out loud. Every "and" is a candidate split po
 A task with no "Verify" field. Build's exit gate cannot fire because there is no command to run and no output to observe. The agent ends up declaring done by feel, which violates `references/verification.md`'s discipline.
 
 The fix: every task has a "Verify" line naming the exact command and the expected observation. If the task's verification is hard to name, that is the signal that the task is fuzzy.
+
+### Placeholder tasks
+
+"Task 4: add appropriate error handling." "Task 6: write tests for the above." "Task 7: same as Task 3 but for orders." Each of these defers a decision to Build time, which means Build stalls or improvises — and improvisation at Build is exactly what the plan exists to prevent. "Similar to Task N" is the sneakiest form: it feels like brevity but forces the executor to re-derive the content, and the two derivations drift.
+
+The fix: the plan is finished only when every task could be executed by someone with no access to the planning conversation. Repeat content instead of referencing it; name the tests instead of gesturing at them; resolve "appropriate" into the actual behavior.
 
 ### Hidden dependencies
 

@@ -31,6 +31,22 @@ Bad: `it("validates the form")`. The behavior is unbounded — multiple rules wi
 
 If the test description contains the word "and", split it. If it contains "should work correctly", you have not picked a behavior — you have picked a vibe.
 
+### Write only at pre-agreed seams
+
+A seam is the boundary a test attaches to — a unit's public interface, an HTTP endpoint, a CLI invocation. Which seams the tests live at is a design decision, and it was made in Clarify (the success-criteria question asks it explicitly) or in the plan file. **No test is written at a seam nobody agreed to.** A test at an improvised seam pins an interface the user never chose, and every later refactor pays for it.
+
+If RED needs a seam that was never agreed — the behavior is unreachable from the agreed ones — that is a Clarify gap, not a license to improvise. Surface it, agree the seam, then write the test. Fewer seams is better: the ideal plan tests through the highest seam that can still express the failure.
+
+### Name the break — the falsifiability check
+
+Before writing the test body, answer one question: **what production change would make this test fail?** Name it concretely — "if the validator stops rejecting empty usernames, this fails." If you cannot name a realistic breaking change, the test is decoration: it will pass forever, guard nothing, and cost maintenance.
+
+Corollary: expected values come from an **independent source of truth** — hand-derived literals, the spec's stated example, a captured known-good output. Never compute the expectation with the same logic the production code uses (see the tautological-test anti-pattern below).
+
+### The mutation check
+
+After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through — write the missing test before moving on.
+
 ### Predict the failure before running
 
 Before running the failing test, state out loud (or in your head) what failure message you expect. Then run it. If the actual failure does not match your prediction:
@@ -134,6 +150,18 @@ Restructuring the code while a test is failing. You lose the ability to localize
 Going RED → GREEN → next RED forever, never cleaning up. The code accumulates duplication and structural debt until each new test takes longer to write than the last. The signal that REFACTOR is being skipped: each new feature feels harder than the previous one, even though the system is supposedly improving with every test.
 
 The fix: end every two GREEN cycles by asking "do I see duplication that the next test will reinforce if I do not consolidate now?" If yes, refactor now.
+
+### Tautological test
+
+The assertion recomputes the expected value the same way the production code computes the actual value: `expect(formatPrice(n)).toBe(`${symbol}${n.toFixed(2)}`)`. The test and the code share the logic, so they share the bugs — the test passes when both are wrong. The tell: the test body imports or re-implements the formula under test.
+
+The fix: hand-derive the expectation and write it as a literal. `expect(formatPrice(1234.5)).toBe("$1,234.50")` can be wrong independently of the code, which is what makes it a check.
+
+### Change-detector test
+
+`expect(MAX_RETRIES).toBe(5)` — a test that restates a constant or mirrors a config value. It fails only when someone *intentionally* changes the value, at which point they update the test to match. It detects change, not breakage, and trains everyone to treat red as "update the mirror."
+
+The fix: test the *behavior* the value produces — "gives up after the fifth failure and surfaces the last error" — and let the constant be an implementation detail.
 
 ### Asserting on incidental output
 

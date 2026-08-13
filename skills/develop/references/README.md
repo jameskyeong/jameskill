@@ -11,7 +11,7 @@ See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationa
 | Develop phase | Reference module | One-line summary |
 |---|---|---|
 | Preflight | _(inline in SKILL.md)_ | Mechanical environment check; no separate discipline |
-| **Clarify** | [`grilling.md`](grilling.md) | Ambiguity as load-bearing signal; one-question discipline; 5-category checklist deepened |
+| **Clarify** | [`grilling.md`](grilling.md) | Ambiguity as load-bearing signal; frontier-round questioning; 5-category checklist deepened |
 | **Route → PLAN** | [`planning.md`](planning.md) | Plan file as contract; task sizing; dependencies; out-of-scope as scope guard |
 | **Route → DIAGNOSE** | [`diagnosis.md`](diagnosis.md) | Bug-first workflow: Reproduce → Minimize → Investigate → Fix → Regression-prevent |
 | **Route → PROTOTYPE** | [`prototyping.md`](prototyping.md) | Throwaway exploration; TDD intentionally relaxed; Discard vs Promote-to-Plan |
@@ -19,8 +19,8 @@ See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationa
 | **Peer-review** | [`peer-review.md`](peer-review.md) | Independence vs author bias; two-axis review; sharpened severity definitions |
 | Ship | _(slot, deferred)_ | Activates when production-readiness skills are wired in |
 | **Verify** (cross-cutting) | [`verification.md`](verification.md) | Evidence before assertion; expanded forbidden language; per-phase evidence catalog |
-| **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — three channels (ADR / references / CONTEXT.md), per-channel thresholds, performative-deposit anti-patterns |
-| **Finish** | [`finishing.md`](finishing.md) | The four branch options sharpened; commit discipline; git-safety anti-patterns |
+| **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — four channels (ADR / references / CONTEXT.md sweep / .out-of-scope/), per-channel thresholds, performative-deposit anti-patterns |
+| **Finish** | [`finishing.md`](finishing.md) | The three-option branch menu plus request-only Discard; commit discipline; git-safety anti-patterns |
 | _Cross-cutting_ | [`subagent-patterns.md`](subagent-patterns.md) | When and how to dispatch subagents without abdicating responsibility |
 | _Cross-cutting_ | [`communication-style.md`](communication-style.md) | Inline-gloss discipline for user-facing summaries — what to gloss, length budget, per-phase patterns, anti-patterns |
 

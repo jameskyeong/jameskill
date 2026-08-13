@@ -8,29 +8,33 @@ The non-negotiable: **the deposit decision is the user's, not the agent's.** Dev
 
 ## Why Retrospective is an explicit phase
 
-Develop's compound engineering pillar rests on five channels: plan files, DIAGNOSE regression tests, ADRs, discipline references, and CONTEXT.md domain glossary. Two of them — plan files (PLAN route) and regression tests (DIAGNOSE route) — deposit automatically as a side effect of running the route. The other three do not.
+Develop's compound engineering pillar rests on six channels: plan files, DIAGNOSE regression tests, ADRs, discipline references, CONTEXT.md domain glossary, and the `.out-of-scope/` rejection knowledge base. Two of them — plan files (PLAN route) and regression tests (DIAGNOSE route) — deposit automatically as a side effect of running the route. Glossary entries deposit inline the moment a term resolves (see `references/grilling.md`). The rest do not deposit themselves.
 
-Without an explicit prompt, ADRs / references / CONTEXT.md only grow when the user remembers to update them. In practice that means they don't grow. The compounding promise becomes infrastructure-only — the channels exist, but the deposits don't happen.
+Without an explicit prompt, ADRs / references / rejection records only grow when the user remembers to update them. In practice that means they don't grow. The compounding promise becomes infrastructure-only — the channels exist, but the deposits don't happen.
 
-Retrospective makes the deposit decision visible at the moment when the session's learnings are still fresh — between Verify (success confirmed) and Finish (branch decision). The friction is one to three short prompts; the value is that the three missing channels actually accumulate.
+Retrospective makes the deposit decision visible at the moment when the session's learnings are still fresh — between Verify (success confirmed) and Finish (branch decision). The friction is a few short prompts; the value is that the non-automatic channels actually accumulate.
 
 ---
 
-## The three channels
+## The four channels
 
 Each channel has a specific threshold. The discipline is not "ask three questions every session" — it is "ask each question only when the threshold is met, propose concrete content when it is."
 
 ### Channel 1 — ADR
 
-**Threshold**: An architectural choice was made during this session whose *reasoning* will be valuable to a future session asking "why did we do it this way?"
+**Threshold — the triple gate. All three must hold; any one missing → skip the ADR:**
 
-Trigger signals (any of):
-- A non-obvious decision between two or more viable options.
+1. **Hard to reverse** — undoing the decision later costs real migration work, not a rename.
+2. **Surprising without context** — a future reader would ask "why on earth is it done this way?"
+3. **The result of a real trade-off** — viable alternatives existed and were actually weighed.
+
+Trigger signals that usually accompany a gate-passing decision:
 - A decision constrained by something not visible in the code (regulatory requirement, partner contract, prior incident).
 - A decision that retires or supersedes a prior pattern.
 - A decision that explicitly *rejects* an alternative the next person is likely to reconsider.
 
 Not an ADR:
+- A decision that passes only one or two of the three gates — easily reversed, unsurprising once read, or made with no real alternative on the table.
 - A small implementation detail with one obvious answer.
 - A bug fix (the commit message carries the why).
 - A refactor that follows existing patterns.
@@ -50,6 +54,8 @@ Save to docs/adr/NNNN-<slug>.md? [y/edit/n]
 ```
 
 The agent proposes the next ADR number based on `ls docs/adr/`. Filename is kebab-case.
+
+**An ADR can be a single paragraph.** Context, decision, and why in 1-3 sentences is a complete ADR; Considered-options and Consequences appear only when they earn their lines. The gate is strict precisely so the format can stay light — fewer, smaller, denser ADRs beat ceremonial ones.
 
 ### Channel 2 — Discipline references
 
@@ -82,9 +88,11 @@ Append? [y/edit/n]
 
 The agent identifies the right reference file (one of `grilling.md`, `planning.md`, `diagnosis.md`, `prototyping.md`, `tdd-discipline.md`, `peer-review.md`, `verification.md`, `finishing.md`, `subagent-patterns.md`, `retrospective.md`).
 
-### Channel 3 — CONTEXT.md domain glossary
+### Channel 3 — CONTEXT.md domain glossary (final sweep)
 
-**Threshold**: A term was introduced, redefined, or contested during this session, and future contributors will need to use it consistently.
+**The primary deposit path is inline**: per `references/grilling.md`, a term that resolves during any phase is proposed for the glossary at that moment — deferred to session end, the nuance of the resolution has already blurred. Retrospective's channel 3 is the **final sweep**: scan the session for terms that were introduced, redefined, or contested but never deposited inline. The threshold below applies to those stragglers.
+
+**Threshold**: A term was introduced, redefined, or contested during this session, was not deposited inline, and future contributors will need to use it consistently.
 
 Trigger signals (any of):
 - A new feature name was coined and used across files.
@@ -113,12 +121,39 @@ _Avoid_: <one or two confusable terms with brief reason>
 Append? [y/edit/n]
 ```
 
+### Channel 4 — `.out-of-scope/` rejection knowledge base
+
+**Threshold**: The user rejected a proposal, feature, or approach during this session *with a load-bearing reason*, and a future session (or a future architecture review) is likely to re-propose it.
+
+Trigger signals (any of):
+- A Clarify approach or scope item the user explicitly excluded, with reasoning recorded nowhere else.
+- A Peer-review or Retrospective proposal the user declined for a reason that will still hold next time.
+- A feature request (via `resolve`) closed as wontfix with rationale.
+
+Not an out-of-scope entry:
+- Deferrals — "later" is not "rejected"; a deferred item belongs in an issue, not here.
+- Rejections whose reason is circumstantial ("no time this sprint").
+- Anything an existing concept file already covers — append the new occurrence to that file instead. One file per **concept**, not per occurrence: a "night theme" request lands in the existing `dark-mode.md`.
+
+**Proposal format** (if threshold met):
+
+```
+.out-of-scope/ proposal: <concept>.md
+
+Why rejected: <the load-bearing reason, 1-3 sentences>
+Prior requests: <this session's occurrence; future ones append here>
+
+Save to .out-of-scope/<concept-slug>.md? [y/edit/n]
+```
+
+The consumer that makes this channel compound: Clarify scans `.out-of-scope/` at session start (see `references/grilling.md`) and surfaces overlaps before grilling. That read is what turns these files into institutional memory instead of an archive.
+
 ---
 
 ## The phase mechanics
 
 1. **Run only after Verify exits green.** If Verify failed, fix Verify first; do not retrospect on broken work.
-2. **Check each channel in order.** ADR → references → CONTEXT.md. Each check is independent — the agent decides whether the threshold is met for that channel and proposes only when it is.
+2. **Check each channel in order.** ADR → references → CONTEXT.md (final sweep) → `.out-of-scope/`. Each check is independent — the agent decides whether the threshold is met for that channel and proposes only when it is.
 3. **Threshold check is silent when no.** If no channel threshold is met, the phase exits with a one-line note ("No compounding-worthy artifacts surfaced this session") and proceeds to Finish. Do not invent deposits to make the phase feel productive.
 4. **Propose, never impose.** Each proposal asks `[y/edit/n]`. The user owns the final wording. The agent does the drafting work so the user doesn't have to context-switch.
 5. **One proposal at a time.** If multiple channels qualify, present them sequentially — not as a batch. Each accept/edit/reject decision is independent.
@@ -195,4 +230,4 @@ If no channel threshold is met, the phase exits with one line: "Retrospective: n
 
 ### Retrospective deposit causes Verify to need to re-run?
 
-It should not — Retrospective only writes to `docs/adr/`, `skills/develop/references/`, and `CONTEXT.md`. None of these affect lint/typecheck/test outcomes. If for some reason a deposit touches a file that does (e.g., a markdown linter is wired into the build), re-run Verify before Finish.
+It should not — Retrospective only writes to `docs/adr/`, `skills/develop/references/`, `CONTEXT.md`, and `.out-of-scope/`. None of these affect lint/typecheck/test outcomes. If for some reason a deposit touches a file that does (e.g., a markdown linter is wired into the build), re-run Verify before Finish.

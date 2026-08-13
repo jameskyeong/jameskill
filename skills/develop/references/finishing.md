@@ -1,8 +1,8 @@
 # Finish Discipline — Commit and Branch Decision
 
-Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present four branch options, no auto-merge or auto-push). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened, resolve caller).
+Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present the three-option branch menu, no auto-merge or auto-push, Discard only on explicit typed request). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened, resolve caller).
 
-The non-negotiable: **the branch decision is the user's, not the agent's.** Develop's job is to surface the four options clearly and capture the choice; it does not auto-merge, auto-push, or auto-delete.
+The non-negotiable: **the branch decision is the user's, not the agent's.** Develop's job is to surface the options clearly and capture the choice; it does not auto-merge, auto-push, or auto-delete.
 
 ---
 
@@ -14,9 +14,9 @@ Finish makes the choice visible so the user makes it consciously. The friction i
 
 ---
 
-## The four options sharpened
+## The three menu options — plus request-only Discard
 
-Each option has a specific situation it fits. The discipline is not "let the user pick whatever" — it is "present each option with the situation it matches."
+Each option has a specific situation it fits. The discipline is not "let the user pick whatever" — it is "present each option with the situation it matches." Three options go on the menu; the fourth (Discard) exists but is never offered.
 
 ### 1. Local merge
 
@@ -63,19 +63,22 @@ After Keep:
 - Do not delete the branch.
 - Capture in a comment / TODO somewhere why the branch is kept and what unblocks it.
 
-### 4. Discard
+### 4. Discard — request-only, never offered
 
-Use when:
+Discard is not presented in the menu. It exists only as a response to the user's own explicit request, because it is the one option that destroys work irreversibly — and an offered option gets picked in the flow of conversation, including by accident. (Upstream removed it from their menu after exactly that accident.)
+
+Use when (and only when the user asks):
 - The work was exploratory and the answer is "no, do not ship this."
 - The work was a spike; it informed the decision but the actual implementation will be different.
 - The work duplicates something already shipping on another branch.
 
-Before Discard:
-- Confirm with the user. Discard is irreversible if the branch is also deleted.
-- Capture what the spike taught you in the issue / docs / `CONTEXT.md` so the discard does not lose the learning.
+The confirmation gate:
+- The user must type the literal word `discard`. "Yeah, get rid of it" and "sure, clean it up" authorize nothing — casual affirmations do not clear an irreversible gate.
+- Capture what the work taught you in the issue / docs / `CONTEXT.md` / `.out-of-scope/` so the discard does not lose the learning.
+- PROTOTYPE-route branches are never discarded this way at all — they are preserved under `prototype/<name>` (see `references/prototyping.md`).
 
-After Discard:
-- Delete the branch locally (`git branch -D <branch>` only after the user confirms).
+After the typed confirmation:
+- Delete the branch locally (`git branch -D <branch>`).
 - Do not push and force-delete remote branches automatically; ask first if the remote also needs cleanup.
 
 ---
@@ -209,7 +212,7 @@ The user explicitly wants to leave a half-written file uncommitted (often a scra
 
 When `develop` is invoked from `jsk:resolve`, Finish has one extra responsibility: signal back to `resolve` for Notion status transition. The discipline:
 
-- Develop still presents the four options to the user.
+- Develop still presents the three menu options to the user.
 - After the user's choice, `develop` passes control back to `resolve` with the outcome.
 - Resolve-issue (not develop) handles the Notion update.
 
@@ -231,7 +234,7 @@ Examples:
 
 > Ran `git status`. Observed: `On branch feature/spike, untracked: notes.md`. User chose: Keep branch with intentional uncommitted state (notes.md). No push, no merge.
 
-> User chose: Discard. Confirmed irreversible. Ran `git checkout main && git branch -D feature/spike`. Observed: `Deleted branch feature/spike (was <sha>)`.
+> User requested discard (not offered from the menu). Typed confirmation received: `discard`. Learning captured at `<location>`. Ran `git checkout main && git branch -D feature/spike`. Observed: `Deleted branch feature/spike (was <sha>)`.
 
 If the sentence cannot be stated with the option and the evidence, Finish has not exited.
 

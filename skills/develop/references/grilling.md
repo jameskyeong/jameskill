@@ -1,6 +1,6 @@
 # Clarify Discipline — Grilling for Ambiguity
 
-Reference for develop's **Clarify** phase. The Clarify section of `SKILL.md` enforces the surface rule (one question at a time; recommended answer with reasoning; ambiguity checklist must reach zero; 2-3 approaches proposed before Route). This document is the deeper discipline — why the rule exists, how to actually grill an ambiguity to the ground, and what to do at the awkward edges (the user wants to skip, no domain doc exists, every question feels like friction).
+Reference for develop's **Clarify** phase. The Clarify section of `SKILL.md` enforces the surface rule (frontier questions in rounds, each with a recommended answer; ambiguity checklist must reach zero; 2-3 approaches proposed before Route). This document is the deeper discipline — why the rule exists, how to actually grill an ambiguity to the ground, and what to do at the awkward edges (the user wants to skip, no domain doc exists, every question feels like friction).
 
 The non-negotiable: **ambiguity is a load-bearing signal, not friction.** Every question you do not ask now becomes a question you answer wrong later, in code, where it costs much more to revisit.
 
@@ -22,13 +22,26 @@ The grilling discipline trades a few minutes of friction at Clarify for the cost
 
 ## How to question
 
-### One question at a time
+### Rounds over the frontier
 
-Multi-question messages produce partial answers. The user answers the first question, ignores the second, and the third gets lost in the response. The agent then either re-asks (annoying) or proceeds with two of three answers, which is worse — incomplete clarification dressed as complete clarification.
+Map the open decisions as a tree before asking anything. Some questions stand alone; some depend on another question's answer. The **frontier** is every question whose prerequisites are already settled — the set the user can actually answer right now.
 
-The rule: ask the **single most decision-blocking question** you have right now. Wait. Read the answer. Ask the next single most decision-blocking question.
+The rule: each round presents the **whole frontier at once** — numbered, each question in a fixed shape:
 
-The discipline is not "no compound questions ever" — it is "no compound questions when the questions are independent." A genuinely conditional question ("if X then Y, otherwise Z?") is one decision, not two.
+> ❓ **Q1 — \<short title\>**: \<the question\>
+> ➡️ Recommended: \<answer\> — \<one-sentence why\>
+
+A question whose answer depends on another question still open in this round belongs to a **later round**. Batching a dependent question with its prerequisite is how partial answers turn into wrong assumptions: the user answers Q1 in a way that invalidates Q3, but Q3's answer is already on record.
+
+Read all answers, redraw the tree (answers open new questions and close old ones), present the next round. Rounds continue until the frontier is empty.
+
+Why rounds beat one-at-a-time: a five-decision Clarify at one question per message costs five round-trips and the user's patience; the same five decisions usually fit in two rounds. One-at-a-time survives only as the degenerate case — a round whose frontier happens to hold a single question.
+
+### Facts are the agent's job; decisions are the user's
+
+Never put a *fact* question to the user — anything answerable by reading the codebase, the docs, or by dispatching a research subagent is the agent's legwork. A running lookup does not block the round: only the questions downstream of that fact wait for it; the rest of the frontier ships now.
+
+What remains for the user is *decisions* — trade-offs, preferences, scope calls. Put each decision to the user and wait. If a "question" you are about to ask has an objectively correct answer discoverable without the user, you are outsourcing legwork, not clarifying.
 
 ### Recommended answer, with reasoning
 
@@ -47,6 +60,10 @@ If a question can be answered by reading the project — naming convention, exis
 
 The heuristic: if you can predict the answer with >80% confidence from a 30-second skim of the codebase, do the skim. Confirm with the user only when the codebase answer is ambiguous or contradicted by something in the prompt.
 
+### Check `.out-of-scope/` before grilling
+
+If the project has a `.out-of-scope/` directory (the rejected-proposal knowledge base — see `references/retrospective.md`), scan it at Clarify start. If the user's request overlaps a rejected concept, surface the prior rejection with its recorded reasoning before grilling further. The user may be knowingly reversing the decision — fine, and that reversal becomes an explicit Clarify item — or unaware of it, in which case the file just saved a wasted session. Match by concept, not by wording: "night theme" overlaps a rejected `dark-mode.md`.
+
 ### Challenge user language that conflicts with CONTEXT.md
 
 If `CONTEXT.md` exists, its glossary is the authority on domain terms. When the user's prompt uses a domain word in a different sense than `CONTEXT.md` defines, the model surfaces the conflict explicitly:
@@ -54,6 +71,8 @@ If `CONTEXT.md` exists, its glossary is the authority on domain terms. When the 
 > "CONTEXT.md defines `tenant` as the billing entity, but your message uses `tenant` for an authenticated user. Are you using the term loosely, or do you actually mean the billing entity here?"
 
 The model does not silently translate. Silent translation hides the conflict and produces code that is correct under the glossary but wrong under the user's actual intent — or vice versa. Surfacing the conflict trains both sides on the shared vocabulary.
+
+When a term is introduced, redefined, or resolved during Clarify, propose its glossary entry **inline at that moment** (same `[y/edit/n]` format as `references/retrospective.md` channel 3) rather than holding it for Retrospective. Deferred to session end, the nuance of the resolution has already blurred and the intervening conversation may have drifted the term again. Retrospective's channel 3 remains as the final sweep for terms that slipped through.
 
 ---
 
@@ -117,6 +136,8 @@ The grill version of this is "what specific test would prove this works, and wha
 
 If the user cannot describe the success test, the requirement is still vague — not because the user is wrong, but because the next step (Build, which is TDD) cannot start without a failing test. The Clarify exit gate has not been met.
 
+The success-test question has a second half: **at which seam** (the boundary the test attaches to — a unit's public interface, an HTTP endpoint, a CLI invocation) should that test live? Agree the seams here; per `references/tdd-discipline.md`'s pre-agreed-seams rule, Build writes tests only at seams that were agreed, so a seam nobody named is a Clarify gap that will stall RED.
+
 Common ambiguous success criteria and their sharper forms:
 
 | Vague | Sharp |
@@ -150,9 +171,9 @@ Presenting one approach with "this is the standard way" framing when real altern
 
 ### Shotgun questioning
 
-Firing five questions at once and waiting for a list of answers. The user answers two, half-answers one, misses two. The agent then proceeds as if all five were answered. The result is a Clarify phase that produced less clarity than no questions at all, dressed up as thorough.
+Firing questions as an unstructured pile — dependent questions mixed with their prerequisites, no numbering, no recommendations. The user answers two, half-answers one, and the answer to Q1 quietly invalidates the recorded answer to Q3. This is the round discipline's counterfeit, not its application: a real round contains only frontier questions (prerequisites settled), numbered, each carrying a recommendation, with dependent questions explicitly deferred.
 
-The fix: one question, one answer, then the next question. The friction is the point.
+The fix: draw the decision tree first. If you cannot say which questions block which, you are not ready to ask any of them.
 
 ### Vibes-based clarify
 
@@ -210,7 +231,7 @@ The user is frustrated, the questions feel slow, the user wants to ship. Two fai
 - **Collapse and skip.** The discipline does not bend to social pressure. Skipping the grill because the user is tired produces the same downstream cost as skipping it for any other reason.
 - **Cargo-cult the grill.** Asking questions you do not actually need just because "the discipline says so" trains the user to ignore future questions that *are* needed.
 
-The middle path: triage your own list. Ask the **single most decision-blocking question** you have. If the user answers that, you may find the rest resolves itself or can be deferred to a follow-up. The user's irritation is signal that the questions feel low-value — the right response is to raise the per-question value, not to drop the discipline.
+The middle path: triage your own list. Shrink the round to the **single most decision-blocking question** you have. If the user answers that, you may find the rest resolves itself or can be deferred to a follow-up. The user's irritation is signal that the questions feel low-value — the right response is to raise the per-question value, not to drop the discipline.
 
 ### Recurring user across many `/develop` sessions
 
