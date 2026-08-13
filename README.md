@@ -22,9 +22,9 @@ The rest (issue tracking, inspection) are opt-in utilities — supplementary, no
 
 <br clear="right" />
 
-## How `/develop` is different from other skill packs
+## Why `/develop` is one skill, not a toolbox
 
-Most skill packs (superpowers, Matt Pocock, etc.) hand you a toolbox of discrete disciplines and ask you to remember which one to invoke when. Each invocation starts fresh. `/develop` inverts both halves:
+The common shape for agent skills is a toolbox: one skill per discipline — brainstorm, plan, test, review — and it's on you (or the model) to invoke the right one at the right moment. Each invocation starts fresh, and a discipline that never gets called never protects you. `/develop` inverts both halves:
 
 ### Pillar 1 — One command, smart pipeline
 
@@ -33,7 +33,7 @@ Most skill packs (superpowers, Matt Pocock, etc.) hand you a toolbox of discrete
 3. **Different phase shapes per route.** DIAGNOSE writes the reproduction test before the fix. PROTOTYPE relaxes TDD on purpose. These aren't relabeled flows — they're different phase orders.
 4. **No-soft-language verification.** Every phase boundary rejects "should work", "seems fine", "looks good". Verification means running the command and observing the output.
 5. **Tracker-free core.** Develop itself never reads or writes Notion. Issue tracking is a separate, opt-in surface.
-6. **Self-contained.** Zero dependency on superpowers, Matt Pocock, or any other skill pack — every discipline lives inside `skills/develop/references/`. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
+6. **Self-contained.** Zero external skill dependencies — every discipline lives inside `skills/develop/references/`, versioned with the plugin and editable per project. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
 
 ### Pillar 2 — Compound engineering, in one skill
 
@@ -63,7 +63,7 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 | **DIRECT** | Small contained change. 1-4 commits, tightly-grouped files. | Build → Peer-review → Verify → Finish | Skips plan file. No ceremony for a one-shot change. |
 | **PLAN** | Medium feature. 5-15 commits, 2-4 files with shared state. | Plan file → user confirms → sequential Build | Plan file becomes the contract; cross-session pickup runs off it. |
 | **DIAGNOSE** | Bug-first work. Reproduction steps, error messages, "it's broken". | Reproduce → Minimize → Investigate → Fix → Regression-prevent | The reproduction test is written *first* and stays in the suite as the regression net. |
-| **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches". | Time-boxed variations (relaxed TDD) → user reviews → Discard or Promote | TDD is intentionally relaxed. Promote = restart as a fresh PLAN run, not a graduation. |
+| **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches". | Time-boxed variations (relaxed TDD) → user reviews → Discard or Promote | TDD is intentionally relaxed. Prototype code parks under `prototype/<name>` as a primary source — never merged. Promote = restart as a fresh PLAN run, not a graduation. |
 
 ### Flexible entry & resume
 
@@ -77,9 +77,10 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 preflight → clarify → route → build (strict TDD) → peer-review → ship (slot) → verify → retrospective → finish
 ```
 
-- **Relentless clarification** — the 5-category ambiguity checklist must reach 0 items before Route.
-- **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later".
-- **Independent peer-review subagent** — fresh perspective on the diff, free from author recency bias.
+- **Relentless clarification, without the ping-pong** — questions arrive in frontier rounds (every currently-answerable question at once, numbered, each with a recommended answer); the 5-category ambiguity checklist must reach 0 items before Route.
+- **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later". Tests must be falsifiable: name the production change that would break each one.
+- **Independent peer-review subagent** — fresh perspective on the diff, free from author recency bias, with a built-in 12-smell baseline and a 3-round fix-loop circuit breaker.
+- **Autonomous where it's safe** — during Build/Verify, non-catastrophic calls are decided and logged as rulings instead of stalling the session; irreversible or security-sensitive decisions still stop and ask.
 - **Retrospective** — proposes ADR / references / CONTEXT.md / `.out-of-scope/` deposits when the session produced learnings worth keeping. Silent exit otherwise.
 - **Branch finish is explicit** — local merge / open PR / keep branch. Discard never appears on the menu: it runs only on explicit request, gated on typing the word `discard`.
 
@@ -117,6 +118,15 @@ Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to groupe
 ```bash
 claude plugins marketplace add https://github.com/jameskyeong/jameskill.git
 claude plugins install jsk
+```
+
+## Quick start
+
+```bash
+/develop add a password-reset flow           # feature → DIRECT or PLAN route
+/develop fix: login 500s on empty email      # bug → DIAGNOSE route
+/develop prototype the onboarding layout     # exploration → PROTOTYPE route
+/develop docs/plans/<github-id>/<feature>.md # resume a plan mid-flight
 ```
 
 ## Requirements

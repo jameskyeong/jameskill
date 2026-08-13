@@ -1,16 +1,16 @@
-# Plan: Upstream adoption 2026-08 — port superpowers v6.x / mattpocock v1.2.x learnings into `/develop`
+# Plan: Upstream adoption 2026-08 — methodology upgrades for `/develop`
 
 ## Goal
 
-Adopt 17 upstream methodology improvements (surveyed 2026-08-13 from `obra/superpowers` v6.3.0 and `mattpocock/skills` v1.2.3) into the develop orchestrator, each explicitly accepted by the user in a 19-item decision session.
+Adopt 17 methodology improvements — surveyed 2026-08-13 from current public agent-skill methodology projects — into the develop orchestrator, each explicitly accepted by the user in a 19-item decision session.
 
 ## Decision record
 
-Adopted (17): A1 frontier-round questioning · A2 review-loop circuit breaker · A3 plan-template hardening (Global Constraints / Interfaces / No Placeholders / inline self-review) · A4 test-quality gates (Name the Break, tautological, change-detector, mutation check, pre-agreed seams) · A5 DIAGNOSE upgrades (ranked hypotheses, DEBUG tags, Redact, revert ritual) · A6 discard menu removal + typed confirmation · A7 ADR triple gate + one-paragraph ADR · B1 route ratchet · B2 rulings-not-stalls (Build/Verify only) · B3 inline glossary deposits (hybrid) · B4 `.out-of-scope/` sixth channel · B5 prototype-branch preservation · B6 expand–contract sequencing · B7 session-boundary hygiene · B8 trigger-only description · C1 file-based handoffs + explicit model tiers (SDD partial) · C3 Fowler-derived smell baseline.
+Adopted (17): A1 frontier-round questioning · A2 review-loop circuit breaker · A3 plan-template hardening (Global Constraints / Interfaces / No Placeholders / inline self-review) · A4 test-quality gates (Name the Break, tautological, change-detector, mutation check, pre-agreed seams) · A5 DIAGNOSE upgrades (ranked hypotheses, DEBUG tags, Redact, revert ritual) · A6 discard menu removal + typed confirmation · A7 ADR triple gate + one-paragraph ADR · B1 route ratchet · B2 rulings-not-stalls (Build/Verify only) · B3 inline glossary deposits (hybrid) · B4 `.out-of-scope/` sixth channel · B5 prototype-branch preservation · B6 expand–contract sequencing · B7 session-boundary hygiene · B8 trigger-only description · C1 file-based handoffs + explicit model tiers (partial adoption of a subagent-execution methodology) · C3 Fowler-derived smell baseline.
 
-Deferred: C2 wayfinder-equivalent (backlog — separate skill scale) · C4 worktree discipline (revisit when parallel-session demand appears) · B5's LOGIC=HTML harness · C1's full SDD execution mode · C3's per-axis parallel reviewers.
+Deferred: C2 decision-map multi-session planning route (backlog — separate skill scale) · C4 worktree discipline (revisit when parallel-session demand appears) · B5's LOGIC=HTML harness · C1's full subagent-execution mode · C3's per-axis parallel reviewers.
 
-Upstream negative results respected (do NOT adopt): subagent review of spec/plan *documents* (measured: identical quality, 2× time — inline self-review instead); dropping REFACTOR from the TDD loop (mattpocock did; superpowers kept it; conflicts with our strict-TDD identity).
+Surveyed negative results respected (do NOT adopt): subagent review of spec/plan *documents* (measured upstream: identical quality, 2× time — inline self-review instead); dropping REFACTOR from the TDD loop (the surveyed projects split on this; conflicts with our strict-TDD identity).
 
 ## Tasks
 
@@ -56,9 +56,9 @@ Tasks 1–8 are independent of each other (disjoint sections; SKILL.md edits tou
 
 ## Out of scope
 
-- C2 wayfinder-equivalent skill (backlog).
+- C2 decision-map multi-session planning skill (backlog).
 - C4 worktree discipline.
-- SDD-style subagent execution mode for PLAN.
+- Full subagent-execution mode for PLAN.
 - Rewriting other jsk skills' descriptions (B8 follow-up, separate session).
 - Version bump / publish (decided at Finish).
 
