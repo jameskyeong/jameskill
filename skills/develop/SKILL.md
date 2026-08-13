@@ -19,8 +19,6 @@ The pipeline summary lives here, not in the frontmatter description: a workflow 
 
 Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
 
-**For the v1.x orchestrator that uses superpowers + Matt Pocock skills, see `/jsk:workflow-external`.**
-
 > **Discipline depth lives in [`references/`](references/README.md).** Each phase below carries a pointer to the module that deepens it (principles, anti-patterns, edge cases). The orchestrator below stays slim; the references hold the full discipline. **Loading them is not optional — see the reference-loading gate below.**
 
 ---

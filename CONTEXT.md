@@ -84,15 +84,9 @@ _Avoid_: tag (v2.0 name, retired), report-issue (alpha.13–15 name, retired —
 The issue resolution skill (`/jsk:resolve`). Fetches pending issues, brainstorms solutions via **develop**, implements fixes, updates Notion status.
 _Avoid_: strike (v2.0 name, retired), resolve-issue (alpha.13–15 name, retired — ADR 0014), tracker-resolve (alpha.16 name, retired — ADR 0015)
 
-### Legacy
-
-**workflow-external**:
-The preserved v1.x orchestrator (`skills/workflow-external/SKILL.md`) that depended on superpowers and Matt Pocock skills. Kept as reference; not actively maintained.
-_Avoid_: old workflow, legacy workflow
-
 ## Flagged ambiguities
 
-**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **develop**; the concept is **production-readiness gate**. The word "workflow" should only appear when referring to the preserved **workflow-external**.
+**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **develop**; the concept is **production-readiness gate**. The v1.x orchestrator once named "workflow" (later `workflow-external`) was retired entirely in 2.0.0-alpha.19 — avoid the bare word "workflow" as a skill name.
 
 ## Example dialogue
 
