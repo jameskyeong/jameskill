@@ -93,6 +93,27 @@ State explicitly that the subagent may return "I did not find X" or "I am not co
 
 ---
 
+## File-based handoffs — pass paths, not payloads
+
+Large inputs — diffs, task text, logs, prior reports — are written to files and passed by path, never pasted into the dispatch prompt. Two reasons:
+
+- **Pasted content parks permanently in the subagent's context.** A diff the subagent consults twice costs one file-read each time as a path, but occupies the prompt forever as a paste. (Upstream measured a real dispatch prompt at 42k characters — 99% of it pasted history the subagent never needed.)
+- **Files keep the prompt legible.** The prompt carries the role, criteria, and output format; the artifacts stay artifacts.
+
+Practical form: write `git diff <base>..HEAD` to a scratch file, the spec excerpt to another, and hand the subagent the paths plus reading instructions. Long subagent reports also go to files — the orchestrator reads the file rather than receiving a monster return message.
+
+---
+
+## Explicit model selection
+
+Every dispatch names its model tier. An unnamed model silently inherits the orchestrator's own — usually the most expensive tier — and the cost multiplies by the number of dispatches (upstream incident: a run put all 26 reviewers on the top tier because none was named).
+
+- **Cheapest tier**: mechanical, fully-specified work — apply a spelled-out change, run a command and report output.
+- **Mid tier as the floor for reviewers and prose-driven work**: turn count beats token price — a cheap model taking 2-3× the turns costs more *and* does worse.
+- **Most capable tier**: architecture judgement and final whole-branch review.
+
+---
+
 ## Evidence requirements — making subagent claims auditable
 
 A subagent claim of success without evidence is the same anti-pattern as the orchestrator's own soft language ("should work", "seems to pass") — it has just been laundered through a dispatch.

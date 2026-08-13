@@ -30,6 +30,25 @@ Standards are the project's "how we do things here." Sources, in priority order:
 
 Standards findings answer: *Does the new code match how this codebase has decided to do things?* A function named `handle_auth` when every other handler in the project is named `handleAuth` is a Standards finding, even if it works correctly.
 
+Beyond the project's own documents, the Standards axis carries a **built-in smell baseline** — twelve classic code smells (Fowler) the reviewer checks regardless of how sparse the project's docs are:
+
+| Smell | Fix direction |
+|---|---|
+| Duplicated code | Extract the shared shape once |
+| Long function | Extract until each piece does one nameable thing |
+| Large module / class | Split by responsibility |
+| Long parameter list | Group into an object the domain can name |
+| Divergent change | One module changing for many unrelated reasons → split by reason |
+| Shotgun surgery | One change touching many modules → consolidate the concern |
+| Feature envy | Logic living far from the data it uses → move it to the data |
+| Data clumps | The same fields always traveling together → make the type |
+| Primitive obsession | Domain concepts as bare strings/numbers → introduce the type |
+| Message chains | `a.b().c().d()` → ask the nearest object for what you need |
+| Middle man | A layer that only forwards → remove it |
+| Speculative generality | Flexibility nothing uses → delete it |
+
+Three rules govern the baseline: **the repo overrides** (an observed in-codebase convention beats the baseline); **skip what tooling enforces** (if the linter already catches it, the reviewer does not re-report it); **always a judgement call** (a smell is a prompt to look, not a mechanical violation — report it only when the fix would leave the diff genuinely better).
+
 ### Axis 2 — Spec compliance
 
 The Spec is the Clarify output or plan file content — what the user asked for and agreed to. Spec findings answer: *Does the implementation fulfill every requirement, and does it stay within scope?*
@@ -82,6 +101,18 @@ Minor findings are reported, not blocked. They do not cause re-loops, they do no
 
 ---
 
+## The fix-loop circuit breaker
+
+Critical findings trigger a re-loop: fix (fresh RED → GREEN for the fix), then re-review. **Count the rounds.** After the third fix → re-review round that still leaves unresolved Critical or Important findings, STOP — do not start round four.
+
+At the cap, the orchestrator stops fixing and hands the decision up: compile every remaining finding with its status — what was attempted, why it still stands — and let the user rule on each one (fix now / defer with a note / reject with reasoning).
+
+The telltale pattern the cap exists to catch: each fix round surfaces new findings in code the previous fix touched. That is the same signal as DIAGNOSE's three-failed-fixes breaker — the structure around the change is wrong, and iterating harder on point-fixes will not fix structure. Surface it as such.
+
+Both directions are violations: stopping *before* the cap to end an annoying loop is pre-judging the findings, and running *past* it because "one more round will clear it" is how a session burns an afternoon converging on nothing.
+
+---
+
 ## When to push back on a finding
 
 The agent who is implementing develop may receive a finding that is technically wrong — the reviewer is missing context, misreading the diff, or pattern-matching to a Standards rule that does not apply. The discipline:
@@ -101,7 +132,7 @@ The peer-review subagent receives a prompt with at minimum:
 1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec."
 2. **The Standards axis content.** Relevant excerpts from CLAUDE.md / CONTEXT.md, and a one-paragraph summary of observed conventions from the surrounding files.
 3. **The Spec axis content.** Either the Clarify output (for DIRECT route) or the plan file content (for PLAN route).
-4. **The diff.** `git diff <baseline-sha>..HEAD` or equivalent. The baseline is the Docs Checkpoint commit from Route, or the branch root for DIRECT.
+4. **The diff — by file path, not pasted.** Write `git diff <baseline-sha>..HEAD` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content. The baseline is the Docs Checkpoint commit from Route, or the branch root for DIRECT.
 5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion.
 6. **The "no false findings" instruction.** "If no issues found, state 'No issues found' — do not invent findings."
 

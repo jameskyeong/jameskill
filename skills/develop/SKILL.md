@@ -1,19 +1,21 @@
 ---
 name: develop
 description: >-
-  Self-contained development orchestrator: clarify → route → build-with-tests → review → verify → retrospective → finish.
-  4-way router (DIRECT/PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration).
-  Strict TDD, relentless clarification, no-soft-language verification at every phase boundary.
-  Retrospective phase proposes compound-engineering deposits (ADR / references / CONTEXT.md) before Finish.
+  Self-contained development orchestrator for feature work, bug fixes, and throwaway exploration.
   Use when: 'develop', 'powertasking' (legacy name), 'start working on', 'implement this', 'build this' (feature),
-  'fix this', 'debug this', 'diagnose this' (DIAGNOSE),
-  'prototype this', 'try a design', 'explore options' (PROTOTYPE).
+  'fix this', 'debug this', 'diagnose this' (bug),
+  'prototype this', 'try a design', 'explore options' (exploration),
+  or when resuming a plan file from docs/plans/.
   Also invoked by `resolve` after issue selection.
 ---
 
 # Develop — Development Orchestrator
 
 Self-contained development orchestrator that takes raw requirements through a disciplined pipeline to produce hardened, production-grade code. No external skill dependencies.
+
+**Pipeline**: Preflight → Clarify → Route (4-way: DIRECT / PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration) → Build (strict TDD) → Peer-review → Verify → Retrospective (compound-engineering deposits) → Finish.
+
+The pipeline summary lives here, not in the frontmatter description: a workflow summary in the description makes agents follow the summary and skip the body's gates (the Description Trap — keep the description trigger-only).
 
 Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
 
@@ -90,8 +92,27 @@ The following phrases are **banned** in any completion claim. If you catch yours
 | Peer-review | Every Critical/Important finding addressed or explicitly user-deferred |
 | Ship | (stub — skip until activated) |
 | Verify | lint + typecheck + test + architecture review all green — output observed |
-| Retrospective | Each qualifying channel (ADR / references / CONTEXT.md) reached an explicit user decision — accepted, edited, or rejected |
+| Retrospective | Each qualifying channel (ADR / references / CONTEXT.md / .out-of-scope/) reached an explicit user decision — accepted, edited, or rejected |
 | Finish | git status confirms clean state after commit |
+
+---
+
+## Cross-cutting rule: rulings, not stalls (Build & Verify only)
+
+Once the user has confirmed the plan or approach, execution should not park on questions the orchestrator can safely decide. During **Build and Verify** (including DIAGNOSE's Fix step and PROTOTYPE's build step), when a non-catastrophic decision blocks progress:
+
+- Make the call, record it as `Ruling: <what was decided> — <why> — <cost if wrong>`, and keep going.
+- Collect every ruling; the Finish report presents the full "Rulings made" list. A ruling that dies with the session was a decision made in secret.
+- The rationale: a wrong ruling costs rework the user can see and undo; a session parked on an orchestrator-decidable question costs the user's whole day and buys nothing.
+
+**Still stop and ask** — always — for these four classes:
+
+1. Irreversible or destructive actions (data deletion, force-push, dropping schema).
+2. Security-sensitive choices (auth, secrets, permissions).
+3. Side effects outside the working tree (external services, published artifacts).
+4. The plan or spec is so broken that every path forward is a guess — that is a re-Clarify, not a ruling.
+
+This rule does **not** apply to Clarify, Route, or plan confirmation — those decision points belong to the user and remain blocking.
 
 ---
 
@@ -166,16 +187,17 @@ Run these checks and report results:
 
 **Goal:** Reach shared understanding with zero ambiguity remaining.
 
-> **Required reading at phase entry — one-question-at-a-time grilling, recommended-answer-with-reasoning patterns, deepened 5-category checklist, approach-proposal discipline, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
+> **Required reading at phase entry — frontier-round grilling (decision tree, rounds, facts-vs-decisions split), recommended-answer-with-reasoning patterns, deepened 5-category checklist, approach-proposal discipline, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
 
 If invoked from `jsk:resolve`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
 
-- Ask **one question at a time**. Wait for the answer before the next question.
-- For each question, provide a **recommended answer** with reasoning.
-- If the question can be answered by **reading the codebase**, do that instead of asking.
-- If `CONTEXT.md` exists in the project root, read it and use its domain vocabulary. Challenge any user language that conflicts with the glossary.
+- Map the open decisions as a tree and ask in **rounds**: each round presents every **frontier question** (all whose prerequisites are already settled) at once — numbered, each with a **recommended answer** and reasoning (`❓ **Q1 — <title>**: … / ➡️ Recommended: … — <why>`).
+- A question that depends on another question still open in this round waits for a **later round**.
+- **Facts are the agent's job; decisions are the user's.** If a question can be answered by **reading the codebase** (or a quick subagent lookup), do that instead of asking — a running lookup blocks only its downstream questions, not the round.
+- If `.out-of-scope/` exists, scan it first. If the request overlaps a rejected concept, surface the prior rejection and its reasoning before grilling further.
+- If `CONTEXT.md` exists in the project root, read it and use its domain vocabulary. Challenge any user language that conflicts with the glossary. When a term is introduced or resolved during Clarify, propose its glossary entry **inline at that moment** — Retrospective only sweeps for stragglers.
 
 ### What to question — the ambiguity checklist
 
@@ -185,7 +207,7 @@ After the initial understanding forms, systematically check these 5 categories. 
 2. **Edge cases**: What happens when input is empty, null, too large, duplicated, concurrent? What are the error states?
 3. **Term definitions**: Are there words the user used that could mean more than one thing? "User" — the logged-in person or the database record? "Delete" — soft delete or hard delete?
 4. **Conflicts with existing code**: Does this change break anything that already exists? Does it overlap with existing functionality?
-5. **Success criteria**: How do we know this is done? What specific test would prove it works? What would a failing test look like?
+5. **Success criteria**: How do we know this is done? What specific test would prove it works? What would a failing test look like? At **which seam** (unit interface / HTTP endpoint / CLI) should that test live? — Build writes tests only at seams agreed here.
 
 ### Propose approaches — after the checklist, before Route
 
@@ -218,6 +240,14 @@ Based on Clarify output, determine the work's scope. **Only one route per run.**
 | **DIAGNOSE** | Bug-first work. Reproduction steps, error messages, "something is broken." | Reproduce → Minimize → Investigate → Fix → Regression-prevent. |
 | **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches", "sanity-check this state model", "I'm not sure which design fits." | Pick LOGIC or UI branch → build with relaxed TDD → user review → Discard or Promote-to-Plan. |
 
+### Route ratchet — upgrades only
+
+When in doubt between two routes, take the heavier one. Reaching for the lighter label to skip its ceremony (no plan file, no reproduction loop) **is itself the doubt** — treat the impulse as the routing signal.
+
+- "Small" measures the change and the repo, not your familiarity. An unfamiliar codebase or a brand-new project makes the work heavier by definition.
+- Mid-flight discovery upgrades, never downgrades. If Build on a DIRECT route uncovers hidden dependencies, shared state, or a growing task list: stop at a clean point, preserve the work done, write the plan file (PLAN.1) covering the remaining work, and get the user's confirmation before continuing. A run never moves from a heavier route to a lighter one.
+- Route changes are stated out loud — "this started DIRECT; upgrading to PLAN because X" — so the user can override.
+
 ### Unsupported routes
 
 If the work matches this pattern, inform the user and suggest alternatives:
@@ -247,10 +277,16 @@ Create `docs/plans/<github-id>/` if it does not already exist (the first plan by
 ## Goal
 One sentence.
 
+## Global constraints
+Project-wide rules every task must respect — exact values, verbatim, not paraphrased
+(naming scheme, error format, size limits). This block is how project-wide rules
+actually reach per-task execution.
+
 ## Tasks
 
 ### Task N: <title>
 - **What**: description of the change
+- **Interfaces**: what this task consumes from / produces for other tasks — exact signatures
 - **Test**: what test to write first (RED step)
 - **Implement**: what code to write (GREEN step)
 - **Verify**: how to confirm it works
@@ -262,6 +298,10 @@ Which tasks depend on which.
 ## Out of scope
 What this plan deliberately does NOT cover.
 ```
+
+**No placeholders.** A plan containing "TBD", "add appropriate error handling", "write tests for the above" (without naming them), "similar to Task N" (repeat the content instead), or references to types no task defines is not finished — resolve the gap or return to Clarify before presenting.
+
+**Inline self-review before presenting** — done by the orchestrator itself, never a subagent (measured upstream: subagent review of plan documents doubled wall-clock at identical quality). Three sweeps: placeholder scan; type/signature consistency across task Interfaces blocks; every Clarify requirement covered by some task.
 
 Present the plan to the user: **"This is the execution plan. Proceed, or adjust?"**
 
@@ -296,9 +336,9 @@ Five steps, each with its own exit condition. The cross-cutting verification gat
 
 1. **Reproduce** — build a fast, deterministic, agent-runnable pass/fail signal for the bug. A failing test is the preferred form; when a test cannot reach the bug, escalate through the loop-construction menu in [`references/diagnosis.md`](references/diagnosis.md) (HTTP script, CLI + output diff, headless browser, trace replay, throwaway harness, fuzz loop, bisection harness, differential run). Run the loop. Observe the failure. The exit condition is that the failure points at the bug, not at setup or fixture issues.
 2. **Minimize** — trim the reproduction until the test exercises only the bug-causing surface. Removing more would make the test pass for the wrong reasons.
-3. **Investigate** — form a hypothesis stating what causes the bug and where. Read code (do NOT change code yet) to confirm or refute. Repeat until a hypothesis is confirmed by reading.
+3. **Investigate** — list 3-5 ranked, falsifiable hypotheses (each with an "if X is the cause, then Y" prediction) *before* testing any — first-idea anchoring is the failure mode. Read code (do NOT change code yet) to confirm or refute, top-ranked first. Temporary instrumentation is tagged `[DEBUG-xxxx]` and removed before the fix commits. Repeat until a hypothesis is confirmed by reading.
 4. **Fix** — minimum code change that makes the minimized test pass without breaking other tests. Standard GREEN discipline applies (see `references/tdd-discipline.md`).
-5. **Regression-prevent** — the minimized test enters the suite permanently, committed alongside the fix.
+5. **Regression-prevent** — the minimized test enters the suite permanently, committed alongside the fix — after the revert ritual (revert the fix → observe the test fail → restore → observe it pass) proves the test guards this bug.
 
 **Circuit breaker — three failed fixes means the architecture is the problem.** Count fix attempts. If a fix does not make the minimized test pass, return to Investigate with the new information — but after the **third** failed attempt, STOP. Do not attempt fix #4. The telltale pattern — each fix revealing new coupling or a new symptom somewhere else — means the structure around the bug is wrong, not the individual change. Surface this to the user with the three attempts as evidence and discuss restructuring before any further fixing. This is not a failed hypothesis; it is a wrong architecture.
 
@@ -322,7 +362,7 @@ PROTOTYPE intentionally relaxes the TDD discipline that DIRECT/PLAN/DIAGNOSE enf
 
 **Promote is a restart, not a continuation.** The chosen variation's code does not graduate; a fresh PLAN run takes the prototype's answer as input to its own Clarify, then authors production code with full discipline.
 
-After PROTOTYPE exits, the prototype branch is Discarded (per `references/finishing.md` Discard option) unless Promote replaced it with a new PLAN run.
+After PROTOTYPE exits, the prototype branch is preserved under `prototype/<name>` — off the delivery path, never merged, kept as a primary source future plans can point at (see `references/prototyping.md`).
 
 ---
 
@@ -402,7 +442,7 @@ The agreed requirements are:
 Does the implementation fulfill every requirement? Is anything missing? Is anything added that wasn't requested?
 
 ## Review the following diff:
-[paste git diff from docs baseline to HEAD]
+Read the diff file at: [scratch-file path — write `git diff <baseline>..HEAD` to a file first; do not paste the diff inline]
 
 ## Output format
 For each finding, state:
@@ -423,6 +463,8 @@ If no issues found, state "No issues found" — do not invent findings.
 | **Minor** | Note for the user, do not block |
 
 If you believe a finding is technically wrong, push back with reasoning — do NOT agree performatively.
+
+**Circuit breaker — count the fix → re-review rounds.** After the third round that still leaves unresolved Critical/Important findings, STOP — do not start round four. Compile the remaining findings with what was attempted and hand the list to the user to rule on each (fix now / defer / reject). Each round surfacing new findings in code the previous fix touched means the structure is wrong, not the fixes.
 
 ### Exit gate
 
@@ -476,11 +518,11 @@ For now, proceed directly to Verify.
 
 > **Required reading at phase entry — why three explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, resolve-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
 
-Run after Verify exits green, before Finish. Check three channels in order. For each, propose a deposit *only if* its threshold is met. Do not invent deposits to make the phase feel productive — silent exit is the correct outcome when no channel qualifies.
+Run after Verify exits green, before Finish. Check four channels in order. For each, propose a deposit *only if* its threshold is met. Do not invent deposits to make the phase feel productive — silent exit is the correct outcome when no channel qualifies.
 
 ### Channel 1: ADR (`docs/adr/`)
 
-**Threshold**: An architectural choice was made whose *reasoning* will be valuable to a future session asking "why did we do it this way?"
+**Threshold — triple gate, all three required**: the decision is (1) **hard to reverse**, (2) **surprising without context**, and (3) **the result of a real trade-off** between viable alternatives. Any one missing → skip the ADR.
 
 If met, propose:
 
@@ -495,9 +537,9 @@ Consequences: <follow-on implications>
 Save to docs/adr/NNNN-<slug>.md? [y/edit/n]
 ```
 
-Next ADR number = `ls docs/adr/ | wc -l + 1`, kebab-case slug.
+Next ADR number = `ls docs/adr/ | wc -l + 1`, kebab-case slug. A 1-3 sentence single-paragraph ADR is valid — Considered-options and Consequences appear only when they earn their lines.
 
-Not an ADR: bug fixes, obvious implementation details, refactors that follow existing patterns, decisions already documented.
+Not an ADR: decisions failing any of the three gates, bug fixes, obvious implementation details, refactors that follow existing patterns, decisions already documented.
 
 ### Channel 2: Discipline references (`skills/develop/references/`)
 
@@ -516,9 +558,11 @@ Append? [y/edit/n]
 
 Not a reference update: one-off mistakes, paraphrases of existing content, findings already documented.
 
-### Channel 3: CONTEXT.md domain glossary
+### Channel 3: CONTEXT.md domain glossary (final sweep)
 
-**Threshold**: A term was introduced, redefined, or contested during this session, and future contributors will need to use it consistently.
+The primary path is **inline**: terms deposit at the moment they resolve, during any phase (see Clarify). This channel is the final sweep for stragglers.
+
+**Threshold**: A term was introduced, redefined, or contested during this session, was not deposited inline, and future contributors will need to use it consistently.
 
 If met, propose:
 
@@ -537,6 +581,23 @@ Append? [y/edit/n]
 ```
 
 Not a glossary update: existing entries, throwaway phrases, standard programming terms with no project-specific meaning.
+
+### Channel 4: `.out-of-scope/` rejection knowledge base
+
+**Threshold**: The user rejected a proposal, feature, or approach this session *with a load-bearing reason*, and a future session is likely to re-propose it. One file per **concept**, not per occurrence — if an existing concept file covers it, append the occurrence there instead.
+
+If met, propose:
+
+```
+.out-of-scope/ proposal: <concept>.md
+
+Why rejected: <the load-bearing reason, 1-3 sentences>
+Prior requests: <this session's occurrence>
+
+Save to .out-of-scope/<concept-slug>.md? [y/edit/n]
+```
+
+Not an out-of-scope entry: deferrals ("later" ≠ rejected — those belong in issues), circumstantial rejections ("no time this sprint").
 
 ### Phase mechanics
 
@@ -558,7 +619,7 @@ Not a glossary update: existing entries, throwaway phrases, standard programming
 
 **Goal:** Capture the work and let the user decide what to do with the branch.
 
-> **Required reading at phase entry — when each of the four branch options actually fits, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, resolve caller integration) — see [`references/finishing.md`](references/finishing.md).**
+> **Required reading at phase entry — when each menu option actually fits and the request-only Discard gate, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, resolve caller integration) — see [`references/finishing.md`](references/finishing.md).**
 
 ### Step 1: Final commit
 
@@ -575,12 +636,13 @@ Skip if: not a git repo, no changes to commit, or PLAN route already produced pe
 
 ### Step 2: Branch decision
 
-Present 4 options to the user:
+Present 3 options to the user:
 
 1. **Local merge** — Solo project, no PR review process, work is complete. Merge the branch into main.
 2. **Open PR** — Team workflow, code review required. Push the branch and create a PR.
 3. **Keep branch** — Work is paused or not ready to merge. Leave the branch as-is.
-4. **Discard** — Work is throwaway (e.g., informed a decision but won't be shipped). Delete the branch.
+
+**Discard is not on the menu.** Deleting a branch happens only when the user explicitly asks for it, and only after they type the literal word `discard` — "yeah, get rid of it" does not count. It is the one irreversible option; the menu never hands it out. (PROTOTYPE-route branches follow their own disposal rule — preserved under `prototype/<name>`, never deleted.)
 
 If invoked from `resolve`, note that resolve will handle status transition after this step.
 
@@ -606,6 +668,16 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 - User provides the problem description as argument, or a plan file path for cross-session pickup
 - All phases proceed normally
 - On completion, summarize what was done
+
+---
+
+## Session boundaries & context hygiene
+
+Long runs outlive a comfortable context window. The discipline:
+
+- **Clarify through plan confirmation happens in one unbroken context.** Decisions live only in the conversation until the plan file captures them — clearing or compacting mid-decision loses exactly the state that has no artifact yet.
+- **Task boundaries are the natural break points.** After a PLAN task's commit, everything worth keeping is in the repo (plan file, tests, commits); the session can end and resume cheaply via cross-session pickup.
+- When context runs long, prefer in order: **(1) continue** — the live session is the primary source; **(2) end at a task boundary** and resume with `/develop <plan-file>`; **(3) dispatch scoped work to a subagent** (per `references/subagent-patterns.md`) so the intermediate context never enters the orchestrator's window; **(4) compact as the last resort** — summarization loses the nuance that has no artifact.
 
 ---
 
