@@ -13,7 +13,7 @@ description: >-
 
 Self-contained development orchestrator that takes raw requirements through a disciplined pipeline to produce hardened, production-grade code. No external skill dependencies.
 
-**Pipeline**: Preflight → Clarify → Route (4-way: DIRECT / PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration) → Build (strict TDD) → Peer-review → Verify → Retrospective (compound-engineering deposits) → Finish.
+**Pipeline**: Preflight → Clarify → Route (4-way: DIRECT / PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration) → Build (strict TDD) → Peer-review → Ship (slot) → Verify → Retrospective (compound-engineering deposits) → Finish.
 
 The pipeline summary lives here, not in the frontmatter description: a workflow summary in the description makes agents follow the summary and skip the body's gates (the Description Trap — keep the description trigger-only).
 
@@ -91,7 +91,7 @@ The following phrases are **banned** in any completion claim. If you catch yours
 | Ship | (stub — skip until activated) |
 | Verify | lint + typecheck + test + architecture review all green — output observed |
 | Retrospective | Each qualifying channel (ADR / references / CONTEXT.md / .out-of-scope/) reached an explicit user decision — accepted, edited, or rejected |
-| Finish | git status confirms clean state after commit |
+| Finish | git status confirms clean state after commit AND recorded rulings presented (or "none" stated) |
 
 ---
 
@@ -229,14 +229,14 @@ When the ambiguity checklist reaches 0, do not jump to Route with the first desi
 
 ## Route
 
-Based on Clarify output, determine the work's scope. **Only one route per run.**
+Based on Clarify output, determine the work's scope. **One active route at a time** — the ratchet below may upgrade it mid-flight (never downgrade), and PROTOTYPE's Promote hands off to a fresh PLAN run rather than switching routes in place.
 
 | Route | When | What happens next |
 |---|---|---|
 | **DIRECT** | Small, contained feature change. 1-4 commits, tightly-grouped files, no task dependencies. | Proceed directly to Build. |
 | **PLAN** | Medium feature. 5-15 commits, 2-4 files with shared state, tasks have dependencies. | Write plan file → user confirms → Docs checkpoint → sequential Build. |
 | **DIAGNOSE** | Bug-first work. Reproduction steps, error messages, "something is broken." | Reproduce → Minimize → Investigate → Fix → Regression-prevent. |
-| **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches", "sanity-check this state model", "I'm not sure which design fits." | Pick LOGIC or UI branch → build with relaxed TDD → user review → Discard or Promote-to-Plan. |
+| **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches", "sanity-check this state model", "I'm not sure which design fits." | Pick LOGIC or UI shape → build with relaxed TDD on a `prototype/` branch → user review → Discard or Promote-to-Plan. |
 
 ### Route ratchet — upgrades only
 
@@ -344,19 +344,20 @@ After Regression-prevent, proceed to Peer-review → Verify → Finish exactly a
 
 ### Route: PROTOTYPE
 
-> **Required reading at phase entry — why prototypes are throwaway by default, the LOGIC/UI branch split, time-box and variation rules, the explicit user-review step, Discard vs Promote-to-Plan, anti-patterns (silent production drift, "while I'm here" production-grade work, no time-box, single approach as exploration, skipping review, Promote without restart), and edge cases (question turns out wrong, user wants to ship as-is, shared file conflicts) — see [`references/prototyping.md`](references/prototyping.md).**
+> **Required reading at phase entry — why prototypes are throwaway by default, the LOGIC/UI shape split, time-box and variation rules, the explicit user-review step, Discard vs Promote-to-Plan, anti-patterns (silent production drift, "while I'm here" production-grade work, no time-box, single approach as exploration, skipping review, Promote without restart), and edge cases (question turns out wrong, user wants to ship as-is, shared file conflicts) — see [`references/prototyping.md`](references/prototyping.md).**
 
 PROTOTYPE intentionally relaxes the TDD discipline that DIRECT/PLAN/DIAGNOSE enforce. The relaxation is scoped to this route and ends the moment a variation is Promoted.
 
 1. **Clarify the question** — state in one sentence what the prototype is answering. If it cannot be stated, return to Clarify.
-2. **Pick the branch** — the question decides the artifact:
+2. **Create the prototype branch** — `git checkout -b prototype/<name>` from a clean main (never on top of an unmerged feature branch). The prototype lives on this branch from its first commit; Discard later means leaving the branch parked, not deleting anything.
+3. **Pick the shape** — the question decides the artifact:
    - **LOGIC** — "does this state model / data model / business logic hold up?" → build **one** small interactive harness (terminal app or script) that pushes the model through the cases that are hard to reason about on paper. A single artifact is correct here — the comparison is between the model and reality, not between design alternatives. Surface the full relevant state after every action.
    - **UI** — "what should this look like?" / "which approach fits?" → build **two or three** meaningfully different variations, presented side by side.
    - Ambiguous and the user unreachable → default by the surrounding code (backend module → LOGIC; page or component → UI) and state the assumption up front.
-3. **Set a time-box** — explicit budget (typically 30 min - 1 day). When it expires, the route exits.
-4. **Build** — per the branch above. No RED, no scope discipline at GREEN, no REFACTOR, no Peer-review subagent. Existing tests still must pass.
-5. **Present to user** — LOGIC: walk through the harness runs and what they revealed. UI: variations side by side with observed trade-offs. The agent does not declare done.
-6. **User decides** — Discard (default), Promote (the chosen variation, or the LOGIC answer — kicks off a fresh PLAN run), or Re-Clarify (the original question was wrong).
+4. **Set a time-box** — explicit budget (typically 30 min - 1 day). When it expires, the route exits.
+5. **Build** — per the shape above. No RED, no scope discipline at GREEN, no REFACTOR, no Peer-review subagent. Existing tests still must pass.
+6. **Present to user** — LOGIC: walk through the harness runs and what they revealed. UI: variations side by side with observed trade-offs. The agent does not declare done.
+7. **User decides** — Discard (default), Promote (the chosen variation, or the LOGIC answer — kicks off a fresh PLAN run), or Re-Clarify (the original question was wrong).
 
 **Promote is a restart, not a continuation.** The chosen variation's code does not graduate; a fresh PLAN run takes the prototype's answer as input to its own Clarify, then authors production code with full discipline.
 
@@ -420,7 +421,7 @@ If more behavior is needed, return to Step 1 with the next test.
 >
 > **Also required at this phase's entry — the cross-cutting subagent dispatch discipline used here and in any other develop phase that fans out work — see [`references/subagent-patterns.md`](references/subagent-patterns.md).**
 
-Spawn a review agent using the Agent tool with this prompt template:
+Spawn a review agent using the Agent tool — **naming the model tier explicitly** (mid tier is the reviewer floor; an unnamed dispatch silently inherits the most expensive tier — see `references/subagent-patterns.md`) — with this prompt template:
 
 ```
 You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec.
@@ -434,8 +435,7 @@ Check the diff against these project standards:
 - Existing code conventions observed in the surrounding files
 
 ### Axis 2: Spec compliance
-The agreed requirements are:
-[paste the clarify output or plan file content]
+Read the spec file at: [path — the plan file under docs/plans/ for PLAN runs, or the Clarify summary written to a scratch file for DIRECT; do not paste spec content inline]
 
 Does the implementation fulfill every requirement? Is anything missing? Is anything added that wasn't requested?
 
@@ -514,7 +514,7 @@ For now, proceed directly to Verify.
 
 **Goal:** Capture this session's learnings into the repo's compound-engineering channels so future sessions start ahead.
 
-> **Required reading at phase entry — why three explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, resolve-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
+> **Required reading at phase entry — why four explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, resolve-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
 
 Run after Verify exits green, before Finish. Check four channels in order. For each, propose a deposit *only if* its threshold is met. Do not invent deposits to make the phase feel productive — silent exit is the correct outcome when no channel qualifies.
 
@@ -535,7 +535,7 @@ Consequences: <follow-on implications>
 Save to docs/adr/NNNN-<slug>.md? [y/edit/n]
 ```
 
-Next ADR number = `ls docs/adr/ | wc -l + 1`, kebab-case slug. A 1-3 sentence single-paragraph ADR is valid — Considered-options and Consequences appear only when they earn their lines.
+Next ADR number = highest existing `NNNN` in `docs/adr/` + 1 (not a file count — deleted or merged ADRs make counts collide), kebab-case slug. A 1-3 sentence single-paragraph ADR is valid — Considered-options and Consequences appear only when they earn their lines.
 
 Not an ADR: decisions failing any of the three gates, bug fixes, obvious implementation details, refactors that follow existing patterns, decisions already documented.
 
@@ -632,7 +632,11 @@ If invoked from `resolve`, include the issue reference in the commit message.
 
 Skip if: not a git repo, no changes to commit, or PLAN route already produced per-task commits.
 
-### Step 2: Branch decision
+### Step 2: Session report — rulings included
+
+Present the session summary before the branch decision. If any `Ruling:` entries were recorded during Build/Verify (per the rulings-not-stalls rule), list every one — what was decided, why, cost if wrong. A ruling that dies with the session was a decision made in secret. If none were recorded, state "No rulings this session."
+
+### Step 3: Branch decision
 
 Present 3 options to the user:
 
@@ -649,6 +653,7 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 ### Exit gate
 
 - `git status` confirms clean working tree (or intentionally kept changes for "Keep branch").
+- All recorded rulings were presented (or "No rulings this session" stated).
 - User has made an explicit branch decision.
 
 ---

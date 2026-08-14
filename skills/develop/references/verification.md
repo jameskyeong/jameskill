@@ -145,8 +145,8 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
   > Architecture: read changed files; observed no single-responsibility violation, no orphaned imports.
 
 ### Finish
-- **What to verify:** `git status` shows the intended state (clean tree if committed; expected uncommitted files if "Keep branch"); user has made the branch decision.
-- **Evidence pattern:** output of `git status`; restate the user's branch choice.
+- **What to verify:** `git status` shows the intended state (clean tree if committed; expected uncommitted files if "Keep branch"); recorded rulings presented (or "No rulings this session" stated); user has made the branch decision.
+- **Evidence pattern:** output of `git status`; the rulings list (or its explicit absence); restate the user's branch choice.
 - **Forbidden:** "branch is ready."
 - **Acceptable:** "Ran `git status`. Observed: `nothing to commit, working tree clean`. User chose: 'open PR'."
 

@@ -9,7 +9,7 @@ The other skills (issue tracking, inspection) are supplementary utilities you ca
 
 ## Signature skill
 
-- **`/develop`** — Self-contained development orchestrator: clarify → route → build-with-tests → review → verify → **retrospective** → finish. 4-way router (DIRECT/PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration). Strict TDD, relentless clarification, no-soft-language verification at every phase boundary. Retrospective proposes ADR / references / CONTEXT.md deposits when the session produced learnings worth keeping. **Tracker-free** — never reads or writes Notion.
+- **`/develop`** — Self-contained development orchestrator: clarify → route → build-with-tests → review → verify → **retrospective** → finish. 4-way router (DIRECT/PLAN for features, DIAGNOSE for bugs, PROTOTYPE for throwaway exploration). Strict TDD, relentless clarification, no-soft-language verification at every phase boundary. Retrospective proposes ADR / references / CONTEXT.md / `.out-of-scope/` deposits when the session produced learnings worth keeping (glossary terms also deposit inline the moment they resolve). **Tracker-free** — never reads or writes Notion.
 
 ## Supplementary skills
 

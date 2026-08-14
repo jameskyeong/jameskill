@@ -43,10 +43,6 @@ Before writing the test body, answer one question: **what production change woul
 
 Corollary: expected values come from an **independent source of truth** — hand-derived literals, the spec's stated example, a captured known-good output. Never compute the expectation with the same logic the production code uses (see the tautological-test anti-pattern below).
 
-### The mutation check
-
-After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through — write the missing test before moving on.
-
 ### Predict the failure before running
 
 Before running the failing test, state out loud (or in your head) what failure message you expect. Then run it. If the actual failure does not match your prediction:
@@ -96,6 +92,10 @@ The teams that have the most trouble with TDD are usually trying to skip this pr
 The exit condition for GREEN is the same as the cross-cutting verification rule: read the output. Not "the test should pass now" — the actual output, the actual green line, the actual count of passed tests. If you cannot show the output, you have not finished GREEN.
 
 This rule has saved more time than any other in the loop. Tests that *should* pass but in fact silently fail (because of a typo'd import, an environment variable, a stubbed function) are the single most common source of "completed work" that turns out not to be done.
+
+### The mutation check
+
+After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through — write the missing test before moving on.
 
 ---
 
@@ -233,4 +233,4 @@ The list is short on purpose. The instinct to say "TDD does not apply to *this* 
 - **Clarify** must reach 0 ambiguities before Build starts. If RED makes you discover an ambiguity ("what should this return when input is empty?"), that is a Clarify failure — go back, resolve, return.
 - **Peer-review** reads the diff, not the cycle. The diff should tell the story by itself: tests added, implementation matching the tests, refactors visible as their own commits or commit-message lines.
 - **Verify** runs the full suite, not just this cycle's test. If the full suite was green before Build started and is not green now, something broke that this cycle's tests did not catch. That is a coverage gap; add the missing test before declaring Verify green.
-- **Finish** is downstream of all of this. The branch decision (merge / PR / keep / discard) is about the work product; the discipline that produced it is the loop above.
+- **Finish** is downstream of all of this. The branch decision (merge / PR / keep) is about the work product; the discipline that produced it is the loop above.

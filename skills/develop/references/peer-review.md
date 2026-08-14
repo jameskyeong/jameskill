@@ -131,12 +131,14 @@ The peer-review subagent receives a prompt with at minimum:
 
 1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec."
 2. **The Standards axis content.** Relevant excerpts from CLAUDE.md / CONTEXT.md, and a one-paragraph summary of observed conventions from the surrounding files.
-3. **The Spec axis content.** Either the Clarify output (for DIRECT route) or the plan file content (for PLAN route).
-4. **The diff — by file path, not pasted.** Write `git diff <baseline-sha>..HEAD` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content. The baseline is the Docs Checkpoint commit from Route, or the branch root for DIRECT.
+3. **The Spec axis content — by file path.** Either the Clarify summary written to a scratch file (DIRECT route) or the plan file already on disk (PLAN route). Spec text is not pasted inline any more than the diff is.
+4. **The diff — by file path, not pasted.** Write `git diff <baseline-sha>..HEAD` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content. The baseline is the Docs Checkpoint commit from Route, or the branch root for DIRECT. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), the baseline stays the **original branch root**, not the upgrade's docs checkpoint — the commits made under the lighter route are exactly the ones the review must not skip.
 5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion.
 6. **The "no false findings" instruction.** "If no issues found, state 'No issues found' — do not invent findings."
 
 That last instruction matters more than it sounds. A subagent dispatched without it tends to produce findings on every review, because "review with no findings" feels like a failed task. Explicitly permitting an empty review is what makes the reviews credible when they do contain findings.
+
+One requirement lives on the dispatch itself, not in the prompt: **name the model tier.** An unnamed dispatch silently inherits the orchestrator's tier — usually the most expensive — and the cost multiplies across re-review rounds. Mid tier is the reviewer floor (see `references/subagent-patterns.md`).
 
 ### Variants by route
 
@@ -240,4 +242,4 @@ If the implementing agent cannot state this sentence with a specific list of fin
 - **Clarify** produces the Spec axis content. A vague Clarify produces a weak Spec axis, which makes Peer-review's spec-compliance review weaker. Peer-review can flag this — "the spec is too vague to verify" is itself a finding — but the deep fix is upstream.
 - **Build** produces the diff Peer-review reads. A Build that skipped REFACTOR will produce a diff with structural issues the reviewer will flag; a Build that scope-crept at GREEN will produce a diff with implementation outside the spec. Both are Build-level discipline failures surfacing here.
 - **Verify** does not depend on Peer-review's findings directly, but Critical findings that triggered a re-loop should have their tests captured — so Verify's full suite includes them.
-- **Finish** is downstream. The branch decision (merge / PR / keep / discard) does not happen until Peer-review's exit gate is met. If findings remain unaddressed, Finish does not run.
+- **Finish** is downstream. The branch decision (merge / PR / keep) does not happen until Peer-review's exit gate is met. If findings remain unaddressed, Finish does not run.
