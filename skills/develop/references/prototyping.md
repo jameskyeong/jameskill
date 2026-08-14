@@ -1,6 +1,6 @@
 # PROTOTYPE Discipline — Throwaway Exploration
 
-Reference for develop's **PROTOTYPE route**. The Route → PROTOTYPE section of `SKILL.md` enforces the phase order (Clarify the question → pick the LOGIC/UI branch → Build → User review → Discard or Promote-to-Plan). This document is the deeper discipline — why prototypes are throwaway by default, the time-box and variation rules that prevent prototype-into-production drift, and what to do when the prototype reveals the original question was wrong.
+Reference for develop's **PROTOTYPE route**. The Route → PROTOTYPE section of `SKILL.md` enforces the phase order (Clarify the question → create the `prototype/` branch → pick the LOGIC/UI shape → Build → User review → Discard or Promote-to-Plan). This document is the deeper discipline — why prototypes are throwaway by default, the time-box and variation rules that prevent prototype-into-production drift, and what to do when the prototype reveals the original question was wrong.
 
 The non-negotiable: **a prototype answers a question; it is not delivery.** The output is not the deliverable; the *answer* is. The prototype code itself is throwaway by default; the chosen direction goes into a fresh PLAN run with full discipline.
 
@@ -36,9 +36,9 @@ Every prototype starts with the assumption that the code leaves the delivery pat
 
 ---
 
-## The two branches — LOGIC and UI
+## The two shapes — LOGIC and UI
 
-The question decides the artifact's shape. Getting the branch wrong wastes the whole prototype.
+The question decides the artifact's shape. Getting the shape wrong wastes the whole prototype. ("Shape" deliberately — the word "branch" is reserved for the git branch the prototype lives on.)
 
 ### LOGIC — "does this state model / data model / business logic hold up?"
 
@@ -52,9 +52,9 @@ LOGIC harness rules:
 
 ### UI — "what should this look like?" / "which approach fits?"
 
-Build **two or three meaningfully different variations**, presented side by side. The variation discipline below applies to this branch.
+Build **two or three meaningfully different variations**, presented side by side. The variation discipline below applies to this shape.
 
-### Picking the branch
+### Picking the shape
 
 Identify which question is being asked — from the user's prompt, the surrounding code, or by asking. If genuinely ambiguous and the user is unreachable, default by the surrounding code (a backend module → LOGIC; a page or component → UI) and state the assumption at the top of the prototype.
 
@@ -77,9 +77,9 @@ A prototype with no time-box becomes work that never ends, often producing code 
 
 ---
 
-## Variation discipline (UI branch)
+## Variation discipline (UI shape)
 
-This section applies to the UI branch; a LOGIC prototype is one harness by design. A UI prototype that builds one approach and iterates on it is not exploration — it is delivery without tests. Exploration means multiple variations evaluated against each other.
+This section applies to the UI shape; a LOGIC prototype is one harness by design. A UI prototype that builds one approach and iterates on it is not exploration — it is delivery without tests. Exploration means multiple variations evaluated against each other.
 
 The discipline:
 - **Two or three variations minimum.** A single variation cannot answer "which approach fits"; the answer requires comparison.
@@ -162,7 +162,7 @@ The prototype has been running for a week. There is no defined "done." The code 
 
 The fix: every prototype has a budget stated up front. If the budget needs to extend, the extension is a deliberate decision, not drift.
 
-### Single approach treated as exploration (UI branch)
+### Single approach treated as exploration (UI shape)
 
 The agent builds one design, iterates on it, polishes it, presents it as a prototype. The user has not been given a choice; the "exploration" was implementation.
 
@@ -191,7 +191,7 @@ You set out to answer "how should the onboarding flow be structured" and discove
 The fix:
 - Stop the current variations.
 - Surface the discovery to the user. "Prototyping the onboarding flow surfaced that the real question is X. Continue with onboarding variations, or re-Clarify around X?"
-- Let the user redirect. If they want to pivot, restart Clarify with the new question; the work done on the original question is captured as a finding (the original question was not the right one), and the prototype's branch is Discarded.
+- Let the user redirect. If they want to pivot, restart Clarify with the new question; the work done on the original question is captured as a finding (the original question was not the right one), and the prototype's branch is parked under `prototype/<name>` per the Discard path.
 
 ### User wants to ship the prototype as-is
 
@@ -225,7 +225,7 @@ After review, the user says "both are fine." This is not a failure; it is inform
 PROTOTYPE has a different exit gate from DIRECT/PLAN/DIAGNOSE because the work product is not a committed change. The form:
 
 > **Question**: `<one sentence>`.
-> **Branch**: `<LOGIC | UI>`.
+> **Shape**: `<LOGIC | UI>`.
 > **Artifacts built**: `<LOGIC: the harness and the cases it exercised | UI: variations with one-line summaries>`.
 > **Time-box**: `<budget>` (actual: `<time taken>`).
 > **User review**: presented at `<timestamp>`. User chose: `<Discard | Promote variation N | Re-Clarify>`.
@@ -243,5 +243,5 @@ If the sentence cannot be stated with the user's choice and its follow-on action
 - **Build** (in DIRECT/PLAN form) is what PROTOTYPE is *not*. PROTOTYPE's "build variations" step intentionally relaxes the discipline that DIRECT/PLAN Build enforces.
 - **Peer-review** does not run during PROTOTYPE. The user is the reviewer.
 - **Verify** still runs the existing test suite to confirm the prototype did not break anything — but no new tests are added for prototype code.
-- **Finish** is the route through which Discard or Promote takes effect. Discard maps to `references/finishing.md`'s Discard option; Promote starts a fresh PLAN run, which has its own Finish at the end.
+- **Finish** is the route through which Discard or Promote takes effect. PROTOTYPE's Discard is its own disposal rule — the branch is preserved under `prototype/<name>`, never routed through `references/finishing.md`'s branch-deletion path; Promote starts a fresh PLAN run, which has its own Finish at the end.
 - **PLAN** is the route Promote-to-Plan kicks off. The PLAN run uses the chosen variation as input to its own Clarify, not as a starting branch.

@@ -72,7 +72,7 @@ If `CONTEXT.md` exists, its glossary is the authority on domain terms. When the 
 
 The model does not silently translate. Silent translation hides the conflict and produces code that is correct under the glossary but wrong under the user's actual intent — or vice versa. Surfacing the conflict trains both sides on the shared vocabulary.
 
-When a term is introduced, redefined, or resolved during Clarify, propose its glossary entry **inline at that moment** (same `[y/edit/n]` format as `references/retrospective.md` channel 3) rather than holding it for Retrospective. Deferred to session end, the nuance of the resolution has already blurred and the intervening conversation may have drifted the term again. Retrospective's channel 3 remains as the final sweep for terms that slipped through.
+When a term is introduced, redefined, or resolved — during Clarify or any later phase — propose its glossary entry **inline at that moment** (same `[y/edit/n]` format as `references/retrospective.md` channel 3) rather than holding it for Retrospective. Deferred to session end, the nuance of the resolution has already blurred and the intervening conversation may have drifted the term again. Retrospective's channel 3 remains as the final sweep for terms that slipped through.
 
 ---
 

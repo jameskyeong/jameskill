@@ -14,6 +14,12 @@ Finish makes the choice visible so the user makes it consciously. The friction i
 
 ---
 
+## The session report — rulings surface here
+
+If the run recorded any `Ruling:` entries under the rulings-not-stalls rule (see `SKILL.md`), Finish is where they surface: before presenting the branch menu, list every ruling — what was decided, why, and the cost if wrong. A ruling that dies with the session was a decision made in secret; the report is what converts autonomous calls into reviewable ones. When the list is empty, state "No rulings this session" explicitly — silence is indistinguishable from a skipped report.
+
+---
+
 ## The three menu options — plus request-only Discard
 
 Each option has a specific situation it fits. The discipline is not "let the user pick whatever" — it is "present each option with the situation it matches." Three options go on the menu; the fourth (Discard) exists but is never offered.

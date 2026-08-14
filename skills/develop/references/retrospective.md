@@ -1,6 +1,6 @@
 # Retrospective Discipline — Compounding Deposit
 
-Reference for develop's **Retrospective** phase. The Retrospective section of `SKILL.md` enforces the surface mechanics (run between Verify and Finish, three channel checks, propose-not-impose). This document is the deeper discipline — why the phase exists, per-channel thresholds, anti-patterns, and edge cases.
+Reference for develop's **Retrospective** phase. The Retrospective section of `SKILL.md` enforces the surface mechanics (run between Verify and Finish, four channel checks, propose-not-impose). This document is the deeper discipline — why the phase exists, per-channel thresholds, anti-patterns, and edge cases.
 
 The non-negotiable: **the deposit decision is the user's, not the agent's.** Develop proposes; the user accepts, edits, or skips. Performative deposits — ADRs for one-line CSS fixes, glossary entries for terms that already exist, references appended with paraphrased SKILL.md content — are worse than no deposit at all.
 
@@ -18,7 +18,7 @@ Retrospective makes the deposit decision visible at the moment when the session'
 
 ## The four channels
 
-Each channel has a specific threshold. The discipline is not "ask three questions every session" — it is "ask each question only when the threshold is met, propose concrete content when it is."
+Each channel has a specific threshold. The discipline is not "ask four questions every session" — it is "ask each question only when the threshold is met, propose concrete content when it is."
 
 ### Channel 1 — ADR
 
@@ -53,7 +53,7 @@ Consequences: <follow-on implications, including what becomes harder>
 Save to docs/adr/NNNN-<slug>.md? [y/edit/n]
 ```
 
-The agent proposes the next ADR number based on `ls docs/adr/`. Filename is kebab-case.
+The agent proposes the next ADR number as the highest existing `NNNN` in `docs/adr/` + 1 (not a file count). Filename is kebab-case.
 
 **An ADR can be a single paragraph.** Context, decision, and why in 1-3 sentences is a complete ADR; Considered-options and Consequences appear only when they earn their lines. The gate is strict precisely so the format can stay light — fewer, smaller, denser ADRs beat ceremonial ones.
 
@@ -190,7 +190,7 @@ A glossary term without an `_Avoid_` line tends to drift — readers don't know 
 
 ### Batch-style deposit proposals
 
-Presenting all three channel proposals at once ("Here are the ADR draft, reference update, and glossary entry — accept all?"). This invites blanket acceptance or blanket rejection, defeating the per-channel threshold discipline.
+Presenting multiple channel proposals at once ("Here are the ADR draft, reference update, glossary entry, and out-of-scope record — accept all?"). This invites blanket acceptance or blanket rejection, defeating the per-channel threshold discipline.
 
 **The cure**: present one at a time. Each gets its own accept/edit/reject decision.
 
@@ -214,7 +214,7 @@ When `/develop` is invoked by `/resolve`, the Retrospective still runs. Deposits
 
 ### PROTOTYPE Discard
 
-If PROTOTYPE exits with Discard (the prototype is thrown away), Retrospective still runs — *the variations themselves* may have produced learnings worth depositing even though the code is discarded. Specifically: which approaches didn't work and why often belongs in a reference or an ADR-as-negative-decision.
+If PROTOTYPE exits with Discard (the prototype leaves the delivery path; its code is preserved under `prototype/<name>`), Retrospective still runs — *the variations themselves* may have produced learnings worth depositing. Specifically: which approaches didn't work and why often belongs in a reference or an ADR-as-negative-decision, with the `prototype/<name>` branch named as the primary source.
 
 ### PROTOTYPE Promote-to-Plan
 
