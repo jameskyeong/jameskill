@@ -12,6 +12,10 @@
   <img src="https://img.shields.io/badge/skills-6-1a1a1a?style=flat-square" alt="6 skills" />
 </p>
 
+<p align="center">
+  <b>English</b> | <a href="README.ko.md">한국어</a>
+</p>
+
 ---
 
 <img align="right" src="docs/jameskill-hero.jpg" width="220" alt="jameskill character" />
