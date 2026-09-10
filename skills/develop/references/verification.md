@@ -135,14 +135,16 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 - **Acceptable:** "Critical: src/auth.ts:42 — fixed in commit `<sha>`, re-ran tests, observed `Tests: 47 passed`. Important: src/auth.ts:88 — user deferred to follow-up issue."
 
 ### Verify
-- **What to verify:** typecheck (if available), lint (if available), full test suite, architecture check — every check green.
+- **What to verify:** typecheck (if available), lint (if available), full test suite, architecture check, **and the UI surface driven** (if Preflight found one) — every check green.
 - **Evidence pattern:** one line per check, naming the command and the observed summary line.
-- **Forbidden:** "all checks pass."
+- **Forbidden:** "all checks pass." Also forbidden: stopping at the terminal checks when Preflight reported a driver. Green tests do not mean the screen works — a component can pass every unit test and still render blank.
 - **Acceptable:**
   > Ran `tsc --noEmit`. Observed: no output (success).
   > Ran `eslint .`. Observed: `✨ 0 problems`.
   > Ran `pnpm test`. Observed: `Tests: 47 passed, 47 total`.
   > Architecture: read changed files; observed no single-responsibility violation, no orphaned imports.
+  > UI: ran `agent-browser snapshot -i` after submitting the form. Observed `[status] Saved` in the tree; console clean.
+- **Acceptable (no surface):** the UI line is replaced by "No UI surface — the CLI was run against a sample input; observed <output>.".
 
 ### Finish
 - **What to verify:** `git status` shows the intended state (clean tree if committed; expected uncommitted files if "Keep branch"); recorded rulings presented (or "No rulings this session" stated); user has made the branch decision.
@@ -157,10 +159,23 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 There are situations where the standard verification command is unavailable: the test suite is too slow to run repeatedly, the change is visual, the change touches infrastructure that cannot be exercised locally. The discipline does not vanish — it shifts.
 
 ### UI / visual changes
-- **Substitute evidence:** before/after screenshot, ideally side by side; a description of what visibly changed.
-- **What still applies:** if the change has any behavior (event handlers, state transitions), that behavior gets a unit test under normal TDD.
-- **Forbidden:** "the layout looks better now."
-- **Acceptable:** "Before: <screenshot or description>. After: <screenshot or description>. The button is now centered within its parent container."
+
+**A UI change is not automatically unverifiable.** Most surfaces have a driver, and Preflight already reported which one this project has. Reach for the fallback only after confirming there is no driver.
+
+| Surface | Driver | What it observes |
+|---|---|---|
+| Web | `agent-browser` | accessibility tree, clicks, console, screenshots |
+| Flutter (native) | `integration_test` + `flutter drive`, or `patrol` | widget tree, taps, on-device state |
+| React Native / Expo | `maestro` | on-device flows |
+| Flutter Web | any web driver | it renders in a browser |
+
+If a driver exists, **drive it and quote what came back** — that is a real check, not substitute evidence. What a driver catches that a screenshot never does: a console error, a request that failed, a handler that ran twice, a control that renders but does not respond.
+
+- **Substitute evidence (no driver only):** before/after screenshot, ideally side by side; a description of what visibly changed.
+- **What still applies:** if the change has any behavior (event handlers, state transitions), that behavior gets a unit test under normal TDD — with or without a driver.
+- **Forbidden:** "the layout looks better now." Also forbidden: offering a screenshot when a driver was available — that is a downgrade, not a substitute.
+- **Acceptable (driver):** "Ran `agent-browser click @e4` then `snapshot -i`. Observed: `[dialog] Delete this item?` present; console clean."
+- **Acceptable (no driver):** "No driver installed for this surface. Before: <screenshot or description>. After: <screenshot or description>. The button is now centered within its parent container."
 
 ### Long-running suites
 - **Substitute evidence:** run the targeted subset for the changed area; explicitly note the wider suite was not run.

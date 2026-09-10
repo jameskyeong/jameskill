@@ -89,7 +89,7 @@ The following phrases are **banned** in any completion claim. If you catch yours
 | Build (per task) | Test runs observed to pass with exact output |
 | Peer-review | Every Critical/Important finding addressed or explicitly user-deferred |
 | Ship | (stub — skip until activated) |
-| Verify | lint + typecheck + test + architecture review all green — output observed |
+| Verify | lint + typecheck + test + architecture review all green — output observed — AND the UI surface driven, or its absence stated |
 | Retrospective | Each qualifying channel (ADR / references / CONTEXT.md / .out-of-scope/) reached an explicit user decision — accepted, edited, or rejected |
 | Finish | git status confirms clean state after commit AND recorded rulings presented (or "none" stated) |
 
@@ -176,6 +176,19 @@ Run these checks and report results:
 
 4. **Linter** (optional): check for `.eslintrc*`, `biome.json`, `ruff.toml`, `.flake8`, or equivalent
    - If not found → **NOTE** (do not halt): "No linter detected. Verify phase will skip lint."
+
+5. **UI surface and its driver** (optional): terminal checks never observe what the user sees. Detect what this project renders and what can drive it:
+
+   | Detected | Surface | Driver to look for |
+   |---|---|---|
+   | `next`, `vite`, `react-dom`, `astro`, `svelte` in deps | Web | `agent-browser` |
+   | `pubspec.yaml` | Flutter | `integration_test/` + `flutter drive`, or `patrol` |
+   | `app.json` + `expo`, or `react-native` in deps | React Native | `maestro` |
+   | none of the above | CLI / server / library | the runnable artifact itself |
+
+   - If a surface is found and its driver is installed → report both. Verify will drive it.
+   - If a surface is found but no driver → **NOTE** (do not halt): "UI surface detected (<kind>) but no driver installed. Verify will fall back to substitute evidence."
+   - If no UI surface → **NOTE**: "No UI surface. Verify covers the runnable artifact instead."
 
 **Exit gate:** All checks ran, output observed, no HALT triggered.
 
