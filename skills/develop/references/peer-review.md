@@ -24,9 +24,11 @@ Every review covers two axes simultaneously. Conflating them produces fuzzy find
 
 Standards are the project's "how we do things here." Sources, in priority order:
 
-1. **`CLAUDE.md`** (project root) — explicit behavioral instructions for the model. These take precedence.
-2. **`CONTEXT.md`** — domain glossary, decisions, naming conventions.
+1. **Instruction and rule files** — `CLAUDE.md` at the root and in the changed directories, `AGENTS.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md`, and path-scoped rule directories such as `.claude/rules/` (only the rules whose paths cover the changed files). Search for them before dispatch; a rule file that exists but never reaches the reviewer is a rule nobody enforces. These take precedence.
+2. **The glossary** — `GLOSSARY.md` if it exists, else `CONTEXT.md`: domain terms, decisions, naming conventions.
 3. **Existing conventions observed in the surrounding files** — the unwritten rules. Naming, error handling, file organization, test layout.
+
+Pass every standards file to the reviewer **by path**, like the spec and the diff.
 
 Standards findings answer: *Does the new code match how this codebase has decided to do things?* A function named `handle_auth` when every other handler in the project is named `handleAuth` is a Standards finding, even if it works correctly.
 
@@ -56,6 +58,9 @@ The Spec is the Clarify output or plan file content — what the user asked for 
 - **Missing.** A requirement from Clarify that the diff does not implement.
 - **Drifted.** A requirement implemented in a way that does not match the agreed shape.
 - **Added.** Behavior the diff implements that Clarify did not request (scope creep).
+- **Unguarded expectation.** Behavior the spec never mentions but a reasonable user would expect: the program does not crash on an empty, huge, or duplicated input; it does not lose data on a retry. The spec is a picture of what the user wants, not an exhaustive list, and **its silence on an input is not permission for that input to break the program.** Guarding a reasonable expectation is not "Added" scope creep. Start from the plan's `## Review focus` lines (or the DIRECT playback's), which name the implied inputs Clarify already found.
+
+Grade a spec finding by its **effect on that user**, not by whether the spec named the case: a crash on an unnamed input is at least Important.
 
 Standards and Spec are evaluated independently. Code can be standards-compliant and spec-deficient (looks like the codebase, does not do what was asked) or spec-compliant and standards-violating (does the right thing the wrong way). Both kinds of findings count.
 
@@ -97,7 +102,7 @@ A finding is Minor if **the user might want to know, but the codebase is fine wi
 - Optimization opportunity that is unlikely to be load-bearing.
 - A "while we're here" suggestion that is unrelated to the change but would be nice.
 
-Minor findings are reported, not blocked. They do not cause re-loops, they do not require deferral notes, they exist for the user's awareness.
+Minor findings are reported, not blocked. They do not cause re-loops; each one left for later is logged as a `Minor (deferred):` line (see `references/planning.md`, The run log) so Finish can report it. They exist for the user's awareness.
 
 ---
 
@@ -130,13 +135,13 @@ Pushing back on a real Critical finding because you have a feeling is reckless; 
 The peer-review subagent receives a prompt with at minimum:
 
 1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec."
-2. **The Standards axis content.** Relevant excerpts from CLAUDE.md / CONTEXT.md, and a one-paragraph summary of observed conventions from the surrounding files.
-3. **The Spec axis content — by file path.** Either the Clarify summary written to a scratch file (DIRECT route) or the plan file already on disk (PLAN route). Spec text is not pasted inline any more than the diff is.
+2. **The Standards axis content — by file path.** The instruction and rule files found for the changed paths and the glossary (see Axis 1), plus a one-paragraph summary of observed conventions from the surrounding files.
+3. **The Spec axis content — by file path.** Either the run file holding the approved Clarify playback (DIRECT and DIAGNOSE; see `references/planning.md`, The run log) or the plan file already on disk (PLAN). Spec text is not pasted inline any more than the diff is.
 4. **The diff — by file path, not pasted, working tree included.** Run `git add -N <new files>` so untracked files appear, then write `git diff BASE` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content.
    - **Why not `BASE..HEAD`:** that range holds only commits. DIRECT commits nothing before Finish, so the range is empty and the reviewer reviews nothing; on any route it misses new untracked files.
-   - **BASE** is recorded where it survives the session: on PLAN, the docs-checkpoint SHA in the plan file; on other routes, `git rev-parse HEAD` at Build start, stated as `BASE: <sha>` and written atop the scratch spec file. A resumed run reuses the recorded BASE, never its own starting HEAD, or the tasks finished in earlier sessions drop out of the review. Do not guess "the branch root": on a long-lived branch it is undefined. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), BASE stays the **first** one, not the upgrade's docs checkpoint — the work done under the lighter route is exactly what the review must not skip.
+   - **BASE** is recorded where it survives the session: on PLAN, the docs-checkpoint SHA in the plan file; on other routes, `git rev-parse HEAD` at Build start, stated as `BASE: <sha>` and written atop the run file. A resumed run reuses the recorded BASE, never its own starting HEAD, or the tasks finished in earlier sessions drop out of the review. Do not guess "the branch root": on a long-lived branch it is undefined. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), BASE stays the **first** one, not the upgrade's docs checkpoint — the work done under the lighter route is exactly what the review must not skip.
    - **Refuse an empty or foreign range.** Before dispatch, confirm the scratch diff is non-empty and `git merge-base --is-ancestor BASE HEAD` succeeds. An empty diff dispatched anyway comes back "No issues found" and looks like a pass.
-5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion.
+5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion. After the findings, a **"Declined to judge"** list: every behavior the reviewer considered and set aside (unsure it matters, outside what it could check). Nothing set aside is dropped silently: the orchestrator decides each line as a `Ruling:` and logs it (see `references/planning.md`, `## Progress`).
 6. **The "no false findings" instruction.** "If no issues found, state 'No issues found' — do not invent findings."
 
 That last instruction matters more than it sounds. A subagent dispatched without it tends to produce findings on every review, because "review with no findings" feels like a failed task. Explicitly permitting an empty review is what makes the reviews credible when they do contain findings.
@@ -154,18 +159,20 @@ You are an independent code reviewer. You have NOT seen the implementation proce
 ## Your review axes
 
 ### Axis 1: Standards compliance
-Check the diff against these project standards:
-- CLAUDE.md (if exists): [paste relevant sections]
-- CONTEXT.md (if exists): [paste domain glossary]
-- Existing code conventions observed in the surrounding files
+Check the diff against these project standards. Read each file at its path:
+- Instruction and rule files: [paths: CLAUDE.md, AGENTS.md, CONTRIBUTING.md, CODING_STANDARDS.md, and the path-scoped rules covering the changed files]
+- Glossary: [path: GLOSSARY.md or CONTEXT.md, if either exists]
+- Existing code conventions observed in the surrounding files: [one-paragraph summary]
 
 ### Axis 2: Spec compliance
-Read the spec file at: [path — the plan file under docs/plans/ for PLAN runs, or the Clarify summary written to a scratch file for DIRECT; do not paste spec content inline]
+Read the spec file at: [path: the plan file under docs/plans/ for PLAN runs, or the run file holding the approved Clarify playback otherwise; do not paste spec content inline]
 
 Does the implementation fulfill every requirement? Is anything missing? Is anything added that wasn't requested?
 
+The spec is a picture of what the user wants, not an exhaustive list: a reasonable user's expectation is a requirement, and the spec's silence on an input is not permission for that input to break the program. Start with the "Review focus" lines in the spec file. Grade such findings by their effect on that user.
+
 ## Review the following diff:
-Read the diff file at: [scratch-file path — `git diff BASE` with new files registered via `git add -N`; do not paste the diff inline]
+Read the diff file at: [scratch-file path: `git diff BASE` with new files registered via `git add -N`; do not paste the diff inline]
 
 ## Output format
 For each finding, state:
@@ -173,6 +180,8 @@ For each finding, state:
 - **File:line**: location
 - **Issue**: what's wrong
 - **Suggestion**: how to fix
+
+Then list under "Declined to judge" every behavior you considered and set aside, with one line on why. An empty list is fine; a silent omission is not.
 
 If no issues found, state "No issues found" — do not invent findings.
 ```
@@ -214,7 +223,7 @@ The fix: the output format requires the reviewer to attribute each finding to on
 
 Calling every finding Critical because Important "sounds weaker." Or calling every finding Minor because Critical "sounds harsh." Both erode the triage signal.
 
-The fix: the sharpened severity definitions above. When in doubt, the reviewer should default down a level (Important rather than Critical, Minor rather than Important) — inflation is the more common direction of error.
+The fix: the sharpened severity definitions above. For **style and structure** findings, when in doubt, default down a level (Important rather than Critical, Minor rather than Important): inflation is the more common direction of error there. **Behavior** findings are graded by their effect on the user instead (see Axis 2), so a crash on an input the spec never named does not slide down to Minor.
 
 ### Self-review by the implementing agent
 

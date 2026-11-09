@@ -111,10 +111,10 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 - **Acceptable:** "I ran `git rev-parse --git-dir` and observed `.git`. I read `package.json` and saw `\"test\": \"vitest\"`."
 
 ### Clarify
-- **What to verify:** the ambiguity checklist reached 0 items, **and** the user explicitly confirmed.
-- **Evidence pattern:** Restate the resolved checklist; quote the user's confirmation.
+- **What to verify:** the ambiguity checklist reached 0 items, the playback was shown, **and** the user explicitly confirmed.
+- **Evidence pattern:** Restate the resolved checklist; show the playback (`You decided:` / `My call:` / `Review focus:` lines); quote the user's confirmation.
 - **Forbidden:** "requirements seem clear enough."
-- **Acceptable:** "Ambiguity checklist after iteration 3: 0 items. User confirmed at <timestamp>: 'yes, proceed.'"
+- **Acceptable:** "Ambiguity checklist after iteration 3: 0 items. Playback shown (3 decided by you, 2 my calls, 1 review focus). User confirmed at <timestamp>: 'yes, proceed.'"
 
 ### Route (PLAN only)
 - **What to verify:** the user confirmed the plan file's contents.
@@ -123,7 +123,7 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 - **Acceptable:** "Plan written at `docs/plans/<github-id>/<slug>.md`. User confirmed: 'good, go ahead.'"
 
 ### Build (per task)
-- **What to verify:** the failing test now passes; previously-passing tests still pass.
+- **What to verify:** the failing test now passes, and the project's test command shows no failure beyond the Preflight baseline; every failure it shows is named.
 - **Evidence pattern:** the test runner's exact summary line and (for the specific test) the test name and pass status.
 - **Forbidden:** "the test passed", "tests are green."
 - **Acceptable:** "Ran `pnpm test src/auth.test.ts`. Observed `✓ auth > rejects empty username (3 ms)`. Ran full suite `pnpm test`. Observed `Tests: 47 passed, 47 total`."
@@ -162,12 +162,13 @@ There are situations where the standard verification command is unavailable: the
 
 **A UI change is not automatically unverifiable.** Most surfaces have a driver, and Preflight already reported which one this project has. Reach for the fallback only after confirming there is no driver.
 
-| Surface | Driver | What it observes |
-|---|---|---|
-| Web | `agent-browser` | accessibility tree, clicks, console, screenshots |
-| Flutter (native) | `integration_test` + `flutter drive`, or `patrol` | widget tree, taps, on-device state |
-| React Native / Expo | `maestro` | on-device flows |
-| Flutter Web | any web driver | it renders in a browser |
+| Surface | Detected by (Preflight) | Driver | What it observes |
+|---|---|---|---|
+| Web | `next`, `vite`, `react-dom`, `astro`, `svelte` in deps | `agent-browser` | accessibility tree, clicks, console, screenshots |
+| Flutter (native) | `pubspec.yaml` | `integration_test` + `flutter drive`, or `patrol` | widget tree, taps, on-device state |
+| React Native / Expo | `app.json` + `expo`, or `react-native` in deps | `maestro` | on-device flows |
+| Flutter Web | `pubspec.yaml` with a web target | any web driver | it renders in a browser |
+| CLI / server / library | none of the above | the runnable artifact itself | its real output |
 
 If a driver exists, **drive it and quote what came back** — that is a real check, not substitute evidence. What a driver catches that a screenshot never does: a console error, a request that failed, a handler that ran twice, a control that renders but does not respond.
 
@@ -179,7 +180,7 @@ If a driver exists, **drive it and quote what came back** — that is a real che
 
 ### Long-running suites
 - **Substitute evidence:** run the targeted subset for the changed area; explicitly note the wider suite was not run.
-- **What still applies:** the full suite must run before Finish or in CI.
+- **What still applies:** the full suite must run before Finish or in CI, and every report of a subset run says it was a subset. An undisclosed subset is the narrow green that hides a broken test next door.
 - **Forbidden:** "ran the relevant tests."
 - **Acceptable:** "Ran `pnpm test src/auth/`. Observed: 14 passed. The full suite was not run in this session — CI will run it on push."
 

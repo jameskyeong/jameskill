@@ -20,6 +20,8 @@ Retrospective makes the deposit decision visible at the moment when the session'
 
 Each channel has a specific threshold. The discipline is not "ask four questions every session" — it is "ask each question only when the threshold is met, propose concrete content when it is."
 
+**Every proposal names its trigger**: the moment in this session it came from, as a `Trigger: <phase>: <what happened>` line ("Trigger: Peer-review round 2: the reviewer caught a crash on an empty cart"). Read it from the session record (the plan's `## Progress`, the review findings, the test output), not from memory. A candidate with no traceable moment is generic advice wearing a deposit's clothes; drop it.
+
 ### Channel 1 — ADR
 
 **Threshold — the triple gate. All three must hold; any one missing → skip the ADR:**
@@ -45,6 +47,7 @@ Not an ADR:
 ```
 ADR proposal: <short title>
 
+Trigger: <phase>: <what happened this session>
 Context: <1-2 sentences on the constraint or trigger>
 Decision: <what was chosen>
 Considered options: <brief list of alternatives evaluated>
@@ -67,6 +70,7 @@ Trigger signals (any of):
 - A Clarify ambiguity surfaced that the 5-category checklist almost missed.
 - A new edge case appeared in DIAGNOSE/PROTOTYPE that wasn't anticipated.
 - A subagent dispatch revealed a coordination pattern worth recording.
+- **After DIAGNOSE: what would have prevented this bug?** Route the answer: a missing seam → an ADR candidate (the bug fix itself is never the ADR; the seam decision it exposed can be, if it passes the triple gate); a confused term → the glossary; a mechanical cause a lint rule, hook, or test could catch → a reference note naming the check that should exist.
 
 Not a reference update:
 - A one-off mistake that's unlikely to recur.
@@ -78,6 +82,7 @@ Not a reference update:
 ```
 Reference update proposal: <references/<phase>.md>
 
+Trigger: <phase>: <what happened this session>
 Section to append: <existing section name, or "new section: <name>">
 
 Content:
@@ -88,7 +93,9 @@ Append? [y/edit/n]
 
 The agent identifies the right reference file (one of `grilling.md`, `planning.md`, `diagnosis.md`, `prototyping.md`, `tdd-discipline.md`, `peer-review.md`, `verification.md`, `finishing.md`, `subagent-patterns.md`, `retrospective.md`).
 
-### Channel 3 — CONTEXT.md domain glossary (final sweep)
+### Channel 3 — Domain glossary (final sweep)
+
+The glossary is `GLOSSARY.md` if the project has one, else `CONTEXT.md`. Write to the file that exists; create `CONTEXT.md` only when neither does. Below, `CONTEXT.md` means whichever file the project uses.
 
 **The primary deposit path is inline**: per `references/grilling.md`, a term that resolves during any phase is proposed for the glossary at that moment — deferred to session end, the nuance of the resolution has already blurred. Retrospective's channel 3 is the **final sweep**: scan the session for terms that were introduced, redefined, or contested but never deposited inline. The threshold below applies to those stragglers.
 
@@ -110,6 +117,7 @@ Not a glossary update:
 ```
 CONTEXT.md glossary proposal:
 
+Trigger: <phase>: <where the term was introduced or contested>
 Term: <name>
 Section: <existing section name, or "new section: <name>">
 
@@ -140,6 +148,7 @@ Not an out-of-scope entry:
 ```
 .out-of-scope/ proposal: <concept>.md
 
+Trigger: <phase>: <the rejection this session>
 Why rejected: <the load-bearing reason, 1-3 sentences>
 Prior requests: <this session's occurrence; future ones append here>
 

@@ -83,7 +83,7 @@ preflight → clarify → route → build (strict TDD) → peer-review → verif
 - **Relentless clarification, without the ping-pong** — questions arrive in frontier rounds (every currently-answerable question at once, numbered, each with a recommended answer); the 5-category ambiguity checklist must reach 0 items before Route.
 - **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later". Tests must be falsifiable: name the production change that would break each one.
 - **Independent peer-review subagent** — fresh perspective on the diff, free from author recency bias, with a built-in 12-smell baseline and a 3-round fix-loop circuit breaker.
-- **Autonomous where it's safe** — during Build/Verify, non-catastrophic calls are decided and logged as rulings instead of stalling the session; irreversible or security-sensitive decisions still stop and ask.
+- **Autonomous where it's safe** — from Build through Verify, non-catastrophic calls are decided and logged as rulings instead of stalling the session; irreversible or security-sensitive decisions still stop and ask.
 - **Retrospective** — proposes ADR / references / CONTEXT.md / `.out-of-scope/` deposits when the session produced learnings worth keeping. Silent exit otherwise.
 - **Branch finish is explicit** — local merge / open PR / keep branch. Discard never appears on the menu: it runs only on explicit request, gated on typing the word `discard`.
 

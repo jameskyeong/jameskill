@@ -37,6 +37,8 @@ A seam is the boundary a test attaches to — a unit's public interface, an HTTP
 
 If RED needs a seam that was never agreed — the behavior is unreachable from the agreed ones — that is a Clarify gap, not a license to improvise. Surface it, agree the seam, then write the test. Fewer seams is better: the ideal plan tests through the highest seam that can still express the failure.
 
+When you propose a seam, give it a one-line note on what it catches, what it misses, and how fast it runs ("unit interface: catches calculation errors, misses request wiring; fast"). A seam chosen by name alone is chosen blind.
+
 ### Name the break — the falsifiability check
 
 Before writing the test body, answer one question: **what production change would make this test fail?** Name it concretely — "if the validator stops rejecting empty usernames, this fails." If you cannot name a realistic breaking change, the test is decoration: it will pass forever, guard nothing, and cost maintenance.
@@ -92,6 +94,8 @@ The teams that have the most trouble with TDD are usually trying to skip this pr
 The exit condition for GREEN is the same as the cross-cutting verification rule: read the output. Not "the test should pass now" — the actual output, the actual green line, the actual count of passed tests. If you cannot show the output, you have not finished GREEN.
 
 This rule has saved more time than any other in the loop. Tests that *should* pass but in fact silently fail (because of a typo'd import, an environment variable, a stubbed function) are the single most common source of "completed work" that turns out not to be done.
+
+**"Other tests" means the project's suite, not your file.** A green run of the test you wrote is not a green suite. Before calling a unit of work done, run the project's test command (`npm test`, `pytest`, `cargo test`, whatever the repo uses) even when the task named one test file: a task's scope bounds the deliverable, not the verification. Report every failure that run shows by name, including ones this change did not cause; Preflight's baseline run says which failures were already there, and green means no failure beyond that baseline. A red test you watched scroll past and did not mention is a report falsified by omission. When the suite is too slow to run per task, run the affected subset, say so, and run the full suite at Verify.
 
 ### The mutation check
 

@@ -69,8 +69,8 @@ Over-budget examples to avoid:
 When the natural gloss exceeds budget, **lift the explanation into the prose itself**:
 
 ```
-✗ combineQuality(거리·방향·곡률을 종합해 등급 매기는 함수) 에서 curvature 분기 제거
-✓ combineQuality(품질 등급 함수) 에서 curvature 분기 제거 — 이제 거리와 방향 두 축만으로 판정함
+🟥 combineQuality(거리·방향·곡률을 종합해 등급 매기는 함수) 에서 curvature 분기 제거
+✅ combineQuality(품질 등급 함수) 에서 curvature 분기 제거 — 이제 거리와 방향 두 축만으로 판정함
 ```
 
 ---
@@ -84,8 +84,8 @@ Each develop phase produces different shapes of user-facing text. The rule is th
 Questions about the codebase will often mention internal terms. Gloss them so the user can answer without grepping.
 
 ```
-✗ analyzeStroke 가 spiral-bleed 도 거르나요, 아니면 따로 처리해야 하나요?
-✓ analyzeStroke(stroke 분석 함수) 가 spiral-bleed(나선형 잔존 신호) 도 거르나요, 아니면 따로 처리해야 하나요?
+🟥 analyzeStroke 가 spiral-bleed 도 거르나요, 아니면 따로 처리해야 하나요?
+✅ analyzeStroke(stroke 분석 함수) 가 spiral-bleed(나선형 잔존 신호) 도 거르나요, 아니면 따로 처리해야 하나요?
 ```
 
 ### Build (RED / GREEN / REFACTOR summaries)
@@ -93,8 +93,8 @@ Questions about the codebase will often mention internal terms. Gloss them so th
 Test names and identifiers being introduced both need glosses. The reader has not seen the file yet.
 
 ```
-✗ RED: test_no_user_kappa_required 작성 완료, combineQuality 호출 시 curvDiffAbs 인자 빠짐 확인
-✓ RED: test_no_user_kappa_required(곡률 인자 제거 후에도 동작해야 한다는 회귀 테스트) 작성 완료. combineQuality(품질 등급 함수) 호출 시 curvDiffAbs(곡률 차이 절대값) 인자 누락 확인
+🟥 RED: test_no_user_kappa_required 작성 완료, combineQuality 호출 시 curvDiffAbs 인자 빠짐 확인
+✅ RED: test_no_user_kappa_required(곡률 인자 제거 후에도 동작해야 한다는 회귀 테스트) 작성 완료. combineQuality(품질 등급 함수) 호출 시 curvDiffAbs(곡률 차이 절대값) 인자 누락 확인
 ```
 
 ### Peer-review (reporting findings)
@@ -102,8 +102,8 @@ Test names and identifiers being introduced both need glosses. The reader has no
 Severity claims that reference internal symbols must gloss them or the severity is unparseable.
 
 ```
-✗ Important: combineQuality 의 guideKAbs 기본값이 0 일 때 corner-leniency 분기 누락
-✓ Important: combineQuality(품질 등급 함수) 의 guideKAbs(가이드 곡률 절대값) 기본값이 0 일 때 corner-leniency(코너 부근 판정 완화) 분기 누락
+🟥 Important: combineQuality 의 guideKAbs 기본값이 0 일 때 corner-leniency 분기 누락
+✅ Important: combineQuality(품질 등급 함수) 의 guideKAbs(가이드 곡률 절대값) 기본값이 0 일 때 corner-leniency(코너 부근 판정 완화) 분기 누락
 ```
 
 ### DIAGNOSE (root-cause explanations)
@@ -111,8 +111,8 @@ Severity claims that reference internal symbols must gloss them or the severity 
 The hypothesis-confirm step often involves chains of identifiers. Glosses keep the chain followable.
 
 ```
-✗ finite-difference 노이즈가 per-point user κ 를 흔들어 combineQuality 가 강제 bad 등급을 매김
-✓ finite-difference(인접 점 차분으로 곡률 추정하는 방식) 의 노이즈가 per-point user κ(각 sample 의 사용자 stroke 곡률) 를 흔들어, combineQuality(품질 등급 함수) 가 강제 bad 등급을 매김
+🟥 finite-difference 노이즈가 per-point user κ 를 흔들어 combineQuality 가 강제 bad 등급을 매김
+✅ finite-difference(인접 점 차분으로 곡률 추정하는 방식) 의 노이즈가 per-point user κ(각 sample 의 사용자 stroke 곡률) 를 흔들어, combineQuality(품질 등급 함수) 가 강제 bad 등급을 매김
 ```
 
 ### Retrospective (proposing deposits)
@@ -120,8 +120,8 @@ The hypothesis-confirm step often involves chains of identifiers. Glosses keep t
 ADR proposals, reference updates, and CONTEXT.md additions are themselves user-facing summaries. Apply the rule to the proposal *and* to the prose around it.
 
 ```
-✗ ADR 제안: combineQuality 의 curvature 분기 제거 사유 기록
-✓ ADR 제안: combineQuality(품질 등급 결합 함수) 에서 곡률(curvature) 비교를 제거한 사유 기록
+🟥 ADR 제안: combineQuality 의 curvature 분기 제거 사유 기록
+✅ ADR 제안: combineQuality(품질 등급 결합 함수) 에서 곡률(curvature) 비교를 제거한 사유 기록
 ```
 
 ### Finish (commit summary)
@@ -129,8 +129,8 @@ ADR proposals, reference updates, and CONTEXT.md additions are themselves user-f
 Commit messages themselves follow project convention — no gloss in the subject line. But the user-facing summary that surrounds the commit *does* need glosses.
 
 ```
-✗ Built: combineQuality 단순화, analyzeStroke 의 user κ 계산 제거. 커밋했음.
-✓ Built: combineQuality(품질 등급 함수) 단순화 및 analyzeStroke(stroke 분석 함수) 의 user κ(사용자 곡률) 계산 제거. 커밋했음.
+🟥 Built: combineQuality 단순화, analyzeStroke 의 user κ 계산 제거. 커밋했음.
+✅ Built: combineQuality(품질 등급 함수) 단순화 및 analyzeStroke(stroke 분석 함수) 의 user κ(사용자 곡률) 계산 제거. 커밋했음.
 ```
 
 ---
@@ -142,7 +142,7 @@ Commit messages themselves follow project convention — no gloss in the subject
 Three or more consecutive un-glossed internal identifiers in one bullet or sentence. The reader's working memory collapses.
 
 ```
-✗ combineQuality 에서 curvDiffAbs 인자를 빼고 analyzeStroke 에서 dirCos 계산만 유지
+🟥 combineQuality 에서 curvDiffAbs 인자를 빼고 analyzeStroke 에서 dirCos 계산만 유지
 ```
 
 Fix: gloss the first occurrence of each, or restructure into separate bullets.
@@ -152,7 +152,7 @@ Fix: gloss the first occurrence of each, or restructure into separate bullets.
 A sentence whose only non-jargon words are syntactic connectives (`에서`, `의`, `로`, `를`). This is identifier soup's prose form.
 
 ```
-✗ analyzeStroke 의 user κ 의 노이즈로 combineQuality 의 curvature 분기가 false-bad 를 유발
+🟥 analyzeStroke 의 user κ 의 노이즈로 combineQuality 의 curvature 분기가 false-bad 를 유발
 ```
 
 Fix: rewrite with verbs and glosses that carry meaning.
@@ -162,9 +162,9 @@ Fix: rewrite with verbs and glosses that carry meaning.
 Glossing an identifier with the identifier itself (or a trivial rephrasing). Tells the reader nothing.
 
 ```
-✗ combineQuality(combineQuality 함수) — 0 information added
-✗ dirCos(dirCos 값) — 0 information added
-✗ zeroPx(zeroPx 상수) — 0 information added
+🟥 combineQuality(combineQuality 함수) — 0 information added
+🟥 dirCos(dirCos 값) — 0 information added
+🟥 zeroPx(zeroPx 상수) — 0 information added
 ```
 
 Fix: name what the thing *does* or *represents*, not what it is syntactically.
@@ -174,7 +174,7 @@ Fix: name what the thing *does* or *represents*, not what it is syntactically.
 Glossing terms the reader already understands. Wastes parsing budget and signals condescension.
 
 ```
-✗ test(테스트) 를 import(임포트) 하고 commit(커밋) 했습니다
+🟥 test(테스트) 를 import(임포트) 하고 commit(커밋) 했습니다
 ```
 
 Fix: only gloss what the rule's "Yes" categories cover.
@@ -184,10 +184,10 @@ Fix: only gloss what the rule's "Yes" categories cover.
 Code blocks should be valid code. Put glosses in the surrounding prose, not inside the block.
 
 ```
-✗
+🟥
    combineQuality(distSq, dirCos(방향 코사인 유사도), guideKAbs)
 
-✓ 위 시그니처에서 dirCos(방향 코사인 유사도) 인자는 그대로 유지됨.
+✅ 위 시그니처에서 dirCos(방향 코사인 유사도) 인자는 그대로 유지됨.
    combineQuality(distSq, dirCos, guideKAbs)
 ```
 

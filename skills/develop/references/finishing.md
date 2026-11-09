@@ -16,7 +16,7 @@ Finish makes the choice visible so the user makes it consciously. The friction i
 
 ## The session report — rulings surface here
 
-If the run recorded any `Ruling:` entries under the rulings-not-stalls rule (see `SKILL.md`), Finish is where they surface: before presenting the branch menu, list every ruling — what was decided, why, and the cost if wrong. A ruling that dies with the session was a decision made in secret; the report is what converts autonomous calls into reviewable ones. When the list is empty, state "No rulings this session" explicitly — silence is indistinguishable from a skipped report.
+Before presenting the branch menu, report what was done, then every ruling. Build the report from the session's log, not from memory: the plan file's `## Progress` on PLAN, the run file on other routes (see `references/planning.md`, The run log). Memory does not survive compaction; the log does. If the run recorded any `Ruling:` entries under the rulings-not-stalls rule (see `SKILL.md`), Finish is where they surface: list every ruling (what was decided, why, and the cost if wrong) and every `Minor (deferred)` finding. A ruling that dies with the session was a decision made in secret; the report is what converts autonomous calls into reviewable ones. When the list is empty, state "No rulings this session" explicitly — silence is indistinguishable from a skipped report.
 
 ---
 
@@ -50,7 +50,12 @@ Use when:
 Before opening the PR:
 - Push the branch (`git push -u origin <branch>` if first push).
 - Verify the branch is up-to-date with `main` (the PR view will surface conflicts otherwise).
-- Draft the PR body — what the change does, why, how to test. The PR body matters more than the commit messages because it is the artifact a reviewer reads first.
+- Draft the PR body. It matters more than the commit messages because it is the artifact a reviewer reads first, and what a reviewer needs is what changed, how it was verified, what could break, and whether it is safe to merge. Three sections:
+  - **Summary:** what changed and why, in a few lines.
+  - **Evidence:** before and after. Reuse the RED and GREEN output Build or DIAGNOSE already observed, and the UI driver's output if Verify drove one. A single after-the-fact snapshot proves the current state works, not that this diff is what changed it.
+  - **Merge danger:** whether the change is a one-way door (hard to undo: a migration, a published API, deleted data) or a two-way door, and its blast radius (who or what breaks if it is wrong). A one-way door is also a stop-and-ask class under the rulings rule.
+- If the repo has `.github/pull_request_template.md`, fill that template and place the three sections inside it.
+- Write the body to a file and pass it with `--body-file`, so quotes and backticks in the evidence survive the shell.
 
 Do not auto-open the PR before the user has chosen this option. "Open PR" requires the user's explicit consent because pushing makes the work visible to others.
 

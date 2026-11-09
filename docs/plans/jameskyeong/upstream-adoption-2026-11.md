@@ -6,7 +6,31 @@ Decide which methodology changes to take into `/develop`, `/security` and `/ship
 
 - Survey date: 2026-11-09.
 - Sources: the two public agent-skill methodology projects surveyed on 2026-08-13 (see [upstream-adoption-2026-08.md](upstream-adoption-2026-08.md)), read from their changes since that date. One project shipped five releases; the other landed 99 non-merge commits.
-- Status: **Group A implemented (2026-11-09).** Groups B and C are proposals awaiting decisions.
+- Status: **Groups A and B implemented (2026-11-09).** Group C items are proposals awaiting decisions. Non-PLAN routes keep their BASE, approved playback and log in a run file, `$(git rev-parse --git-dir)/develop/<slug>.md` (added while implementing B3 and B10).
+
+## Decision record (Group B)
+
+Decided one item at a time with the author; implemented together once every B item is decided.
+
+| ID | Decision |
+|---|---|
+| B1 | Adopt |
+| B2 | Adopt |
+| B3 | Adopt |
+| B4 | Adopt |
+| B5 | Adopt |
+| B6 | Adopt |
+| B7 | Adopt (DIRECT: review focus as 1-3 lines in the B3 playback) |
+| B8 | Adopt, including the Preflight baseline run; a slow suite may run a disclosed subset per task, full suite at Verify |
+| B9 | Adopt |
+| B10 | Adopt (non-PLAN ledger lives in the scratch spec file that holds BASE) |
+| B11 | Adopt (standards files passed by path; resolves the paste-vs-path wording conflict) |
+| B12 | Adopt (mechanical-cause deposits go to Channel 2 unless C1 is adopted later) |
+| B13 | Adopt |
+| B14 | Adopt (new-file default stays CONTEXT.md; changing it is C17) |
+| B15 | Adopt |
+
+Separate request during the session: every icon the skills print is a boxed emoji. PASS ✅, WARN 🟨, BLOCK and bad examples 🟥 (❎ was rejected because it is green like ✅), SKIP ⏭️, recommendation ➡️, question numbers 1️⃣ 2️⃣ …, security title ☑️, ship title ▶️. Quoted tool output and the quoted forbidden attribution line keep their original characters.
 
 ## How to read this
 

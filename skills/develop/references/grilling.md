@@ -26,26 +26,48 @@ The grilling discipline trades a few minutes of friction at Clarify for the cost
 
 Map the open decisions as a tree before asking anything. Some questions stand alone; some depend on another question's answer. The **frontier** is every question whose prerequisites are already settled — the set the user can actually answer right now.
 
-The rule: each round presents the **whole frontier at once** — numbered, each question in a fixed shape:
+The rule: each round presents the **whole frontier at once** (every open decision that would change what gets built; see *Ask only what changes the build*) — numbered with keycap digits (1️⃣ 2️⃣ 3️⃣ …), each question in a fixed shape, with a `---` line between questions so each reads as its own unit:
 
-> ❓ **Q1 — \<short title\>**: \<the question\>
-> ➡️ Recommended: \<answer\> — \<one-sentence why\>
+> 1️⃣ **\<short title\>**: \<the question\>
+> ➡️ Recommended: \<answer\>, because \<one-sentence why\>
+>
+> ---
+>
+> 2️⃣ **\<short title\>**: \<the question\>
+> ➡️ Recommended: \<answer\>, because \<one-sentence why\>
+
+- **Word each question so "yes" accepts the recommendation.** "Keep the cache on? (recommended)" lets an agreeing user say yes. "Turn the cache off?" with "keep it on" recommended makes the agreeing answer "no", and the answers come back crossed.
+- **Ask in plain chat text** the user answers in their own words, not through a picker widget. Pickers push toward pre-baked multiple-choice answers and leave no room for the constraint the agent did not think of.
 
 A question whose answer depends on another question still open in this round belongs to a **later round**. Batching a dependent question with its prerequisite is how partial answers turn into wrong assumptions: the user answers Q1 in a way that invalidates Q3, but Q3's answer is already on record.
 
 Read all answers, redraw the tree (answers open new questions and close old ones), present the next round. Rounds continue until the frontier is empty.
 
-Why rounds beat one-at-a-time: a five-decision Clarify at one question per message costs five round-trips and the user's patience; the same five decisions usually fit in two rounds. One-at-a-time survives only as the degenerate case — a round whose frontier happens to hold a single question.
+Why rounds beat one-at-a-time: a five-decision Clarify at one question per message costs five round-trips and the user's patience; the same five decisions usually fit in two rounds. One-at-a-time is the default only as the degenerate case — a round whose frontier happens to hold a single question.
+
+**Unless the user asks for one at a time.** When the user's instructions (CLAUDE.md, memory, or the conversation) say to ask one question at a time, honor it: still map the full frontier, but send only the most decision-blocking question per message, and the next one after it is answered. The checklist coverage does not shrink; only the delivery does.
+
+### Intent before shape
+
+When the request does not say **why** the user wants the change, round 1 opens with that question: one open question about the purpose ("what will this let you do?"), with **no recommended answer** attached. It is the one exception to the recommended-answer rule below: a recommendation for a question about intent steers the user toward a plausible-sounding reason instead of their real one. When the request already states its purpose, skip it.
+
+This is not the "philosophical questions" anti-pattern: it asks about the intent of this change, the input every later decision (scope, edge cases, approach) is judged against.
+
+### Ask only what changes the build
+
+A frontier node becomes a numbered question only if a different answer would change what gets built, and neither the request nor the project answers it. Otherwise make the call and state it, as `My call: <X>, because <Y>`, so the user sees it and can overturn it. Process choices (where a file goes, whether to write something up, how to show a result) are always the agent's calls: state them, do not ask them.
+
+A stated call is not "answering your own question": the anti-pattern hides the decision, a stated call puts it in front of the user. Every call lands in the Clarify playback (see the exit gate sentence) before anything is built.
 
 ### Facts are the agent's job; decisions are the user's
 
 Never put a *fact* question to the user — anything answerable by reading the codebase, the docs, or by dispatching a research subagent is the agent's legwork. A running lookup does not block the round: only the questions downstream of that fact wait for it; the rest of the frontier ships now.
 
-What remains for the user is *decisions* — trade-offs, preferences, scope calls. Put each decision to the user and wait. If a "question" you are about to ask has an objectively correct answer discoverable without the user, you are outsourcing legwork, not clarifying.
+What remains for the user is *decisions* — trade-offs, preferences, scope calls. Put each decision that changes what gets built to the user and wait; the rest are stated calls (see *Ask only what changes the build*). If a "question" you are about to ask has an objectively correct answer discoverable without the user, you are outsourcing legwork, not clarifying.
 
 ### Recommended answer, with reasoning
 
-Every question carries a recommended answer and a one-sentence why. This converts the interaction from "make me think for you" into "agree with my recommendation, or tell me which constraint I missed." Three benefits:
+Every question carries a recommended answer and a one-sentence why (the intent question is the one exception; see *Intent before shape*). This converts the interaction from "make me think for you" into "agree with my recommendation, or tell me which constraint I missed." Three benefits:
 
 - **Cheaper for the user.** Saying "yes, your recommendation is fine" is faster than thinking through the question from scratch.
 - **Reveals the model's mental model.** If the recommendation is wrong, the user catches it immediately — and the catch teaches the model something about the project that no further question would have surfaced.
@@ -64,9 +86,11 @@ The heuristic: if you can predict the answer with >80% confidence from a 30-seco
 
 If the project has a `.out-of-scope/` directory (the rejected-proposal knowledge base — see `references/retrospective.md`), scan it at Clarify start. If the user's request overlaps a rejected concept, surface the prior rejection with its recorded reasoning before grilling further. The user may be knowingly reversing the decision — fine, and that reversal becomes an explicit Clarify item — or unaware of it, in which case the file just saved a wasted session. Match by concept, not by wording: "night theme" overlaps a rejected `dark-mode.md`.
 
-### Challenge user language that conflicts with CONTEXT.md
+### Challenge user language that conflicts with the glossary
 
-If `CONTEXT.md` exists, its glossary is the authority on domain terms. When the user's prompt uses a domain word in a different sense than `CONTEXT.md` defines, the model surfaces the conflict explicitly:
+The project glossary is `GLOSSARY.md` if it exists, else `CONTEXT.md`. Read and write only the file that exists, so a repo never ends up with two glossaries. (Below, `CONTEXT.md` means whichever file the project uses.)
+
+If the glossary exists, it is the authority on domain terms. When the user's prompt uses a domain word in a different sense than `CONTEXT.md` defines, the model surfaces the conflict explicitly:
 
 > "CONTEXT.md defines `tenant` as the billing entity, but your message uses `tenant` for an authenticated user. Are you using the term loosely, or do you actually mean the billing entity here?"
 
@@ -137,6 +161,13 @@ The grill version of this is "what specific test would prove this works, and wha
 If the user cannot describe the success test, the requirement is still vague — not because the user is wrong, but because the next step (Build, which is TDD) cannot start without a failing test. The Clarify exit gate has not been met.
 
 The success-test question has a second half: **at which seam** (the boundary the test attaches to — a unit's public interface, an HTTP endpoint, a CLI invocation) should that test live? Agree the seams here; per `references/tdd-discipline.md`'s pre-agreed-seams rule, Build writes tests only at seams that were agreed, so a seam nobody named is a Clarify gap that will stall RED.
+
+Give each proposed seam a one-line note on **what it catches, what it misses, and how fast it runs**, so the user picks on substance rather than on the name:
+
+> Unit interface: catches calculation errors, misses request wiring; fast.
+> HTTP endpoint: catches request and response shape too, misses rendering; medium.
+
+Also ask for **anti-goals**: what would make this a failure even if it technically works ("it passes but the page now takes 3 seconds", "it works but admins lose the old export"). An anti-goal is a success criterion stated from the other side, and it often names the edge the spec forgot.
 
 Common ambiguous success criteria and their sharper forms:
 
@@ -216,7 +247,7 @@ The user may genuinely have a clear-cut, well-specified change. Or they may be i
 - Do not refuse to skip — the user owns the call.
 - Do not silently pretend the skip is fine when it is not. Surface, then defer.
 
-### No CONTEXT.md exists
+### No glossary exists (neither `GLOSSARY.md` nor `CONTEXT.md`)
 
 Without a glossary, the agent has no project-specific authority to challenge user language. The discipline:
 
@@ -251,9 +282,17 @@ Sometimes the grill reveals that the user is asking for something they should no
 
 ## The exit gate sentence
 
+Before asking to proceed, show the **playback**: what will be built, in about 250 words or fewer, with every line marked by its source:
+
+> **You decided:** \<only what the user actually said or chose\>
+> **My call:** \<what the agent filled in\>, because \<why\>
+> **Review focus:** \<1-3 inputs or failure modes the spec implies but nobody named\>
+
+Only what the user said goes in as theirs; anything the agent filled in goes in as its call, never as something the user agreed to. Approval covers what was shown. Route has not run yet, so the playback always carries its Review focus lines: on PLAN they move into the plan's `## Review focus`; on other routes the approved playback is saved in the run file (see `references/planning.md`, The run log) as the spec the reviewer reads, so the review checks the same picture the user approved.
+
 The Clarify exit gate is the same evidence-based form used in `references/verification.md`:
 
-> **Ambiguity checklist: 0 items.** User confirmed at `<timestamp>`: "`<exact user quote>`."
+> **Ambiguity checklist: 0 items.** Playback shown. User confirmed at `<timestamp>`: "`<exact user quote>`."
 
 Both halves are required. "Ambiguity checklist: 0 items" without a user confirmation is the agent declaring its own readiness, not the user's. "User confirmed: proceed" without the checklist is the user trusting the agent's vague sense that things are clear, which puts the responsibility for the unsurfaced ambiguities on the wrong side.
 

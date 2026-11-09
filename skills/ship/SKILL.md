@@ -23,7 +23,7 @@ Answers one question: **"Is there a known security configuration issue blocking 
 
 Invoke `jsk:security` against the project and collect its BLOCK and WARN items.
 
-If `lock` is unavailable, tell the user it must be installed and stop — there is nothing to base a verdict on.
+If `security` is unavailable, tell the user it must be installed and stop — there is nothing to base a verdict on.
 
 ### Step 2: Apply the verdict rule
 
@@ -37,29 +37,29 @@ The rule is intentionally simple: security configuration issues that `security` 
 **NO-GO example:**
 
 ```
-🚦 LAUNCH READY?   NO-GO
+▶️ LAUNCH READY?   NO-GO
 
 Blocking (2):
-  ❌ [Security] Supabase RLS off on table `users`
+  🟥 [Security] Supabase RLS off on table `users`
        supabase/migrations/0003_users.sql:12
-  ❌ [Security] STRIPE_SECRET reachable from client bundle
+  🟥 [Security] STRIPE_SECRET reachable from client bundle
        components/Checkout.tsx:8
 
 Fix the blockers above, then run /jsk:ship again.
 
 Advisory (not blocking):
-  ⚠️  [Security] Stripe webhook parses JSON before signature verification — api/webhooks/stripe.ts:14
+  🟨 [Security] Stripe webhook parses JSON before signature verification — api/webhooks/stripe.ts:14
 ```
 
 **GO example:**
 
 ```
-🚦 LAUNCH READY?   GO  ✅
+▶️ LAUNCH READY?   GO  ✅
 
 No blocking issues found.
 
 Advisory (not blocking):
-  ⚠️  [Security] Public reference table `plans` has RLS off — confirm intentional
+  🟨 [Security] Public reference table `plans` has RLS off — confirm intentional
 
 Security configuration checks passed.
 ```
@@ -67,10 +67,10 @@ Security configuration checks passed.
 If **every** check returned SKIP (the project uses neither Supabase nor Stripe, so nothing applicable ran), do not imply a clean bill of health:
 
 ```
-🚦 LAUNCH READY?   GO  ✅
+▶️ LAUNCH READY?   GO  ✅
 
 No applicable security checks ran (no Supabase or Stripe usage detected).
-Nothing is blocking, but lock had nothing to inspect in this project.
+Nothing is blocking, but security had nothing to inspect in this project.
 ```
 
 ---
@@ -89,11 +89,11 @@ Nothing is blocking, but lock had nothing to inspect in this project.
 When the verdict or advisory mentions a service-specific term, environment variable, or abbreviation (`RLS`, `anon-key`, `STRIPE_SECRET`, `webhook-sig`, etc.), append a short parenthetical gloss (5–15 chars in the response language) on first mention so the user can act without grepping.
 
 ```
-✗ Supabase RLS off on table `users`
-✓ Supabase RLS(행 단위 권한) off on table `users`
+🟥 Supabase RLS off on table `users`
+✅ Supabase RLS(행 단위 권한) off on table `users`
 
-✗ STRIPE_SECRET reachable from client bundle
-✓ STRIPE_SECRET(서버 전용 결제 시크릿) reachable from client bundle
+🟥 STRIPE_SECRET reachable from client bundle
+✅ STRIPE_SECRET(서버 전용 결제 시크릿) reachable from client bundle
 ```
 
 Skip glossing terms the user already used in the prompt, terms inside code blocks, and standard programming words. Develop's [`communication-style.md`](../develop/references/communication-style.md) holds the full discipline.
