@@ -85,13 +85,31 @@ Standard GREEN discipline from `references/tdd-discipline.md`. The change is the
 
 **Exit condition**: minimized test passes, full suite still passes, output observed directly.
 
-**Circuit breaker — count your failed fixes.** A fix that does not make the minimized loop pass means the hypothesis was wrong or incomplete: return to Investigate with what the failure taught you. But track the count. After the **third** failed fix attempt, STOP — do not attempt fix #4. The telltale pattern: each fix reveals new coupling, new shared state, or a new symptom in a different place; each fix needs "just one more" adjacent change. That pattern is not a failed hypothesis — it is a wrong architecture around the bug. Surface it to the user, with the three attempts as evidence, and discuss restructuring before any further fixing.
+**Circuit breaker — count your failed fixes.** A fix that does not make the minimized loop pass means the hypothesis was wrong or incomplete: return to Investigate with what the failure taught you. But track the count, out loud: before each attempt, re-read this paragraph and state it (`fix attempt 2/3`), because a count held only in memory resets silently when the context is compacted. After the **third** failed fix attempt, STOP — do not attempt fix #4. The telltale pattern: each fix reveals new coupling, new shared state, or a new symptom in a different place; each fix needs "just one more" adjacent change. That pattern is not a failed hypothesis — it is a wrong architecture around the bug. Surface it to the user, with the three attempts as evidence, and discuss restructuring before any further fixing.
 
 ### 5. Regression-prevent — the test stays
 
 The minimized Reproduce test enters the suite permanently. It is the only thing that prevents the exact same bug from recurring.
 
-**The revert ritual — prove the test guards the bug.** With the fix in place and the test green: temporarily revert the fix (stash the fix hunks), run the test, **observe it fail**; restore the fix, run again, observe it pass. Thirty seconds, and it is the only direct evidence that the test fails *because of this bug* rather than passing vacuously — a regression test that never demonstrated red against the real bug is a hope, not a net.
+**The revert ritual — prove the test guards the bug.** With the fix in place and the test green: temporarily revert the fix, prove the revert landed, run the test, **observe it fail**; restore the fix, prove it is back, run again, observe it pass. Thirty seconds, and it is the only direct evidence that the test fails *because of this bug* rather than passing vacuously — a regression test that never demonstrated red against the real bug is a hope, not a net.
+
+The procedure. `<fix files>` are the files the fix changed or created, never the test file; `$SCRATCH` is any scratch directory outside the repo:
+
+```bash
+git add -N <new fix files>                                  # only if the fix created files
+git diff HEAD -- <fix files> > "$SCRATCH/fix.patch" \
+  && git apply -R "$SCRATCH/fix.patch" \
+  && git diff --stat HEAD -- <fix files>                    # must print nothing: the fix is out
+# run the test → observe RED
+git apply "$SCRATCH/fix.patch" \
+  && git diff --stat HEAD -- <fix files>                    # the fix is back
+# run the test → observe GREEN
+```
+
+- **Never `git stash` for this.** `refs/stash` is shared by every session and worktree on the repo. Observed in a consuming repo: `git stash push -- <path>` failed on an untracked file, the following `git stash pop` restored another session's stash, and 11 files were left with conflict markers.
+- **Chain with `&&`.** If writing or reverse-applying the patch fails, nothing after it runs, so a failed revert can never be mistaken for a red test.
+- **The empty `--stat` is the proof.** A red run without it may be red for another reason (a typo in the revert, a stale build), and a green run without it may mean the revert never happened.
+- **Fix and test share a file:** edit the patch to drop the test hunks before reverse-applying, then check the `--stat` names only fix lines.
 
 The discipline:
 - If the Reproduce loop was not a test (HTTP script, harness, bisection run), convert the minimized reproduction into a test at the closest seam now. If no seam can host it, that absence is itself a finding — record it alongside the fix as an architecture gap.
@@ -156,7 +174,7 @@ The fix: the test enters the suite at the same commit as the fix. The Regression
 
 The bug exists in production / on the user's machine / in CI, but not locally. Reproduce cannot exit on the standard path. Options:
 
-- **Capture the environmental difference.** Diff your local env against the failing env (env vars, dependency versions, OS, data fixtures). The bug often lives in that difference.
+- **Capture the environmental difference.** Diff your local env against the failing env (env vars, dependency versions, OS, data fixtures). The bug often lives in that difference. Compare env vars by **name and presence** (or a hash), never by printing values: `env | grep KEY` or an echoed variable puts a secret into the transcript, and the transcript is a log too.
 - **Run the test against the failing environment.** If the bug is in CI only, push a branch with the test and observe it fail in CI.
 - **Stub the environmental piece.** If the bug requires production data, build a local fixture that mimics the production data shape that triggers the bug.
 
@@ -214,7 +232,7 @@ Per `references/verification.md` evidence form:
 >
 > **Fix**: changed `<files:lines>`. Ran the minimized test. Observed: `<pass output>`. Ran full suite. Observed: `<pass output>`.
 >
-> **Regression-prevent**: revert ritual — reverted fix, observed `<failure output>`; restored, observed `<pass output>`. Minimized test committed at `<sha>` alongside the fix.
+> **Regression-prevent**: revert ritual — reverted fix (revert proven by an empty `git diff --stat HEAD -- <fix files>`), observed `<failure output>`; restored, observed `<pass output>`. Minimized test committed at `<sha>` alongside the fix.
 
 If any of the five sentences cannot be stated, the corresponding step has not exited.
 
@@ -226,4 +244,5 @@ If any of the five sentences cannot be stated, the corresponding step has not ex
 - **Build** is folded into DIAGNOSE's Fix step (which is GREEN discipline applied to the minimized Reproduce test). The TDD discipline from `references/tdd-discipline.md` fully applies.
 - **Peer-review** still runs after the fix, with the diff being the fix + the regression test. The reviewer's spec axis is the bug report; the standards axis is unchanged.
 - **Verify** runs the full suite plus the new regression test. The minimized test joins the full suite permanently from this point on.
+- **Retrospective** runs after Verify, as on every route. A bug fix is not an ADR by itself, but a missing seam the regression test exposed, or a term the bug report used ambiguously, can qualify for a channel.
 - **Finish** has the same branch menu. Local merge / Open PR / Keep branch (plus request-only discard) apply identically to bug fixes as to feature work.

@@ -94,17 +94,23 @@ Look in `supabase/migrations/*.sql`, `schema.sql`, or Prisma/Drizzle schema file
 ### What to scan
 
 ```bash
-# Secret keys that must NEVER reach the client
-grep -rn "SUPABASE_SERVICE_ROLE_KEY\|service_role\|sk_live_\|sk_test_\|STRIPE_SECRET" \
+# Secret keys that must NEVER reach the client.
+# The sed masks key values, so a hard-coded key never lands in the transcript.
+grep -rnE "SUPABASE_SERVICE_ROLE_KEY|service_role|sk_live_|sk_test_|STRIPE_SECRET" \
   --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
-  . 2>/dev/null | grep -v node_modules
+  . 2>/dev/null | grep -v node_modules \
+  | sed -E 's/(sk_(live|test)_)[A-Za-z0-9]+/\1****/g; s/eyJ[A-Za-z0-9._-]+/eyJ****/g'
 
 # The dangerous anti-pattern: secrets behind a PUBLIC env prefix.
 # Match SECRET / SERVICE_ROLE / PRIVATE / SERVICE_KEY — NOT bare "SK"
 # (SK substring-matches TASK, DISK, RISK, MASK — all valid public names).
-grep -rnE "(NEXT_PUBLIC_|VITE_|PUBLIC_)[A-Z_]*(SECRET|SERVICE_ROLE|SERVICE_KEY|PRIVATE_KEY|_SK_|_SK$)" \
+# -o prints only the variable name: this scan also reads .env* files,
+# where the rest of the line is the secret itself.
+grep -rnoE "(NEXT_PUBLIC_|VITE_|PUBLIC_)[A-Z_]*(SECRET|SERVICE_ROLE|SERVICE_KEY|PRIVATE_KEY|_SK_|_SK\b)" \
   . 2>/dev/null | grep -v node_modules
 ```
+
+> **Never print a secret value.** The session transcript is a log. Report `file:line` and the variable name; when a line must be shown for context, show it with the value masked as above. Do not `cat` an `.env*` file or echo a variable to confirm a finding.
 
 ### What to flag
 
@@ -189,6 +195,7 @@ If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Ne
 
 - **Be conservative with BLOCK.** A false BLOCK erodes trust faster than a missed WARN. When evidence is ambiguous (e.g. can't tell if a file is client-reachable), downgrade to WARN and say why.
 - **Always cite file:line.** A finding without evidence the user can open is not actionable.
+- **Cite the name, never the value.** A finding names the variable or the key prefix (`sk_live_****`), never the secret itself. The report is pasted into chats and tickets; a leaked value there needs rotating just like one in the bundle.
 - This skill is read-only — it inspects and reports. It does not edit files. (Auto-fix arrives in a later version.)
 
 ## Output style — inline-gloss discipline

@@ -30,7 +30,7 @@ If `lock` is unavailable, tell the user it must be installed and stop — there 
 - **BLOCK ≥ 1** → **NO-GO**.
 - **BLOCK = 0** → **GO**. WARN items surface as advisory and do not change the verdict.
 
-The rule is intentionally simple: security configuration issues that `lock` rates as BLOCK are deploy-blockers; everything else is information.
+The rule is intentionally simple: security configuration issues that `security` rates as BLOCK are deploy-blockers; everything else is information.
 
 ### Step 3: Emit the verdict
 

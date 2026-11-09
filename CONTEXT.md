@@ -77,6 +77,6 @@ _Avoid_: ship-ready (v1 name, retired), launch (v2.0 name, retired), production-
 ## Example dialogue
 
 > **Dev**: "I want to wire security into the develop pipeline."
-> **Domain expert**: "Develop has a Ship slot that activates when inspection skills are available — that's the wiring point. But for v2.0 the slot stays inert: develop skips it with a note, and `security` runs standalone."
+> **Domain expert**: "Develop has no ship step. The inert Ship slot it once carried named skills that never existed and was removed; `security` runs standalone, when the user asks for it."
 > **Dev**: "So how does ship fit in?"
 > **Domain expert**: "Ship is a separate skill the user invokes when they want a deploy verdict. It calls `security`, reads the findings, and issues a security GO / NO-GO. It is not a multi-axis aggregator — that framing was retired in [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md). v0.1 is security-only by design, and post-v0.1 expansion is gated on real user demand, not pre-announced."

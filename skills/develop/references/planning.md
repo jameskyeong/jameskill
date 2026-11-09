@@ -19,9 +19,59 @@ The cost of not writing a plan when one is warranted: mid-flight redirections th
 
 ---
 
+## The plan file template
+
+Plans are filed per author: `docs/plans/<github-id>/<slug>.md`. Resolve `<github-id>` before writing:
+
+1. Run `gh api user --jq .login`, which returns the author's GitHub login.
+2. If `gh` is missing or unauthenticated (the command fails or returns empty), ask the user once: *"What's your GitHub id? Your plan files are filed under `docs/plans/<id>/`."*
+
+Create `docs/plans/<github-id>/` if it does not exist yet, then write the plan with this structure:
+
+```markdown
+# Plan: <feature name>
+
+## Goal
+One sentence.
+
+## Global constraints
+Project-wide rules every task must respect — exact values, verbatim, not paraphrased
+(naming scheme, error format, size limits). This block is how project-wide rules
+actually reach per-task execution.
+
+## Tasks
+
+### Task N: <title>
+- **What**: description of the change
+- **Interfaces**: what this task consumes from / produces for other tasks — exact signatures
+- **Test**: what test to write first (RED step)
+- **Implement**: what code to write (GREEN step)
+- **Verify**: how to confirm it works
+- **Commit**: commit message
+
+## Dependencies
+Which tasks depend on which.
+
+## Out of scope
+What this plan deliberately does NOT cover.
+```
+
+**No placeholders.** A plan containing "TBD", "add appropriate error handling", "write tests for the above" (without naming them), "similar to Task N" (repeat the content instead), or references to types no task defines is not finished. Resolve the gap or return to Clarify before presenting.
+
+**Docs checkpoint.** After the user confirms the plan, commit uncommitted documentation before building:
+
+```bash
+git add CONTEXT.md docs/adr/ docs/plans/ <other-doc-paths>
+git commit -m "docs: capture context for <feature>"
+```
+
+Record this commit's SHA in the plan file (`BASE: <sha>`): it is the run's review baseline, and a resumed session reads it from there. A run the ratchet upgraded from DIRECT keeps the BASE it recorded first, not this commit.
+
+---
+
 ## Anatomy of a good plan file
 
-The PLAN sub-step in `SKILL.md` names the sections: Goal, Global constraints, Tasks, Dependencies, Out of scope. Plus per-task structure (What / Interfaces / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
+The template above names the sections: Goal, Global constraints, Tasks, Dependencies, Out of scope. Plus per-task structure (What / Interfaces / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
 
 ### Goal — one sentence
 
@@ -196,14 +246,13 @@ The fix: every plan has the Out of scope section, even if it is short. "Out of s
 
 ### Mid-execution discovery requires plan change
 
-Build is on Task 3 and discovers Task 5 depends on a surface that does not exist. The discipline:
+Build is on Task 3 and discovers Task 5 depends on a surface that does not exist. Build is under the rulings-not-stalls rule (`SKILL.md`), so the question is whether the fix is decidable:
 
-- Stop Build at the end of the current task (do not start Task 5 yet).
-- Surface the discovery to the user: "Task 5 needs surface X, which the plan did not include. Options: add Task 4.5 to create surface X, or restructure Task 5 to not need it."
-- Update the plan file with the user's choice. Capture the change in the plan ("Updated: added Task 4.5 — create surface X. Confirmed at <timestamp>.").
-- Resume Build with the updated plan.
+- Finish the current task first (do not start Task 5 yet).
+- **Decidable** (the smallest change that satisfies the spec is clear, e.g. add Task 4.5 to create surface X): make the call, record `Ruling: added Task 4.5 (create surface X) — Task 5 needs it — cost if wrong: one extra task to revert`, update the plan file ("Updated: added Task 4.5. Ruling, <timestamp>."), and continue.
+- **Not decidable** (every option changes what the user asked for, or a stop class applies): stop and surface it: "Task 5 needs surface X, which the plan did not include. Options: add Task 4.5, or restructure Task 5 to not need it." Update the plan with the user's choice.
 
-The change is logged, not silently absorbed. The plan stays the truth.
+Either way the change is logged in the plan file, not silently absorbed. The plan stays the truth.
 
 ### User adds a task mid-flight
 
@@ -219,9 +268,10 @@ Even small mid-flight additions go through plan-update. The discipline is the au
 
 Build executes Task 3 and the test the plan named cannot be written, or fails for reasons that mean the task itself was misconceived. The discipline:
 
-- Stop Build. Do not "force it through" with a different test than the plan named.
-- Surface the issue to the user with the specific reason: "Task 3 names test X; X cannot be written because Y. Options: rewrite Task 3 with a different test, or restructure the change so X becomes writeable."
-- The fix is a plan update, not a silent improvisation.
+- Do not "force it through" with a different test than the plan named and say nothing.
+- If a different test at the same seam clearly proves the same requirement, that is decidable: record a `Ruling:` with the reason ("Task 3 names test X; X cannot be written because Y; wrote X′, which asserts the same behavior"), update the plan file, and continue.
+- If the task itself was misconceived (no test can prove the requirement as stated), stop and surface it with the specific reason and the options: rewrite Task 3, or restructure the change so the test becomes writeable.
+- Either way the fix is a recorded plan update, not a silent improvisation.
 
 ### Cross-session resume
 
