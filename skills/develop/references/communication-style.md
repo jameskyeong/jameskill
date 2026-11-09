@@ -1,22 +1,22 @@
-# Communication Style — Inline-Gloss Discipline
+# Communication Style: Inline-Gloss Discipline
 
-Reference for develop's **cross-cutting communication gate**. `SKILL.md` defines the surface rule (gloss non-obvious identifiers inline on first mention, 5–15 char gloss, three forbidden shapes). This document is the deeper discipline — why dense identifier-only output breaks user understanding, the subtle ways agents fall into it, what to do at each phase boundary, and the edge cases.
+Reference for develop's **cross-cutting communication gate**. `SKILL.md` defines the surface rule (gloss non-obvious identifiers inline on first mention, 5–15 char gloss, three forbidden shapes). This document is the deeper discipline: why dense identifier-only output breaks user understanding, the subtle ways agents fall into it, what to do at each phase boundary, and the edge cases.
 
-The non-negotiable: **a user-facing summary is for the user, not for the code.** If the reader cannot follow the change without opening the file, the summary failed — regardless of how technically accurate the identifiers are.
+The non-negotiable: **a user-facing summary is for the user, not for the code.** If the reader cannot follow the change without opening the file, the summary failed, regardless of how technically accurate the identifiers are.
 
 ---
 
 ## The core principle
 
-Develop produces user-facing text at almost every phase boundary: Clarify questions, Route decisions, Build summaries, Peer-review reports, DIAGNOSE conclusions, Verify reports, Retrospective proposals, Finish notes. Each of these is the **only window** the user has into what just happened — they did not watch the tool calls, they did not read the diff line-by-line, they are not (yet) holding the code's vocabulary in their head.
+Develop produces user-facing text at almost every phase boundary: Clarify questions, Route decisions, Build summaries, Peer-review reports, DIAGNOSE conclusions, Verify reports, Retrospective proposals, Finish notes. Each of these is the **only window** the user has into what just happened: they did not watch the tool calls, they did not read the diff line-by-line, they are not (yet) holding the code's vocabulary in their head.
 
-When develop writes `combineQuality 에서 curvature 분기 제거`, the user sees four atoms — three of them opaque without grepping the codebase. The technical content is correct; the communication is broken. The fix is not to dumb the content down. The fix is to **carry the identifier's meaning forward in the prose** so the reader does not have to re-derive it.
+When develop writes `combineQuality 에서 curvature 분기 제거`, the user sees four atoms, three of them opaque without grepping the codebase. The technical content is correct; the communication is broken. The fix is not to dumb the content down. The fix is to **carry the identifier's meaning forward in the prose** so the reader does not have to re-derive it.
 
 A glossed summary has three components:
 
-1. **The identifier** — exact, copy-pasteable, so the user can grep for it.
-2. **A short parenthetical** — 5–15 characters in the response language, naming what the identifier *is* in this codebase.
-3. **The action or claim** — what was done, decided, observed.
+1. **The identifier**: exact, copy-pasteable, so the user can grep for it.
+2. **A short parenthetical**: 5–15 characters in the response language, naming what the identifier *is* in this codebase.
+3. **The action or claim**: what was done, decided, observed.
 
 If component 2 is missing on first mention, the summary is asserting expertise the reader does not yet have.
 
@@ -36,7 +36,7 @@ The rule applies to identifiers and abbreviations the reader cannot decode from 
 | Standard programming term | `test`, `import`, `commit`, `null`, `branch` | **No** |
 | Common framework API | `useState`, `fetch`, `console.log` | **No** |
 | Term already used earlier this conversation | (any) | **No (already established)** |
-| Term defined in repo CONTEXT.md the user already read | (any) | **No (gloss optional)** |
+| Term defined in the repo glossary the user already read | (any) | **No (gloss optional)** |
 
 When uncertain, gloss. The cost of an unnecessary 8-character parenthetical is near zero; the cost of unglossed jargon that loses the reader is much higher.
 
@@ -47,30 +47,30 @@ When uncertain, gloss. The cost of an unnecessary 8-character parenthetical is n
 The gloss is a **navigation aid, not a definition**. It should fit in the reader's parsing flow without breaking the sentence.
 
 - **5–15 characters** in the response language. Korean: roughly 3–7 syllables.
-- One concept per gloss. If you need two clauses, the parenthetical is too long — split the sentence instead.
+- One concept per gloss. If you need two clauses, the parenthetical is too long; split the sentence instead.
 - No nested parentheses inside the gloss.
-- No re-introducing the identifier inside its own gloss (`combineQuality(combineQuality 함수)` — banned, see Anti-patterns).
+- No re-introducing the identifier inside its own gloss (`combineQuality(combineQuality 함수)`: banned, see Anti-patterns).
 
 Examples within budget:
 
 | Identifier | Good gloss | Why |
 |---|---|---|
-| `combineQuality` | `(품질 등급 결합 함수)` — 13 chars | Names the role |
-| `dirCos` | `(방향 코사인 유사도)` — 10 chars | Expands the abbreviation |
-| `κ` | `(곡률)` — 2 chars | Symbol → word |
-| `zeroPx` | `(매칭 임계 거리)` — 8 chars | Translates the constant |
-| `RLS` | `(행 단위 권한)` — 6 chars | Korean for Row-Level Security |
+| `combineQuality` | `(품질 등급 결합 함수)` (13 chars) | Names the role |
+| `dirCos` | `(방향 코사인 유사도)` (10 chars) | Expands the abbreviation |
+| `κ` | `(곡률)` (2 chars) | Symbol → word |
+| `zeroPx` | `(매칭 임계 거리)` (8 chars) | Translates the constant |
+| `RLS` | `(행 단위 권한)` (6 chars) | Korean for Row-Level Security |
 
 Over-budget examples to avoid:
 
-- `combineQuality(거리·방향·곡률을 모두 받아 stroke 의 품질 등급을 산출하는 핵심 함수)` — 35 chars, too verbose; split into prose
-- `dirCos(가이드 stroke 의 tangent vector 와 사용자 stroke 의 tangent vector 간 cosine similarity)` — wraps a line; rewrite as a sentence
+- `combineQuality(거리·방향·곡률을 모두 받아 stroke 의 품질 등급을 산출하는 핵심 함수)`: 35 chars, too verbose; split into prose
+- `dirCos(가이드 stroke 의 tangent vector 와 사용자 stroke 의 tangent vector 간 cosine similarity)`: wraps a line; rewrite as a sentence
 
 When the natural gloss exceeds budget, **lift the explanation into the prose itself**:
 
 ```
 🟥 combineQuality(거리·방향·곡률을 종합해 등급 매기는 함수) 에서 curvature 분기 제거
-✅ combineQuality(품질 등급 함수) 에서 curvature 분기 제거 — 이제 거리와 방향 두 축만으로 판정함
+✅ combineQuality(품질 등급 함수) 에서 curvature 분기 제거. 이제 거리와 방향 두 축만으로 판정함
 ```
 
 ---
@@ -117,7 +117,7 @@ The hypothesis-confirm step often involves chains of identifiers. Glosses keep t
 
 ### Retrospective (proposing deposits)
 
-ADR proposals, reference updates, and CONTEXT.md additions are themselves user-facing summaries. Apply the rule to the proposal *and* to the prose around it.
+ADR proposals, rule updates, and glossary additions are themselves user-facing summaries. Apply the rule to the proposal *and* to the prose around it.
 
 ```
 🟥 ADR 제안: combineQuality 의 curvature 분기 제거 사유 기록
@@ -126,7 +126,7 @@ ADR proposals, reference updates, and CONTEXT.md additions are themselves user-f
 
 ### Finish (commit summary)
 
-Commit messages themselves follow project convention — no gloss in the subject line. But the user-facing summary that surrounds the commit *does* need glosses.
+Commit messages themselves follow project convention: no gloss in the subject line. But the user-facing summary that surrounds the commit *does* need glosses.
 
 ```
 🟥 Built: combineQuality 단순화, analyzeStroke 의 user κ 계산 제거. 커밋했음.
@@ -162,9 +162,9 @@ Fix: rewrite with verbs and glosses that carry meaning.
 Glossing an identifier with the identifier itself (or a trivial rephrasing). Tells the reader nothing.
 
 ```
-🟥 combineQuality(combineQuality 함수) — 0 information added
-🟥 dirCos(dirCos 값) — 0 information added
-🟥 zeroPx(zeroPx 상수) — 0 information added
+🟥 combineQuality(combineQuality 함수): 0 information added
+🟥 dirCos(dirCos 값): 0 information added
+🟥 zeroPx(zeroPx 상수): 0 information added
 ```
 
 Fix: name what the thing *does* or *represents*, not what it is syntactically.
@@ -193,7 +193,7 @@ Code blocks should be valid code. Put glosses in the surrounding prose, not insi
 
 ### Gloss drift across sessions
 
-A term glossed one way in session A and another way in session B confuses the reader who reads both. If CONTEXT.md defines the term, **use CONTEXT.md's wording** in the gloss. If not, propose adding it during Retrospective Channel 3.
+A term glossed one way in session A and another way in session B confuses the reader who reads both. If the glossary (`GLOSSARY.md` or `CONTEXT.md`) defines the term, **use the glossary's wording** in the gloss. If not, propose adding it during Retrospective Channel 3.
 
 ---
 
@@ -201,18 +201,18 @@ A term glossed one way in session A and another way in session B confuses the re
 
 ### The user pre-established the term
 
-If the user wrote `analyzeStroke` in their message or in an earlier turn of this conversation, treat it as established — no gloss needed on your first mention. Glossing it back is condescending.
+If the user wrote `analyzeStroke` in their message or in an earlier turn of this conversation, treat it as established: no gloss needed on your first mention. Glossing it back is condescending.
 
-### CONTEXT.md already defines the term
+### The glossary already defines the term
 
-Glossing in CONTEXT.md's exact wording is acceptable but not required — the user may or may not have read CONTEXT.md recently. When in doubt, gloss the first occurrence in this response and skip subsequent ones.
+Glossing in the glossary's exact wording is acceptable but not required; the user may or may not have read the glossary recently. When in doubt, gloss the first occurrence in this response and skip subsequent ones.
 
 ### Long identifier names
 
 A 30-character identifier (e.g., `validateStrokeAgainstGuideShape`) with a 12-character gloss makes the sentence unwieldy. Two options:
 
-1. **Trust the name** — if the identifier itself is self-glossing (`validateStrokeAgainstGuideShape` reads in English), skip the parenthetical and explain the *role* in the surrounding prose instead.
-2. **Alias it** — introduce it once with gloss, then refer to it by a short noun phrase: `validateStrokeAgainstGuideShape(검증 함수)` once, then "검증 함수" subsequently.
+1. **Trust the name**: if the identifier itself is self-glossing (`validateStrokeAgainstGuideShape` reads in English), skip the parenthetical and explain the *role* in the surrounding prose instead.
+2. **Alias it**: introduce it once with gloss, then refer to it by a short noun phrase: `validateStrokeAgainstGuideShape(검증 함수)` once, then "검증 함수" subsequently.
 
 ### Subagent output passing through develop
 
@@ -227,7 +227,7 @@ English: combineQuality (the quality-grade combiner) drops the curvature branch
 Japanese: combineQuality(品質判定の結合関数) から curvature(曲率) 分岐を削除
 ```
 
-The 5–15 character budget is in the response language's natural units (characters for CJK, words for English-style languages — aim for 1–3 words).
+The 5–15 character budget is in the response language's natural units (characters for CJK, words for English-style languages; aim for 1–3 words).
 
 ### Code-review and diff narration
 
@@ -237,7 +237,7 @@ When develop narrates a diff (typically in Peer-review or Verify), every identif
 
 ## Why this rule earns its place
 
-Without this discipline, develop's correctness-of-content masks failure-of-communication. The user reads "combineQuality 에서 curvature 분기 제거", accepts it because develop has been correct in this session before, and only later realizes — when grepping or when the next bug surfaces — that they did not actually understand what changed. The cost lands in the next session: re-reading code to recover context, asking develop to re-explain, or worst, approving a change whose implications the user mis-modeled.
+Without this discipline, develop's correctness-of-content masks failure-of-communication. The user reads "combineQuality 에서 curvature 분기 제거", accepts it because develop has been correct in this session before, and only later realizes, when grepping or when the next bug surfaces, that they did not actually understand what changed. The cost lands in the next session: re-reading code to recover context, asking develop to re-explain, or worst, approving a change whose implications the user mis-modeled.
 
 Glossing on first mention reverses this. The reader builds the mental model alongside the prose, retains it across the session, and can grep with confidence because each identifier was anchored to its role on its first appearance.
 

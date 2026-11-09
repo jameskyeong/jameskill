@@ -41,16 +41,17 @@ The common shape for agent skills is a toolbox: one skill per discipline — bra
 
 ### Pillar 2 — Compound engineering, in one skill
 
-Each `/develop` session deposits durable artifacts in your repo so future sessions start ahead. **Six channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
+Each `/develop` session deposits durable artifacts in your repo so future sessions start ahead. **Seven channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
 
 | Channel | How `/develop` deposits | What compounds |
 |---|---|---|
 | **Plan files** | Auto — PLAN route writes `docs/plans/<github-id>/<feature>.md` | Resumable contracts. `/develop docs/plans/<github-id>/<feature>.md` re-enters from the first incomplete task across sessions. |
 | **Regression tests** | Auto — DIAGNOSE route adds the *minimized* reproduction test to the suite permanently | Bugs compound into protection. The net grows with every fix. |
-| **Domain glossary** | Inline — a CONTEXT.md entry is proposed the moment a term resolves, in any phase; Retrospective sweeps for stragglers | Language stays consistent across sessions and contributors. |
+| **Domain glossary** | Inline — a glossary entry (`GLOSSARY.md`, or an existing `CONTEXT.md`) is proposed the moment a term resolves, in any phase; Retrospective sweeps for stragglers | Language stays consistent across sessions and contributors. |
 | **ADRs** | Auto-prompted — **Retrospective phase** proposes an ADR when a decision passes the triple gate (hard to reverse · surprising without context · real trade-off) | Decision history accumulates in `docs/adr/`. Future sessions know *why*. |
-| **Discipline references** | Auto-prompted — Retrospective proposes a `references/<phase>.md` append when a new failure mode surfaces | In-repo, editable discipline that grows with the project. Not vendor-locked. |
+| **Discipline rules** | Auto-prompted — Retrospective proposes an append to the repo's own rule files (e.g. `.claude/rules/<area>.md`) when a new failure mode surfaces | In-repo, editable discipline the next review enforces. Not vendor-locked. |
 | **Rejection records** | Auto-prompted — Retrospective proposes a `.out-of-scope/<concept>.md` when the user rejects a proposal with a load-bearing reason | Clarify reads them at session start — rejected ideas stop getting re-proposed. |
+| **Automated checks** | Auto-prompted — Retrospective proposes a lint rule, hook, or test when a mistake this session was mechanical; accepted checks become the next run's first task | Mechanical mistakes stop needing a reviewer. |
 
 The Retrospective phase runs between Verify and Finish, checks each channel against a threshold, and proposes deposits one at a time. Silent exit when no channel qualifies — performative deposits are explicitly rejected. See [ADR 0007](docs/adr/0007-retrospective-phase.md).
 
@@ -84,7 +85,7 @@ preflight → clarify → route → build (strict TDD) → peer-review → verif
 - **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later". Tests must be falsifiable: name the production change that would break each one.
 - **Independent peer-review subagent** — fresh perspective on the diff, free from author recency bias, with a built-in 12-smell baseline and a 3-round fix-loop circuit breaker.
 - **Autonomous where it's safe** — from Build through Verify, non-catastrophic calls are decided and logged as rulings instead of stalling the session; irreversible or security-sensitive decisions still stop and ask.
-- **Retrospective** — proposes ADR / references / CONTEXT.md / `.out-of-scope/` deposits when the session produced learnings worth keeping. Silent exit otherwise.
+- **Retrospective** — proposes ADR / rule / glossary / `.out-of-scope/` / automated-check deposits when the session produced learnings worth keeping. Silent exit otherwise.
 - **Branch finish is explicit** — local merge / open PR / keep branch. Discard never appears on the menu: it runs only on explicit request, gated on typing the word `discard`.
 
 > Decision history: [ADR 0001](docs/adr/0001-self-contained-orchestrator.md) (self-contained), [ADR 0005](docs/adr/0005-forge-depth-references.md) (depth via references), [ADR 0006](docs/adr/0006-forge-route-expansion.md) (DIAGNOSE + PROTOTYPE), [ADR 0007](docs/adr/0007-retrospective-phase.md) (Retrospective).

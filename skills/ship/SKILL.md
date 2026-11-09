@@ -7,13 +7,13 @@ description: >-
   'is this safe to deploy', 'ready to ship', 'cleared for launch'.
 ---
 
-# Ship — Security GO / NO-GO Verdict
+# Ship: Security GO / NO-GO Verdict
 
-Answers one question: **"Is there a known security configuration issue blocking deploy?"** — Yes or No, plus exactly what's blocking.
+Answers one question: **"Is there a known security configuration issue blocking deploy?"** (Yes or No, plus exactly what's blocking).
 
-`jsk:security` reports findings; ship turns those findings into a single binary decision. That decision is the entire value — no other inspection axis ships in v0.1.
+`jsk:security` reports findings; ship turns those findings into a single binary decision. That decision is the entire value; no other inspection axis ships in v0.1.
 
-**v0.1 scope: security only.** Ship runs `jsk:security` and nothing else. There is no design check, no quality check, no performance check. Multi-axis aggregation (design / quality / performance / dependencies) is post-v0.1 work and not promised — see [ADR 0010](../../docs/adr/0010-launch-v0.1-security-only.md) for the rationale.
+**v0.1 scope: security only.** Ship runs `jsk:security` and nothing else. There is no design check, no quality check, no performance check. Multi-axis aggregation (design / quality / performance / dependencies) is post-v0.1 work and not promised; see [ADR 0010](../../docs/adr/0010-launch-v0.1-security-only.md) for the rationale.
 
 ---
 
@@ -21,9 +21,9 @@ Answers one question: **"Is there a known security configuration issue blocking 
 
 ### Step 1: Run `jsk:security`
 
-Invoke `jsk:security` against the project and collect its BLOCK and WARN items.
+Call the Skill tool with `jsk:security` and wait for its full report; collect its BLOCK and WARN items from that report. Never re-create its checks yourself: a hand-rolled grep skips the value masking `security` applies, and a secret ends up in the transcript.
 
-If `security` is unavailable, tell the user it must be installed and stop — there is nothing to base a verdict on.
+If `security` is unavailable, tell the user it must be installed and stop: there is nothing to base a verdict on.
 
 ### Step 2: Apply the verdict rule
 
@@ -48,7 +48,7 @@ Blocking (2):
 Fix the blockers above, then run /jsk:ship again.
 
 Advisory (not blocking):
-  🟨 [Security] Stripe webhook parses JSON before signature verification — api/webhooks/stripe.ts:14
+  🟨 [Security] Stripe webhook parses JSON before signature verification (api/webhooks/stripe.ts:14)
 ```
 
 **GO example:**
@@ -59,7 +59,7 @@ Advisory (not blocking):
 No blocking issues found.
 
 Advisory (not blocking):
-  🟨 [Security] Public reference table `plans` has RLS off — confirm intentional
+  🟨 [Security] Public reference table `plans` has RLS off (confirm intentional)
 
 Security configuration checks passed.
 ```
@@ -77,14 +77,14 @@ Nothing is blocking, but security had nothing to inspect in this project.
 
 ## Rules
 
-- The verdict is **GO or NO-GO** — never "mostly ready" or "probably fine". Binary, by design.
+- The verdict is **GO or NO-GO**, never "mostly ready" or "probably fine". Binary, by design.
 - A NO-GO must list **every** blocking item with file:line. The user needs to know exactly what to fix.
 - WARN-level items are shown as advisory and never change a GO to NO-GO.
-- Do not re-derive findings independently — ship is a **decision layer** on top of `security`. `security` owns the detection; ship owns the verdict.
+- Do not re-derive findings independently; ship is a **decision layer** on top of `security`. `security` owns the detection; ship owns the verdict.
 - Never fabricate a GO. If `security` errored or could not run, report that the verdict is **incomplete**, not GO.
-- Do not market ship as a multi-axis aggregator. v0.1 is "security GO/NO-GO" — staying honest about scope is itself a feature.
+- Do not market ship as a multi-axis aggregator. v0.1 is "security GO/NO-GO"; staying honest about scope is itself a feature.
 
-## Output style — inline-gloss discipline
+## Output style: inline-gloss discipline
 
 When the verdict or advisory mentions a service-specific term, environment variable, or abbreviation (`RLS`, `anon-key`, `STRIPE_SECRET`, `webhook-sig`, etc.), append a short parenthetical gloss (5–15 chars in the response language) on first mention so the user can act without grepping.
 

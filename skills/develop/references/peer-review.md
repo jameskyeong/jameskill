@@ -1,6 +1,6 @@
-# Peer-review Discipline — Independent Diff Review
+# Peer-review Discipline: Independent Diff Review
 
-Reference for develop's **Peer-review** phase. The Peer-review section of `SKILL.md` defines the surface mechanics (write the diff, dispatch a fresh reviewer with the two-axis prompt template below, triage findings by severity, fix Critical/Important or explicitly defer). This document is the deeper discipline — why independence matters, how to make severity calls that are not arbitrary, what makes a review prompt actually produce useful findings, and the anti-patterns that turn the review into theater.
+Reference for develop's **Peer-review** phase. The Peer-review section of `SKILL.md` defines the surface mechanics (write the diff, dispatch a fresh reviewer with the two-axis prompt template below, triage findings by severity, fix Critical/Important or explicitly defer). This document is the deeper discipline: why independence matters, how to make severity calls that are not arbitrary, what makes a review prompt actually produce useful findings, and the anti-patterns that turn the review into theater.
 
 The non-negotiable: **the reviewer sees the diff, not the journey.** Everything Peer-review produces is grounded in what the code now is, not in how it came to be that way. Author recency bias is the thing this phase exists to defeat.
 
@@ -8,7 +8,7 @@ The non-negotiable: **the reviewer sees the diff, not the journey.** Everything 
 
 ## Why independence matters
 
-The author of code has spent the last hour (or day, or week) inside the change. They know which lines were hard, which were obvious, which were almost wrong before they fixed them. That knowledge — useful while writing — is a *liability* during review. It makes the author skim over places the code is in fact still wrong, because their memory fills in the version that was almost there.
+The author of code has spent the last hour (or day, or week) inside the change. They know which lines were hard, which were obvious, which were almost wrong before they fixed them. That knowledge, useful while writing, is a *liability* during review. It makes the author skim over places the code is in fact still wrong, because their memory fills in the version that was almost there.
 
 A fresh reviewer reads only the artifact. They have no version-in-their-head to fill in gaps. If the code does not communicate the intent without the author's memory, the reviewer surfaces it as a finding. That is the value: not new information, but the *absence* of the author's memory.
 
@@ -20,19 +20,19 @@ This is also why peer-review uses a separate subagent in develop rather than ask
 
 Every review covers two axes simultaneously. Conflating them produces fuzzy findings; separating them produces sharp ones.
 
-### Axis 1 — Standards compliance
+### Axis 1: Standards compliance
 
 Standards are the project's "how we do things here." Sources, in priority order:
 
-1. **Instruction and rule files** — `CLAUDE.md` at the root and in the changed directories, `AGENTS.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md`, and path-scoped rule directories such as `.claude/rules/` (only the rules whose paths cover the changed files). Search for them before dispatch; a rule file that exists but never reaches the reviewer is a rule nobody enforces. These take precedence.
-2. **The glossary** — `GLOSSARY.md` if it exists, else `CONTEXT.md`: domain terms, decisions, naming conventions.
-3. **Existing conventions observed in the surrounding files** — the unwritten rules. Naming, error handling, file organization, test layout.
+1. **Instruction and rule files**: `CLAUDE.md` at the root and in the changed directories, `AGENTS.md`, `CONTRIBUTING.md`, `CODING_STANDARDS.md`, and path-scoped rule directories such as `.claude/rules/` (only the rules whose paths cover the changed files). Search for them before dispatch; a rule file that exists but never reaches the reviewer is a rule nobody enforces. These take precedence.
+2. **The glossary**: `GLOSSARY.md` if it exists, else `CONTEXT.md`: domain terms, decisions, naming conventions.
+3. **Existing conventions observed in the surrounding files**: the unwritten rules. Naming, error handling, file organization, test layout.
 
 Pass every standards file to the reviewer **by path**, like the spec and the diff.
 
 Standards findings answer: *Does the new code match how this codebase has decided to do things?* A function named `handle_auth` when every other handler in the project is named `handleAuth` is a Standards finding, even if it works correctly.
 
-Beyond the project's own documents, the Standards axis carries a **built-in smell baseline** — twelve classic code smells (Fowler) the reviewer checks regardless of how sparse the project's docs are:
+Beyond the project's own documents, the Standards axis carries a **built-in smell baseline**, twelve classic code smells (Fowler) the reviewer checks regardless of how sparse the project's docs are:
 
 | Smell | Fix direction |
 |---|---|
@@ -49,11 +49,11 @@ Beyond the project's own documents, the Standards axis carries a **built-in smel
 | Middle man | A layer that only forwards → remove it |
 | Speculative generality | Flexibility nothing uses → delete it |
 
-Three rules govern the baseline: **the repo overrides** (an observed in-codebase convention beats the baseline); **skip what tooling enforces** (if the linter already catches it, the reviewer does not re-report it); **always a judgement call** (a smell is a prompt to look, not a mechanical violation — report it only when the fix would leave the diff genuinely better).
+Three rules govern the baseline: **the repo overrides** (an observed in-codebase convention beats the baseline); **skip what tooling enforces** (if the linter already catches it, the reviewer does not re-report it); **always a judgement call** (a smell is a prompt to look, not a mechanical violation; report it only when the fix would leave the diff genuinely better).
 
-### Axis 2 — Spec compliance
+### Axis 2: Spec compliance
 
-The Spec is the Clarify output or plan file content — what the user asked for and agreed to. Spec findings answer: *Does the implementation fulfill every requirement, and does it stay within scope?*
+The Spec is the Clarify output or plan file content: what the user asked for and agreed to. Spec findings answer: *Does the implementation fulfill every requirement, and does it stay within scope?*
 
 - **Missing.** A requirement from Clarify that the diff does not implement.
 - **Drifted.** A requirement implemented in a way that does not match the agreed shape.
@@ -88,11 +88,11 @@ A finding is Important if **shipping the code as-is would make the codebase mate
 
 - Standards violation: naming, file organization, error handling pattern.
 - Missing test coverage for a Spec requirement (the requirement is implemented, but if the implementation drifts later, no test will catch it).
-- Test that asserts on implementation details rather than behavior — fragile to refactor.
+- Test that asserts on implementation details rather than behavior, fragile to refactor.
 - Duplication of an existing pattern (the project has a helper for X, the diff reinvented X).
 - Documentation gap that the next reader will pay for (the change is non-obvious and no comment / doc explains why).
 
-Important findings are fixed unless the user explicitly defers. Deferral is allowed but should be cheap: "I'm aware, will address in a follow-up issue" — captured, not lost.
+Important findings are fixed unless the user explicitly defers. Deferral is allowed but should be cheap: "I'm aware, will address in a follow-up issue" (captured, not lost).
 
 ### Minor
 
@@ -108,53 +108,70 @@ Minor findings are reported, not blocked. They do not cause re-loops; each one l
 
 ## The fix-loop circuit breaker
 
-Critical findings trigger a re-loop: fix (fresh RED → GREEN for the fix), then re-review. **Count the rounds, out loud.** Before each round, re-read this paragraph and state the count (`review round 2/3`): a count held only in memory resets silently when the context is compacted. After the third fix → re-review round that still leaves unresolved Critical or Important findings, STOP — do not start round four.
+Critical findings trigger a re-loop: fix (fresh RED → GREEN for the fix), then re-review. **Count the rounds, out loud.** Before each round, re-read this paragraph and state the count (`review round 2/3`): a count held only in memory resets silently when the context is compacted. After the third fix → re-review round that still leaves unresolved Critical or Important findings, STOP. Do not start round four.
 
-At the cap, the orchestrator stops fixing and hands the decision up: compile every remaining finding with its status — what was attempted, why it still stands — and let the user rule on each one (fix now / defer with a note / reject with reasoning).
+At the cap, the orchestrator stops fixing and hands the decision up: compile every remaining finding with its status (what was attempted, why it still stands) and let the user rule on each one (fix now / defer with a note / reject with reasoning).
 
-The telltale pattern the cap exists to catch: each fix round surfaces new findings in code the previous fix touched. That is the same signal as DIAGNOSE's three-failed-fixes breaker — the structure around the change is wrong, and iterating harder on point-fixes will not fix structure. Surface it as such.
+The telltale pattern the cap exists to catch: each fix round surfaces new findings in code the previous fix touched. That is the same signal as DIAGNOSE's three-failed-fixes breaker: the structure around the change is wrong, and iterating harder on point-fixes will not fix structure. Surface it as such.
 
 Both directions are violations: stopping *before* the cap to end an annoying loop is pre-judging the findings, and running *past* it because "one more round will clear it" is how a session burns an afternoon converging on nothing.
+
+### A re-review judges the fix, not the whole change again
+
+A full re-review keeps finding things in code nobody touched since round 1. Each such finding looks like "a new finding per round", which the breaker above reads as a structural problem when it is not, and the rounds cost more than the work. So each fix is proved by its own test, and the re-review is scoped to the fix:
+
+1. **Snapshot what was reviewed**, right before dispatching each round, without a commit or a stash:
+
+   ```bash
+   I=$(mktemp) && GIT_INDEX_FILE=$I git read-tree HEAD && GIT_INDEX_FILE=$I git add -A \
+     && SNAP=$(GIT_INDEX_FILE=$I git write-tree) && rm -f "$I"
+   ```
+
+   This writes the working tree as a tree object through a throwaway index; the real index and `refs/stash` stay untouched. Log `Review snapshot (round N): <SNAP>` in the run log.
+2. **Fix each Critical/Important finding through the Build loop:** a failing test that shows the finding, then the fix, then the project's test command.
+3. **Re-review with two files:** the **fix diff** `git diff <SNAP>` (after `git add -N` on files created since) as the scope, and the regenerated full diff `git diff BASE` as context only, plus the previous round's findings.
+4. **The reviewer answers per previous finding** `ADDRESSED` or `NOT ADDRESSED`, and reports new problems **only inside the fix diff**. Anything it notices outside the fix diff is logged as `Minor (deferred):` and does not start another round.
 
 ---
 
 ## When to push back on a finding
 
-The agent who is implementing develop may receive a finding that is technically wrong — the reviewer is missing context, misreading the diff, or pattern-matching to a Standards rule that does not apply. The discipline:
+The agent who is implementing develop may receive a finding that is technically wrong: the reviewer is missing context, misreading the diff, or pattern-matching to a Standards rule that does not apply. The discipline:
 
 - Push back with reasoning. State the specific reason the finding is wrong: "The reviewer flagged X as a regression, but the test the reviewer cited is exercising the old contract that ADR 0007 explicitly retired. The new contract is correct."
-- Do not silently ignore. If a finding is reviewed and rejected, that rejection is captured: "Critical at src/auth.ts:42 — rejected because <reason>."
-- Do not agree performatively. "Good point" followed by no change is the worst possible response — it tells the user the agent processed the finding when it did not.
+- Do not silently ignore. If a finding is reviewed and rejected, that rejection is captured: "Critical at src/auth.ts:42, rejected because <reason>."
+- Do not agree performatively. "Good point" followed by no change is the worst possible response: it tells the user the agent processed the finding when it did not.
 
 Pushing back on a real Critical finding because you have a feeling is reckless; pushing back on a misapplied Standards finding because you can articulate why is correct. The discipline is to require articulation either way.
 
 ---
 
-## The subagent prompt — what it must contain
+## The subagent prompt: what it must contain
 
 The peer-review subagent receives a prompt with at minimum:
 
-1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec."
-2. **The Standards axis content — by file path.** The instruction and rule files found for the changed paths and the glossary (see Axis 1), plus a one-paragraph summary of observed conventions from the surrounding files.
-3. **The Spec axis content — by file path.** Either the run file holding the approved Clarify playback (DIRECT and DIAGNOSE; see `references/planning.md`, The run log) or the plan file already on disk (PLAN). Spec text is not pasted inline any more than the diff is.
-4. **The diff — by file path, not pasted, working tree included.** Run `git add -N <new files>` so untracked files appear, then write `git diff BASE` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content.
+1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process, only the diff and the spec."
+2. **The Standards axis content: by file path.** The instruction and rule files found for the changed paths and the glossary (see Axis 1), plus a one-paragraph summary of observed conventions from the surrounding files.
+3. **The Spec axis content: by file path.** Either the run file holding the approved Clarify playback (DIRECT and DIAGNOSE; see `references/planning.md`, The run log) or the plan file already on disk (PLAN). Spec text is not pasted inline any more than the diff is.
+4. **The diff: by file path, not pasted, working tree included.** Run `git add -N <new files>` so untracked files appear, then write `git diff BASE` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content.
    - **Why not `BASE..HEAD`:** that range holds only commits. DIRECT commits nothing before Finish, so the range is empty and the reviewer reviews nothing; on any route it misses new untracked files.
-   - **BASE** is recorded where it survives the session: on PLAN, the docs-checkpoint SHA in the plan file; on other routes, `git rev-parse HEAD` at Build start, stated as `BASE: <sha>` and written atop the run file. A resumed run reuses the recorded BASE, never its own starting HEAD, or the tasks finished in earlier sessions drop out of the review. Do not guess "the branch root": on a long-lived branch it is undefined. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), BASE stays the **first** one, not the upgrade's docs checkpoint — the work done under the lighter route is exactly what the review must not skip.
+   - **BASE** is recorded where it survives the session: on PLAN, the docs-checkpoint SHA in the plan file; on other routes, `git rev-parse HEAD` at Build start, stated as `BASE: <sha>` and written atop the run file. A resumed run reuses the recorded BASE, never its own starting HEAD, or the tasks finished in earlier sessions drop out of the review. Do not guess "the branch root": on a long-lived branch it is undefined. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), BASE stays the **first** one, not the upgrade's docs checkpoint: the work done under the lighter route is exactly what the review must not skip.
    - **Refuse an empty or foreign range.** Before dispatch, confirm the scratch diff is non-empty and `git merge-base --is-ancestor BASE HEAD` succeeds. An empty diff dispatched anyway comes back "No issues found" and looks like a pass.
 5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion. After the findings, a **"Declined to judge"** list: every behavior the reviewer considered and set aside (unsure it matters, outside what it could check). Nothing set aside is dropped silently: the orchestrator decides each line as a `Ruling:` and logs it (see `references/planning.md`, `## Progress`).
-6. **The "no false findings" instruction.** "If no issues found, state 'No issues found' — do not invent findings."
+6. **The "no false findings" instruction.** "If no issues found, state 'No issues found'; do not invent findings."
 
 That last instruction matters more than it sounds. A subagent dispatched without it tends to produce findings on every review, because "review with no findings" feels like a failed task. Explicitly permitting an empty review is what makes the reviews credible when they do contain findings.
 
 Two requirements live on the dispatch itself, not in the prompt:
 
 - **A fresh agent, never a fork.** A forked subagent inherits the whole implementing conversation, which is exactly the author bias the review exists to escape, and it ignores any model override.
-- **Name the model tier.** An unnamed dispatch silently inherits the orchestrator's tier, and the cost multiplies across re-review rounds. The first review is the run's final whole-branch review, so it gets the most capable tier; re-review rounds, which confirm the fixes, get the mid tier, which is the reviewer floor (see `references/subagent-patterns.md`). Every round regenerates the scratch diff from BASE, so a re-review sees the fixes in context.
+- **Name the model tier.** An unnamed dispatch silently inherits the orchestrator's tier, and the cost multiplies across re-review rounds. The first review is the run's final whole-branch review, so it gets the most capable tier; re-review rounds, which confirm the fixes, get the mid tier, which is the reviewer floor (see `references/subagent-patterns.md`). A re-review gets the fix diff as its scope and the regenerated full diff as context (see *A re-review judges the fix*).
 
 ### The prompt template
 
 ```
-You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec.
+You are an independent code reviewer. You have NOT seen the implementation process, only the diff and the spec.
+Do not invoke skills and do not dispatch subagents: do the review yourself and report.
 
 ## Your review axes
 
@@ -183,12 +200,29 @@ For each finding, state:
 
 Then list under "Declined to judge" every behavior you considered and set aside, with one line on why. An empty list is fine; a silent omission is not.
 
-If no issues found, state "No issues found" — do not invent findings.
+If no issues found, state "No issues found"; do not invent findings.
+```
+
+### The re-review template (rounds 2 and 3)
+
+Same role line, the same "do not invoke skills or dispatch subagents" line, and the same Axis 1 and Axis 2 inputs. Replace the diff and output sections with:
+
+```
+## What to judge
+Previous round's findings: [scratch-file path: the findings list, numbered]
+Fix diff, your scope: [scratch-file path: `git diff <SNAP>` with files created since registered via `git add -N`]
+Full diff, context only: [scratch-file path: `git diff BASE`]
+
+## Output format
+For each previous finding, by number: ADDRESSED or NOT ADDRESSED, with one line of evidence from the fix diff.
+Then any new finding, only inside the fix diff, in the usual format (Severity, File:line, Issue, Suggestion).
+Anything you notice outside the fix diff: list it under "Outside the fix" in one line each; it is logged for later and does not start another round.
+Then "Declined to judge", as before.
 ```
 
 ### Variants by route
 
-- **DIRECT route**: the Spec content is shorter (just Clarify output). The diff is smaller. The review tends to surface fewer findings but should still be run — a clean review is a green light, not a skipped phase.
+- **DIRECT route**: the Spec content is shorter (just Clarify output). The diff is smaller. The review tends to surface fewer findings but should still be run: a clean review is a green light, not a skipped phase.
 - **PLAN route**: the Spec content is the plan file. The diff spans multiple commits if sequential execution produced per-task commits. The review reads each task's commit individually if the plan file structures it that way.
 
 ---
@@ -197,15 +231,15 @@ If no issues found, state "No issues found" — do not invent findings.
 
 ### Performative agreement
 
-Receiving a finding and saying "good catch, I'll address it" — and then not addressing it, or addressing it superficially without re-running tests. The fix tracks back to nothing; the next reviewer (or the same reviewer in a follow-up pass) finds the same issue still present.
+Receiving a finding and saying "good catch, I'll address it", and then not addressing it, or addressing it superficially without re-running tests. The fix tracks back to nothing; the next reviewer (or the same reviewer in a follow-up pass) finds the same issue still present.
 
-The fix: every accepted finding produces a specific action — a commit, a deferral note, or a rejection-with-reasoning. The action is recorded next to the finding so the trail is auditable.
+The fix: every accepted finding produces a specific action (a commit, a deferral note, or a rejection-with-reasoning). The action is recorded next to the finding so the trail is auditable.
 
 ### Fabricated findings
 
 A review that produces findings because "a good review has findings." The findings are plausible-sounding but, on inspection, point at code that is correct or at conventions the project does not actually enforce. These pollute the triage step and erode trust in future reviews.
 
-The fix: the "if no issues found, state 'No issues found'" instruction in the subagent prompt. Plus, when triaging, the implementing agent should be willing to mark a finding as **rejected — not a real issue**, with a one-sentence reason.
+The fix: the "if no issues found, state 'No issues found'" instruction in the subagent prompt. Plus, when triaging, the implementing agent should be willing to mark a finding as **rejected: not a real issue**, with a one-sentence reason.
 
 ### Suggestion without reasoning
 
@@ -231,6 +265,8 @@ The implementing agent reading its own diff and calling it Peer-review. The auth
 
 The fix: develop dispatches an actual subagent for this phase. The implementing agent is allowed to triage the findings, but is not allowed to *be* the reviewer.
 
+**The one fallback: no fresh reviewer can be dispatched at all** (the harness has no subagent tool, or develop is itself running inside a subagent that cannot spawn one). Then, and only then, run the same template inline, label the result `Self-review (not independent: no reviewer could be dispatched)`, log it as a `Ruling:`, and say so in the Finish report with a recommendation to get an independent review before merging. A weaker review that says it is weaker beats a review silently skipped or silently faked.
+
 ---
 
 ## Edge cases
@@ -239,7 +275,7 @@ The fix: develop dispatches an actual subagent for this phase. The implementing 
 
 This is allowed and should not be treated as a failure. Sometimes the change is small, the spec is precise, and the implementation matches. A clean review is a green light.
 
-But — the implementing agent should sanity-check: is this *really* a clean review, or did the subagent prompt fail to give the reviewer enough context to find issues? Signals that the review is lazy rather than clean:
+But the implementing agent should sanity-check: is this *really* a clean review, or did the subagent prompt fail to give the reviewer enough context to find issues? Signals that the review is lazy rather than clean:
 
 - The diff is large but the review is empty.
 - The diff touches files with strong existing conventions, and the reviewer did not even comment on conformance.
@@ -249,19 +285,19 @@ When in doubt, re-dispatch with a sharper prompt: "Specifically verify that each
 
 ### Review returns mass findings (10+)
 
-If a review surfaces 10+ findings on a normal-sized diff, something is wrong upstream — usually Clarify was vague or Build skipped steps. The discipline:
+If a review surfaces 10+ findings on a normal-sized diff, something is wrong upstream: usually Clarify was vague or Build skipped steps. The discipline:
 
 - Triage by severity first. Often the bulk is Minor or false-positive, and the real Important findings are 1-2.
 - If the real findings cluster around a single root cause (e.g., "the implementation does not match the spec at all"), the fix is to re-Clarify or re-Build, not to address each finding individually.
-- If the findings are genuinely distributed across many small issues, fix the Critical and Important, defer the Minor, and note the volume as a process signal — Clarify was probably too shallow.
+- If the findings are genuinely distributed across many small issues, fix the Critical and Important, defer the Minor, and note the volume as a process signal: Clarify was probably too shallow.
 
 ### User defers an Important finding
 
 The user is allowed to defer an Important finding. The discipline:
 
 - The deferral is captured in the commit message or in a follow-up issue, not lost.
-- The deferral note states *what* was deferred and *why* — "deferring the missing test for the success path; will add in PR #N."
-- Critical findings cannot be deferred. If the user wants to ship a Critical finding unaddressed, that is a project-level decision (the user, not Peer-review, owns ship/no-ship) — but `develop`'s role is to surface the cost clearly, not to silently agree.
+- The deferral note states *what* was deferred and *why*: "deferring the missing test for the success path; will add in PR #N."
+- Critical findings cannot be deferred. If the user wants to ship a Critical finding unaddressed, that is a project-level decision (the user, not Peer-review, owns ship/no-ship), but `develop`'s role is to surface the cost clearly, not to silently agree.
 
 ### The reviewer makes a Critical mistake (e.g., calls correct code broken)
 
@@ -285,7 +321,7 @@ If the implementing agent cannot state this sentence with a specific list of fin
 
 ## Relationship to `develop`'s other phases
 
-- **Clarify** produces the Spec axis content. A vague Clarify produces a weak Spec axis, which makes Peer-review's spec-compliance review weaker. Peer-review can flag this — "the spec is too vague to verify" is itself a finding — but the deep fix is upstream.
+- **Clarify** produces the Spec axis content. A vague Clarify produces a weak Spec axis, which makes Peer-review's spec-compliance review weaker. Peer-review can flag this ("the spec is too vague to verify" is itself a finding), but the deep fix is upstream.
 - **Build** produces the diff Peer-review reads. A Build that skipped REFACTOR will produce a diff with structural issues the reviewer will flag; a Build that scope-crept at GREEN will produce a diff with implementation outside the spec. Both are Build-level discipline failures surfacing here.
-- **Verify** does not depend on Peer-review's findings directly, but Critical findings that triggered a re-loop should have their tests captured — so Verify's full suite includes them.
+- **Verify** does not depend on Peer-review's findings directly, but Critical findings that triggered a re-loop should have their tests captured, so Verify's full suite includes them.
 - **Finish** is downstream. The branch decision (merge / PR / keep) does not happen until Peer-review's exit gate is met. If findings remain unaddressed, Finish does not run.

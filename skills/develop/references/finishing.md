@@ -1,6 +1,6 @@
-# Finish Discipline — Commit and Branch Decision
+# Finish Discipline: Commit and Branch Decision
 
-Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present the three-option branch menu, no auto-merge or auto-push, Discard only on explicit typed request). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened).
+Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present the three-option branch menu, no auto-merge or auto-push, Discard only on explicit typed request). This document is the deeper discipline: when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened).
 
 The non-negotiable: **the branch decision is the user's, not the agent's.** Develop's job is to surface the options clearly and capture the choice; it does not auto-merge, auto-push, or auto-delete.
 
@@ -14,15 +14,15 @@ Finish makes the choice visible so the user makes it consciously. The friction i
 
 ---
 
-## The session report — rulings surface here
+## The session report: rulings surface here
 
-Before presenting the branch menu, report what was done, then every ruling. Build the report from the session's log, not from memory: the plan file's `## Progress` on PLAN, the run file on other routes (see `references/planning.md`, The run log). Memory does not survive compaction; the log does. If the run recorded any `Ruling:` entries under the rulings-not-stalls rule (see `SKILL.md`), Finish is where they surface: list every ruling (what was decided, why, and the cost if wrong) and every `Minor (deferred)` finding. A ruling that dies with the session was a decision made in secret; the report is what converts autonomous calls into reviewable ones. When the list is empty, state "No rulings this session" explicitly — silence is indistinguishable from a skipped report.
+Before presenting the branch menu, report what was done, then every ruling. Build the report from the session's log, not from memory: the plan file's `## Progress` on PLAN, the run file on other routes (see `references/planning.md`, The run log). Memory does not survive compaction; the log does. If the run recorded any `Ruling:` entries under the rulings-not-stalls rule (see `SKILL.md`), Finish is where they surface: list every ruling (what was decided, why, and the cost if wrong), every `Minor (deferred)` finding, and every `Follow-up:` (a check accepted in Retrospective, to build as the next run's first task). If Peer-review ran as a labeled self-review because no reviewer could be dispatched, say so here and recommend an independent review before merging. A ruling that dies with the session was a decision made in secret; the report is what converts autonomous calls into reviewable ones. When the list is empty, state "No rulings this session" explicitly; silence is indistinguishable from a skipped report.
 
 ---
 
-## The three menu options — plus request-only Discard
+## The three menu options, plus request-only Discard
 
-Each option has a specific situation it fits. The discipline is not "let the user pick whatever" — it is "present each option with the situation it matches." Three options go on the menu; the fourth (Discard) exists but is never offered.
+Each option has a specific situation it fits. The discipline is not "let the user pick whatever"; it is "present each option with the situation it matches." Three options go on the menu; the fourth (Discard) exists but is never offered.
 
 ### 1. Local merge
 
@@ -37,7 +37,7 @@ Do not use when:
 - The branch's tests passed but the full `main` post-merge state has not been verified.
 
 After local merge:
-- Run the full test suite on `main` after the merge — the merge itself can produce a state that neither side tested.
+- Run the full test suite on `main` after the merge: the merge itself can produce a state that neither side tested.
 - Decide whether to delete the feature branch immediately or keep it as a recovery point.
 
 ### 2. Open PR
@@ -74,9 +74,9 @@ After Keep:
 - Do not delete the branch.
 - Capture in a comment / TODO somewhere why the branch is kept and what unblocks it.
 
-### 4. Discard — request-only, never offered
+### 4. Discard: request-only, never offered
 
-Discard is not presented in the menu. It exists only as a response to the user's own explicit request, because it is the one option that destroys work irreversibly — and an offered option gets picked in the flow of conversation, including by accident. (Upstream removed it from their menu after exactly that accident.)
+Discard is not presented in the menu. It exists only as a response to the user's own explicit request, because it is the one option that destroys work irreversibly, and an offered option gets picked in the flow of conversation, including by accident. (Upstream removed it from their menu after exactly that accident.)
 
 Use when (and only when the user asks):
 - The work was exploratory and the answer is "no, do not ship this."
@@ -84,15 +84,26 @@ Use when (and only when the user asks):
 - The work duplicates something already shipping on another branch.
 
 The confirmation gate:
-- The user must type the literal word `discard`. "Yeah, get rid of it" and "sure, clean it up" authorize nothing — casual affirmations do not clear an irreversible gate.
-- Capture what the work taught you in the issue / docs / `CONTEXT.md` / `.out-of-scope/` so the discard does not lose the learning.
-- PROTOTYPE-route branches are never discarded this way at all — they are preserved under `prototype/<name>` (see `references/prototyping.md`).
+- The user must type the literal word `discard`. "Yeah, get rid of it" and "sure, clean it up" authorize nothing: casual affirmations do not clear an irreversible gate.
+- Capture what the work taught you in the issue / docs / the glossary / `.out-of-scope/` so the discard does not lose the learning.
+- PROTOTYPE-route branches are never discarded this way at all; they are preserved under `prototype/<name>` (see `references/prototyping.md`).
 
 After the typed confirmation:
 - Delete the branch locally (`git branch -D <branch>`).
 - Do not push and force-delete remote branches automatically; ask first if the remote also needs cleanup.
 
 ---
+
+## Committing in a shared working tree
+
+Several sessions often share one working tree, and the index (the staging area) is shared with them. Develop commits so that another session's work can never ride along or be rewritten:
+
+- **Commit by path:** `git add <paths> && git commit -m "<type>: <description>" -- <paths>`, where `<paths>` are every file this run changed or created: the implementation, the tests, Retrospective's accepted deposits, and the plan file with its `## Progress`. Naming the paths commits exactly those files, whatever else another session has staged (the `git add` is needed only so new files are known to git); a bare `git add` + `git commit` commits everything in the shared index.
+- **Never `--amend` inside develop.** Between your last commit and now, another session may have committed; amending would rewrite its commit. A correction is a new commit.
+- **Confirm what landed:** `git show --name-only HEAD` lists only your files. If anything else is there, stop and tell the user before doing more.
+- **Never `git stash`** for the same reason: `refs/stash` is shared by every session and worktree (see the revert ritual in `references/diagnosis.md`).
+
+These hold in a single-session repo too, where they cost nothing, so develop always follows them.
 
 ## Commit message discipline
 
@@ -118,7 +129,7 @@ Two-line message minimum for non-trivial work:
 - **Subject line.** What changed, in one sentence. Imperative voice. Under 72 characters if possible.
 - **Body.** Why this change exists. What it does not do. What follow-up issues, if any, exist.
 
-A commit body that only restates the subject in more words is noise. A body that explains the why — including the why-now and why-this-shape — is what makes the commit useful six months later when someone is reading `git blame`.
+A commit body that only restates the subject in more words is noise. A body that explains the why (including the why-now and why-this-shape) is what makes the commit useful six months later when someone is reading `git blame`.
 
 ### AI attribution is forbidden
 
@@ -140,7 +151,7 @@ Borderline rule: if the change primarily closes a gap in existing behavior, use 
 
 ## Git-safety anti-patterns
 
-These are the operations that are silently destructive — they look like a normal step but produce a state that is hard or impossible to recover from. The discipline is to refuse them unless the user has explicitly requested the operation.
+These are the operations that are silently destructive: they look like a normal step but produce a state that is hard or impossible to recover from. The discipline is to refuse them unless the user has explicitly requested the operation.
 
 ### Auto-push without explicit user choice
 
@@ -150,19 +161,19 @@ Pushing makes the work visible to others. Until the user has chosen "Open PR" (o
 
 Bypassing the pre-commit hook is the same shape as bypassing the test gate at Build. The pre-commit hook exists because the project decided certain checks must run before commits. Skipping it produces a commit that the project's discipline considered insufficient.
 
-If a hook fails, the discipline is to fix the underlying issue, not to bypass the hook. The only exception is when the user explicitly says "skip the hook" — and even then, the agent should surface the cost ("the format check will not run on this commit; CI may catch it later").
+If a hook fails, the discipline is to fix the underlying issue, not to bypass the hook. The only exception is when the user explicitly says "skip the hook," and even then, the agent should surface the cost ("the format check will not run on this commit; CI may catch it later").
 
 ### `--amend` on commits already pushed
 
 Amending a commit changes its SHA. If the commit has been pushed, the remote and the local now have different histories at that point. Recovery requires force-push (which has its own problems) or accepting a divergent history.
 
-Rule: amend only commits that have not been pushed. For pushed commits, create a new commit on top with the correction.
+Rule: develop never amends (see *Committing in a shared working tree*); outside develop, amend only commits that have not been pushed. For pushed commits, create a new commit on top with the correction.
 
 ### `--amend` after a failed pre-commit hook
 
 A particularly subtle trap. When a pre-commit hook fails, the commit did *not* happen. Running `git commit --amend` then modifies the *previous* commit, not the one you thought just failed. The fix-up message is now attached to the wrong commit, and the actual change you wanted to commit is still uncommitted.
 
-Rule: after a hook failure, fix the issue, re-stage, and create a new commit. Do not amend.
+Rule: after a hook failure, fix the issue and create a new path-scoped commit. Do not amend.
 
 ### `git reset --hard` as a "clean up"
 
@@ -188,7 +199,7 @@ Rule: before deleting any branch, verify that all commits on it are either merge
 
 ### Working tree is not clean at Finish
 
-The user is on the "Keep branch" path and intentionally has uncommitted changes. The Finish exit gate is *not* "working tree clean for all options" — it is "working tree shows the intended state for the chosen option."
+The user is on the "Keep branch" path and intentionally has uncommitted changes. The Finish exit gate is *not* "working tree clean for all options"; it is "working tree shows the intended state for the chosen option."
 
 - For Local merge / Open PR: all intended changes are committed; working tree is clean.
 - For Keep branch with intentional uncommitted state: working tree shows exactly the changes the user intends to leave uncommitted.
@@ -200,7 +211,7 @@ Merging the feature branch into `main` produces a conflict. The discipline:
 
 - Do not automatically resolve the conflict using either side wholesale.
 - Surface the conflicting files and let the user decide the resolution.
-- After resolution, re-run the full test suite on the merged state — the resolution itself can produce a state neither branch tested.
+- After resolution, re-run the full test suite on the merged state: the resolution itself can produce a state neither branch tested.
 - Only then commit the merge.
 
 ### PR cannot be opened
@@ -246,4 +257,4 @@ If the sentence cannot be stated with the option and the evidence, Finish has no
 - **Verify** must be green before Finish runs. A Finish on a red state ships broken code, and "fix it in main" is the wrong place to do that work.
 - **Peer-review** must have its Critical and Important findings resolved or explicitly deferred before Finish. A Finish that bypasses unresolved Critical findings is the most expensive kind of shortcut.
 - **Build** produced the commits Finish either pushes, merges, or discards. The commit messages from Build determine the changelog and the PR description, so Build's commit discipline (type prefixes, no AI attribution, body explains why) is part of what makes Finish succeed.
-- **Clarify** decided the work's purpose; Finish decides where the work ends up. If Clarify was vague, Finish often discovers the work product is not what the user wanted — at which point the right move is sometimes Discard, sometimes Keep, but rarely the merge that "would have made it look done."
+- **Clarify** decided the work's purpose; Finish decides where the work ends up. If Clarify was vague, Finish often discovers the work product is not what the user wanted, at which point the right move is sometimes Discard, sometimes Keep, but rarely the merge that "would have made it look done."

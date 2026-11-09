@@ -1,8 +1,8 @@
-# Verification — Evidence Before Assertion
+# Verification: Evidence Before Assertion
 
-Reference for develop's **cross-cutting verification gate** and every phase that ends in a completion claim. The gate in `SKILL.md` defines the surface rule (run the check, read the output, then state what passed). This document is the deeper discipline — why the rule exists, the subtle ways agents and humans break it without noticing, and what to do at each gate.
+Reference for develop's **cross-cutting verification gate** and every phase that ends in a completion claim. The gate in `SKILL.md` defines the surface rule (run the check, read the output, then state what passed). This document is the deeper discipline: why the rule exists, the subtle ways agents and humans break it without noticing, and what to do at each gate.
 
-The non-negotiable: **a completion claim is a statement about what you observed, not about what you expect.** Anything less is a confession of soft language — the model output equivalent of saying you went to the gym without actually going.
+The non-negotiable: **a completion claim is a statement about what you observed, not about what you expect.** Anything less is a confession of soft language: the model output equivalent of saying you went to the gym without actually going.
 
 ---
 
@@ -10,15 +10,15 @@ The non-negotiable: **a completion claim is a statement about what you observed,
 
 A completion claim has three components, in this order:
 
-1. **What you ran** — the exact command, the exact context, the exact arguments.
-2. **What you observed** — the actual output, not a summary, not a paraphrase, not "it passed."
-3. **What you conclude** — drawn from (1) and (2), not from prior expectation.
+1. **What you ran**: the exact command, the exact context, the exact arguments.
+2. **What you observed**: the actual output, not a summary, not a paraphrase, not "it passed."
+3. **What you conclude**: drawn from (1) and (2), not from prior expectation.
 
-If any of the three is missing, the claim is not verified — it is asserted. The difference matters because asserted "completions" pile up into work that has to be redone later, often at the worst possible time (a deploy, a user report, a regression).
+If any of the three is missing, the claim is not verified; it is asserted. The difference matters because asserted "completions" pile up into work that has to be redone later, often at the worst possible time (a deploy, a user report, a regression).
 
 ---
 
-## Forbidden language — and why each is forbidden
+## Forbidden language, and why each is forbidden
 
 The cross-cutting gate in `SKILL.md` lists banned phrases. Here is why each is banned, what it usually masks, and the replacement.
 
@@ -27,18 +27,18 @@ The cross-cutting gate in `SKILL.md` lists banned phrases. Here is why each is b
 | "should work" | The agent reasoned about the change but did not run it | "I ran `<command>` and observed `<output line>`" |
 | "seems to pass" | The agent ran the command but did not actually read the output | "I ran `<command>` and the output's last line was `<exact text>`" |
 | "probably fixed" | The agent has a hypothesis but no evidence | "I reproduced the original failure with `<repro command>`, then ran `<fix verification command>` and observed `<output>`" |
-| "I think it passes" | Hedging on a claim the agent did not verify | Either verify and remove the hedge, or state explicitly "I did not verify this — the next step is to run `<command>`" |
+| "I think it passes" | Hedging on a claim the agent did not verify | Either verify and remove the hedge, or state explicitly "I did not verify this; the next step is to run `<command>`" |
 | "looks correct" | A read of the code, not a run of it | "I ran `<command>` and observed `<output>`" |
 | "this should be fine" | Confidence projection without evidence | Either run the check, or admit "I have not checked X" |
-| "likely works" | Probabilistic hedging — the agent does not know | Either run the check, or write "unverified" explicitly |
+| "likely works" | Probabilistic hedging: the agent does not know | Either run the check, or write "unverified" explicitly |
 
 The pattern: every banned phrase substitutes confidence for evidence. The replacement is always "I ran X and saw Y" or "I have not checked Z."
 
 ### The "I have not checked" exception
 
-It is fine, expected, and often necessary to say "I have not checked X." That is a clean, evidence-based statement — it just happens to be evidence about what was not done. Stating it explicitly is much better than hedging language because it gives the user a clear action item ("then check X next") rather than a vague gradient of confidence.
+It is fine, expected, and often necessary to say "I have not checked X." That is a clean, evidence-based statement; it just happens to be evidence about what was not done. Stating it explicitly is much better than hedging language because it gives the user a clear action item ("then check X next") rather than a vague gradient of confidence.
 
-The discipline is not "claim everything works" — it is "do not claim anything works without evidence." Saying "I have not checked X" is fully compatible with the discipline.
+The discipline is not "claim everything works"; it is "do not claim anything works without evidence." Saying "I have not checked X" is fully compatible with the discipline.
 
 ---
 
@@ -48,15 +48,15 @@ The act of "reading the output" is where most verification quietly fails. Subtle
 
 ### Reading a summary instead of the output
 
-A subagent reports "all tests passed" — but the actual output, if you read it, shows 47 passed and 2 skipped. The skipped tests might be the ones that would have caught the bug you just introduced. **A subagent's summary is not evidence**; the output the subagent observed is. Ask for the raw output or run the command yourself.
+A subagent reports "all tests passed," but the actual output, if you read it, shows 47 passed and 2 skipped. The skipped tests might be the ones that would have caught the bug you just introduced. **A subagent's summary is not evidence**; the output the subagent observed is. Ask for the raw output or run the command yourself.
 
 ### Reading only the first or last line
 
-A pytest run prints `1 passed in 0.42s` at the end — but the run printed `Warning: deprecated mock usage` two lines earlier, which is the only sign that the test you thought you wrote is actually hitting a stub. Read enough of the output to know that the relevant signal is there, not just the summary line.
+A pytest run prints `1 passed in 0.42s` at the end, but the run printed `Warning: deprecated mock usage` two lines earlier, which is the only sign that the test you thought you wrote is actually hitting a stub. Read enough of the output to know that the relevant signal is there, not just the summary line.
 
 ### Remembering a prior run
 
-"I ran the tests a minute ago and they passed." Probably true, probably irrelevant — the question is whether they pass *now*, after the most recent change. Re-run.
+"I ran the tests a minute ago and they passed." Probably true, probably irrelevant: the question is whether they pass *now*, after the most recent change. Re-run.
 
 ### Reading the wrong output
 
@@ -64,7 +64,7 @@ The command was `npm test`, but the project actually has two test suites and `np
 
 ---
 
-## Disguised verification — common ways the gate gets faked
+## Disguised verification: common ways the gate gets faked
 
 These are the verification anti-patterns that look correct on a first read but are actually unsupported claims dressed up as evidence.
 
@@ -80,7 +80,7 @@ The fix: "I ran `npm test`. The last lines of output were: `Tests: 12 passed, 12
 
 > "The script ran without errors, so the migration completed."
 
-A script can exit zero and still have done the wrong thing — silently skipping rows, writing to the wrong table, applying the migration to a stale schema. "No error" is necessary but not sufficient evidence of "the thing succeeded." Verify the post-state.
+A script can exit zero and still have done the wrong thing: silently skipping rows, writing to the wrong table, applying the migration to a stale schema. "No error" is necessary but not sufficient evidence of "the thing succeeded." Verify the post-state.
 
 ### Running tests in a different environment than the one being claimed
 
@@ -90,7 +90,17 @@ Local pass and staging pass are different claims. They might be correlated, but 
 
 ### Partial-output reads
 
-The full output had a stack trace at line 47; you read lines 1-10 and the last 5. The trace got missed. The fix is not "read every line of every run" — it is "scroll through enough of the output to know that no signal is hiding in the middle." For long outputs, search for `error`, `warn`, `fail`, `skip`.
+The full output had a stack trace at line 47; you read lines 1-10 and the last 5. The trace got missed. The fix is not "read every line of every run"; it is "scroll through enough of the output to know that no signal is hiding in the middle."
+
+For long outputs, do not pour them into the conversation: thousands of lines of test output fill the context and bring the next compaction closer. Send them to a file and read the file in three parts, all required:
+
+```bash
+<test command> > "$SCRATCH/test.log" 2>&1; echo "exit: $?"
+tail -n 30 "$SCRATCH/test.log"                       # the summary line
+grep -nEi "fail|error|skip|warn" "$SCRATCH/test.log"  # every signal in the middle
+```
+
+The exit code, the summary line, and every search hit are what "read the output" means here; quote them in the claim. The exit code catches a failure in a format the search misses. Reading only the head and the tail is still the partial read above.
 
 ### Trusting subagent claims of success
 
@@ -105,7 +115,7 @@ The cleanest version: structure subagent prompts to require evidence in the resp
 Every develop phase has an exit gate. Here is what "evidence" looks like at each gate.
 
 ### Preflight
-- **What to verify:** git repo present, test runner detected, optional checkers noted.
+- **What to verify:** git repo present, test runner detected (`package.json`, `Makefile`, `pyproject.toml`, or equivalent), its baseline run recorded, optional checkers noted: type checker (`tsconfig.json`, `mypy.ini`, `pyrightconfig.json`), linter (`.eslintrc*`, `biome.json`, `ruff.toml`, `.flake8`), UI driver (table below).
 - **Evidence pattern:** Output of `git rev-parse --git-dir` (returns `.git` or similar), output of the `cat package.json` / `cat Makefile` / equivalent showing the test script, output of optional-checker presence checks.
 - **Forbidden:** "the environment looks fine."
 - **Acceptable:** "I ran `git rev-parse --git-dir` and observed `.git`. I read `package.json` and saw `\"test\": \"vitest\"`."
@@ -132,19 +142,20 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 - **What to verify:** every Critical and Important finding has been addressed (fixed in code, or explicitly user-deferred).
 - **Evidence pattern:** list each finding by file:line, state the action taken or the deferral, link to the new commit if applicable.
 - **Forbidden:** "review findings handled."
-- **Acceptable:** "Critical: src/auth.ts:42 — fixed in commit `<sha>`, re-ran tests, observed `Tests: 47 passed`. Important: src/auth.ts:88 — user deferred to follow-up issue."
+- **Acceptable:** "Critical: src/auth.ts:42, fixed in commit `<sha>`, re-ran tests, observed `Tests: 47 passed`. Important: src/auth.ts:88, user deferred to follow-up issue."
 
 ### Verify
-- **What to verify:** typecheck (if available), lint (if available), full test suite, architecture check, **and the UI surface driven** (if Preflight found one) — every check green.
+- **What to verify:** typecheck (if available), lint (if available), full test suite, architecture check, **and the UI surface driven** (if Preflight found one), with every check green.
 - **Evidence pattern:** one line per check, naming the command and the observed summary line.
-- **Forbidden:** "all checks pass." Also forbidden: stopping at the terminal checks when Preflight reported a driver. Green tests do not mean the screen works — a component can pass every unit test and still render blank.
+- **Forbidden:** "all checks pass." Also forbidden: stopping at the terminal checks when Preflight reported a driver. Green tests do not mean the screen works: a component can pass every unit test and still render blank.
 - **Acceptable:**
   > Ran `tsc --noEmit`. Observed: no output (success).
   > Ran `eslint .`. Observed: `✨ 0 problems`.
   > Ran `pnpm test`. Observed: `Tests: 47 passed, 47 total`.
   > Architecture: read changed files; observed no single-responsibility violation, no orphaned imports.
+- **Architecture issues found:** fix them, re-run the tests, and re-read the output before claiming Verify.
   > UI: ran `agent-browser snapshot -i` after submitting the form. Observed `[status] Saved` in the tree; console clean.
-- **Acceptable (no surface):** the UI line is replaced by "No UI surface — the CLI was run against a sample input; observed <output>.".
+- **Acceptable (no surface):** the UI line is replaced by "No UI surface: the CLI was run against a sample input; observed <output>.".
 
 ### Finish
 - **What to verify:** `git status` shows the intended state (clean tree if committed; expected uncommitted files if "Keep branch"); recorded rulings presented (or "No rulings this session" stated); user has made the branch decision.
@@ -156,7 +167,7 @@ Every develop phase has an exit gate. Here is what "evidence" looks like at each
 
 ## When the check cannot be run
 
-There are situations where the standard verification command is unavailable: the test suite is too slow to run repeatedly, the change is visual, the change touches infrastructure that cannot be exercised locally. The discipline does not vanish — it shifts.
+There are situations where the standard verification command is unavailable: the test suite is too slow to run repeatedly, the change is visual, the change touches infrastructure that cannot be exercised locally. The discipline does not vanish; it shifts.
 
 ### UI / visual changes
 
@@ -170,11 +181,11 @@ There are situations where the standard verification command is unavailable: the
 | Flutter Web | `pubspec.yaml` with a web target | any web driver | it renders in a browser |
 | CLI / server / library | none of the above | the runnable artifact itself | its real output |
 
-If a driver exists, **drive it and quote what came back** — that is a real check, not substitute evidence. What a driver catches that a screenshot never does: a console error, a request that failed, a handler that ran twice, a control that renders but does not respond.
+If a driver exists, **drive it and quote what came back**; that is a real check, not substitute evidence. What a driver catches that a screenshot never does: a console error, a request that failed, a handler that ran twice, a control that renders but does not respond.
 
 - **Substitute evidence (no driver only):** before/after screenshot, ideally side by side; a description of what visibly changed.
-- **What still applies:** if the change has any behavior (event handlers, state transitions), that behavior gets a unit test under normal TDD — with or without a driver.
-- **Forbidden:** "the layout looks better now." Also forbidden: offering a screenshot when a driver was available — that is a downgrade, not a substitute.
+- **What still applies:** if the change has any behavior (event handlers, state transitions), that behavior gets a unit test under normal TDD, with or without a driver.
+- **Forbidden:** "the layout looks better now." Also forbidden: offering a screenshot when a driver was available; that is a downgrade, not a substitute.
 - **Acceptable (driver):** "Ran `agent-browser click @e4` then `snapshot -i`. Observed: `[dialog] Delete this item?` present; console clean."
 - **Acceptable (no driver):** "No driver installed for this surface. Before: <screenshot or description>. After: <screenshot or description>. The button is now centered within its parent container."
 
@@ -182,7 +193,7 @@ If a driver exists, **drive it and quote what came back** — that is a real che
 - **Substitute evidence:** run the targeted subset for the changed area; explicitly note the wider suite was not run.
 - **What still applies:** the full suite must run before Finish or in CI, and every report of a subset run says it was a subset. An undisclosed subset is the narrow green that hides a broken test next door.
 - **Forbidden:** "ran the relevant tests."
-- **Acceptable:** "Ran `pnpm test src/auth/`. Observed: 14 passed. The full suite was not run in this session — CI will run it on push."
+- **Acceptable:** "Ran `pnpm test src/auth/`. Observed: 14 passed. The full suite was not run in this session; CI will run it on push."
 
 ### Infra / external services
 - **Substitute evidence:** dry-run output, plan output (Terraform `plan`, migration `--dry-run`), sandbox/staging execution.
@@ -208,13 +219,13 @@ A good verification has all three:
 
 > "I called `POST /auth/login` with the test credentials from `fixtures/users.json` and observed a 200 response with a non-empty `token` field. Therefore the login endpoint accepts those credentials and returns a token."
 
-The good version is longer. That is the point — the length is the evidence.
+The good version is longer. That is the point: the length is the evidence.
 
 ---
 
 ## Relationship to `develop`'s other phases
 
-- **Build's exit gate** is a verification gate. The TDD loop is not a substitute for verification — it is the engine that produces the evidence the verification gate then reads.
-- **Peer-review** reads the diff and may issue findings. Those findings themselves require verification before being marked resolved — "fixed" without re-running the tests is the same anti-pattern in miniature.
+- **Build's exit gate** is a verification gate. The TDD loop is not a substitute for verification; it is the engine that produces the evidence the verification gate then reads.
+- **Peer-review** reads the diff and may issue findings. Those findings themselves require verification before being marked resolved: "fixed" without re-running the tests is the same anti-pattern in miniature.
 - **Verify phase** is the largest single verification gate. Everything in this document applies; the gate is "every check above is green, output directly observed for each."
 - **Finish** has the lightest gate (`git status` clean), but the discipline is the same: run the command, read the output, state the conclusion.

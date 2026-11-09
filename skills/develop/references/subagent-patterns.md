@@ -1,6 +1,6 @@
 # Subagent Dispatch Discipline
 
-Reference for develop's **subagent usage** across all phases. The Peer-review phase has its own subagent dispatch case (covered in `references/peer-review.md`); this document is the cross-cutting discipline for every other dispatch — when to fan out, how to construct prompts that produce auditable work, how to fan back in, and the anti-patterns that turn dispatch from a tool into an abdication.
+Reference for develop's **subagent usage** across all phases. The Peer-review phase has its own subagent dispatch case (covered in `references/peer-review.md`); this document is the cross-cutting discipline for every other dispatch: when to fan out, how to construct prompts that produce auditable work, how to fan back in, and the anti-patterns that turn dispatch from a tool into an abdication.
 
 The non-negotiable: **dispatching a subagent does not transfer responsibility.** The orchestrator still owns the work product. The subagent's report is one input the orchestrator audits, not a black-box outcome to accept on faith.
 
@@ -26,7 +26,7 @@ This generalizes: any time the orchestrator's prior decisions would bias its cur
 
 Two pieces of work that do not share state and do not depend on each other can be done in parallel by two subagents while the orchestrator waits for both. The orchestrator's wall-clock time drops; correctness is unaffected because nothing was contested.
 
-The independence has to be real. If the two pieces share state (the same files, the same database, the same in-flight branch), parallel dispatch produces races and contradictions — see Anti-patterns.
+The independence has to be real. If the two pieces share state (the same files, the same database, the same in-flight branch), parallel dispatch produces races and contradictions (see Anti-patterns).
 
 ---
 
@@ -60,17 +60,19 @@ A subagent prompt must contain enough for the subagent to produce auditable work
 
 ### 1. Role and constraint
 
-State what the subagent is and what it does *not* have access to. "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec." The negative constraint matters: it tells the subagent it cannot assume context that does not exist in the prompt.
+State what the subagent is and what it does *not* have access to. "You are an independent code reviewer. You have NOT seen the implementation process, only the diff and the spec." The negative constraint matters: it tells the subagent it cannot assume context that does not exist in the prompt.
+
+Add one more line to every dispatch: **"Do not invoke skills and do not dispatch subagents: do the task yourself and report."** A subagent sees the same skill list the orchestrator does, and a review prompt full of words like "fix" can trigger develop itself inside the reviewer; a reviewer that spawns reviewers duplicates the review and the cost.
 
 ### 2. Context
 
 Whatever the subagent needs to do the work. For research: the question, the relevant directories, the search patterns. For review: the diff, the spec, the standards excerpts. For an evaluation: the artifact being evaluated and the criteria.
 
-If the orchestrator does not give the subagent enough context, the subagent fabricates context from training-time priors — and the result is fluent but wrong.
+If the orchestrator does not give the subagent enough context, the subagent fabricates context from training-time priors, and the result is fluent but wrong.
 
 ### 3. Inputs
 
-Concrete, named. Not "look at the auth code" — `src/auth.ts`, `src/middleware/auth.ts`, `tests/auth.test.ts`. Specific paths or specific patterns. A subagent dispatched to "look at the auth code" without paths reads everything plausible, burns context, and returns a survey.
+Concrete, named. Not "look at the auth code"; `src/auth.ts`, `src/middleware/auth.ts`, `tests/auth.test.ts`. Specific paths or specific patterns. A subagent dispatched to "look at the auth code" without paths reads everything plausible, burns context, and returns a survey.
 
 ### 4. Output format
 
@@ -87,29 +89,29 @@ The most-skipped section, and the most important. The subagent must return the r
 
 Without this clause, "the tests pass" comes back from the subagent and the orchestrator has no way to verify whether the tests actually ran. With this clause, the orchestrator gets `Tests: 47 passed, 47 total` and can confirm the claim.
 
-### 6. Negative permission — admitting "I do not know"
+### 6. Negative permission: admitting "I do not know"
 
 State explicitly that the subagent may return "I did not find X" or "I am not confident." Without this, the subagent treats the question as a task that must be completed and fabricates an answer rather than reporting the gap.
 
 ---
 
-## File-based handoffs — pass paths, not payloads
+## File-based handoffs: pass paths, not payloads
 
-Large inputs — diffs, task text, logs, prior reports — are written to files and passed by path, never pasted into the dispatch prompt. Two reasons:
+Large inputs (diffs, task text, logs, prior reports) are written to files and passed by path, never pasted into the dispatch prompt. Two reasons:
 
-- **Pasted content parks permanently in the subagent's context.** A diff the subagent consults twice costs one file-read each time as a path, but occupies the prompt forever as a paste. (Upstream measured a real dispatch prompt at 42k characters — 99% of it pasted history the subagent never needed.)
+- **Pasted content parks permanently in the subagent's context.** A diff the subagent consults twice costs one file-read each time as a path, but occupies the prompt forever as a paste. (Upstream measured a real dispatch prompt at 42k characters, 99% of it pasted history the subagent never needed.)
 - **Files keep the prompt legible.** The prompt carries the role, criteria, and output format; the artifacts stay artifacts.
 
-Practical form: write the diff to a scratch file (for review, `git diff BASE` with new files registered via `git add -N`, so uncommitted work is included; see `references/peer-review.md`), the spec excerpt to another, and hand the subagent the paths plus reading instructions. Long subagent reports also go to files — the orchestrator reads the file rather than receiving a monster return message.
+Practical form: write the diff to a scratch file (for review, `git diff BASE` with new files registered via `git add -N`, so uncommitted work is included; see `references/peer-review.md`), the spec excerpt to another, and hand the subagent the paths plus reading instructions. Long subagent reports also go to files: the orchestrator reads the file rather than receiving a monster return message.
 
 ---
 
 ## Explicit model selection
 
-Every dispatch names its model tier. An unnamed model silently inherits the orchestrator's own — usually the most expensive tier — and the cost multiplies by the number of dispatches (upstream incident: a run put all 26 reviewers on the top tier because none was named).
+Every dispatch names its model tier. An unnamed model silently inherits the orchestrator's own (usually the most expensive tier), and the cost multiplies by the number of dispatches (upstream incident: a run put all 26 reviewers on the top tier because none was named).
 
-- **Cheapest tier**: mechanical, fully-specified work — apply a spelled-out change, run a command and report output.
-- **Mid tier as the floor for reviewers and prose-driven work**: turn count beats token price — a cheap model taking 2-3× the turns costs more *and* does worse.
+- **Cheapest tier**: mechanical, fully-specified work (apply a spelled-out change, run a command and report output).
+- **Mid tier as the floor for reviewers and prose-driven work**: turn count beats token price; a cheap model taking 2-3× the turns costs more *and* does worse.
 - **Most capable tier**: architecture judgement and final whole-branch review. Develop's first Peer-review of the whole diff is that review; its re-review rounds drop to the mid tier.
 
 ---
@@ -125,9 +127,15 @@ A fork also starts with the orchestrator's whole context in its window, which is
 
 ---
 
-## Evidence requirements — making subagent claims auditable
+## Wait for what the next step consumes
 
-A subagent claim of success without evidence is the same anti-pattern as the orchestrator's own soft language ("should work", "seems to pass") — it has just been laundered through a dispatch.
+Some harnesses run every subagent in the background by default and deliver its report later. When the next step **consumes** the report (a review whose findings gate Peer-review, a codebase fact a Clarify decision waits on), wait for it to return before taking that step, and never fill in a pending result from what you expect it to say. Background dispatch is for work nothing waits on. While waiting, do only work the report cannot change.
+
+---
+
+## Evidence requirements: making subagent claims auditable
+
+A subagent claim of success without evidence is the same anti-pattern as the orchestrator's own soft language ("should work", "seems to pass"); it has just been laundered through a dispatch.
 
 The discipline:
 
@@ -139,7 +147,7 @@ This is the corollary to `references/verification.md`'s "trust no agent's claim 
 
 ---
 
-## Parallel dispatch — when and how
+## Parallel dispatch: when and how
 
 ### When it works
 
@@ -156,9 +164,9 @@ Examples that work:
 
 ### How to fan back in
 
-The orchestrator waits for all parallel subagents to return. Each returns its evidence-bearing report in the prompt-specified format. The orchestrator integrates them — usually by listing each finding by source agent, deduplicating where overlap is real, surfacing contradictions for the user to resolve.
+The orchestrator waits for all parallel subagents to return. Each returns its evidence-bearing report in the prompt-specified format. The orchestrator integrates them, usually by listing each finding by source agent, deduplicating where overlap is real, surfacing contradictions for the user to resolve.
 
-If two parallel agents return contradictory conclusions on the same artifact, the contradiction is itself a signal — usually that the artifact was ambiguous, that the standards were under-specified, or that one agent had a context gap. The orchestrator does not silently pick one; it surfaces the contradiction with both supporting evidence chains.
+If two parallel agents return contradictory conclusions on the same artifact, the contradiction is itself a signal: usually that the artifact was ambiguous, that the standards were under-specified, or that one agent had a context gap. The orchestrator does not silently pick one; it surfaces the contradiction with both supporting evidence chains.
 
 ---
 
@@ -196,7 +204,7 @@ The fix: every dispatch prompt names the scope (which files), the criteria (what
 
 ### Cascading dispatch without a budget
 
-Subagent A dispatches subagent B, which dispatches subagent C. The orchestrator can no longer audit any of it — each layer adds an unaudited claim. By the time the result returns, no one knows whether the underlying work was actually done.
+Subagent A dispatches subagent B, which dispatches subagent C. The orchestrator can no longer audit any of it: each layer adds an unaudited claim. By the time the result returns, no one knows whether the underlying work was actually done.
 
 The fix: develop's orchestrator dispatches; subagents do not dispatch further subagents (with rare exceptions for well-scoped recursive cases). If a subagent's work needs further fan-out, the subagent reports back and the orchestrator dispatches the next layer.
 
@@ -220,7 +228,7 @@ This may be a real clean result, or it may be a lazy pass. Signals it is lazy ra
 - The standards excerpts were comprehensive but the report did not reference any of them.
 - The output format was not followed.
 
-The fix: re-dispatch with a sharper prompt — name specific files to check, specific criteria to verify, specific evidence to report. If the sharper dispatch also returns clean, trust it.
+The fix: re-dispatch with a sharper prompt: name specific files to check, specific criteria to verify, specific evidence to report. If the sharper dispatch also returns clean, trust it.
 
 ### Subagent surfaces a question the orchestrator cannot answer
 
@@ -243,9 +251,9 @@ The middle path: the orchestrator reads the subagent's raw evidence, compares it
 
 ## Relationship to `develop`'s other phases
 
-- **Clarify** is rarely dispatched — the value of Clarify is the orchestrator's direct interaction with the user, and a subagent loses the user-facing channel. Dispatch in Clarify is for sub-tasks like "search the codebase for existing patterns that answer this question."
+- **Clarify** is rarely dispatched: the value of Clarify is the orchestrator's direct interaction with the user, and a subagent loses the user-facing channel. Dispatch in Clarify is for sub-tasks like "search the codebase for existing patterns that answer this question."
 - **Route → PLAN** sub-step is inline; the plan file is a contract between the orchestrator and the user, not something to delegate.
-- **Build** is mostly inline (TDD cycles require the orchestrator to think about behavior). Dispatch in Build is for sub-tasks like "scan for callers of this function before the rename" — research that informs the cycle.
+- **Build** is mostly inline (TDD cycles require the orchestrator to think about behavior). Dispatch in Build is for sub-tasks like "scan for callers of this function before the rename" (research that informs the cycle).
 - **Peer-review** is the canonical dispatch case. See `references/peer-review.md` for the specifics.
 - **Verify** can dispatch parallel sub-agents for independent checks (one for typecheck, one for lint, one for tests) if the wall-clock matters, but the orchestrator still reads each output directly.
 - **Finish** is inline; the branch decision is between the orchestrator and the user.
