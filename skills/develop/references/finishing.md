@@ -1,6 +1,6 @@
 # Finish Discipline — Commit and Branch Decision
 
-Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present the three-option branch menu, no auto-merge or auto-push, Discard only on explicit typed request). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened, resolve caller).
+Reference for develop's **Finish** phase. The Finish section of `SKILL.md` enforces the surface mechanics (commit if uncommitted, present the three-option branch menu, no auto-merge or auto-push, Discard only on explicit typed request). This document is the deeper discipline — when each branch option is the right call, the git-safety rules that prevent silent damage, and the awkward edges (working tree not clean, conflicts, PR cannot be opened).
 
 The non-negotiable: **the branch decision is the user's, not the agent's.** Develop's job is to surface the options clearly and capture the choice; it does not auto-merge, auto-push, or auto-delete.
 
@@ -213,16 +213,6 @@ The user explicitly wants to leave a half-written file uncommitted (often a scra
 - Confirm with the user which files are intentionally uncommitted.
 - Do not run `git add .` blindly; you would accidentally commit the scratch.
 - The Finish exit sentence captures this: "User chose: Keep branch. Intentional uncommitted state: <files>."
-
-### Resolve-issue caller integration
-
-When `develop` is invoked from `jsk:resolve`, Finish has one extra responsibility: signal back to `resolve` for Notion status transition. The discipline:
-
-- Develop still presents the three menu options to the user.
-- After the user's choice, `develop` passes control back to `resolve` with the outcome.
-- Resolve-issue (not develop) handles the Notion update.
-
-The branch decision and the issue tracker update are separate steps owned by separate skills. Develop does not touch Notion directly; `resolve` does not make the branch decision.
 
 ---
 

@@ -6,7 +6,6 @@ description: >-
   'fix this', 'debug this', 'diagnose this' (bug),
   'prototype this', 'try a design', 'explore options' (exploration),
   or when resuming a plan file from docs/plans/.
-  Also invoked by `resolve` after issue selection.
 ---
 
 # Develop — Development Orchestrator
@@ -200,7 +199,7 @@ Run these checks and report results:
 
 > **Required reading at phase entry — frontier-round grilling (decision tree, rounds, facts-vs-decisions split), recommended-answer-with-reasoning patterns, deepened 5-category checklist, approach-proposal discipline, anti-patterns (shotgun questioning, vibes-based clarify, answering your own questions), and edge cases (premature skip, no CONTEXT.md, pushback fatigue) — see [`references/grilling.md`](references/grilling.md).**
 
-If invoked from `jsk:resolve`, use the issue title + body as starting context. If invoked standalone, use whatever the user provided. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
+Use whatever the user provided as starting context. If invoked with a path to an existing plan file (`docs/plans/<github-id>/*.md`), skip Clarify and Route — proceed directly to Build with that plan (cross-session pickup).
 
 ### How to question
 
@@ -527,7 +526,7 @@ For now, proceed directly to Verify.
 
 **Goal:** Capture this session's learnings into the repo's compound-engineering channels so future sessions start ahead.
 
-> **Required reading at phase entry — why four explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, resolve-caller integration, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
+> **Required reading at phase entry — why four explicit channels, per-channel thresholds (when to propose vs stay silent), proposal formats, anti-patterns (performative deposit, paraphrasing SKILL.md, ADR for a bug fix, batch-style proposals), and edge cases (multi-session plans, PROTOTYPE Discard/Promote, no-deposit sessions) — see [`references/retrospective.md`](references/retrospective.md).**
 
 Run after Verify exits green, before Finish. Check four channels in order. For each, propose a deposit *only if* its threshold is met. Do not invent deposits to make the phase feel productive — silent exit is the correct outcome when no channel qualifies.
 
@@ -630,7 +629,7 @@ Not an out-of-scope entry: deferrals ("later" ≠ rejected — those belong in i
 
 **Goal:** Capture the work and let the user decide what to do with the branch.
 
-> **Required reading at phase entry — when each menu option actually fits and the request-only Discard gate, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open, resolve caller integration) — see [`references/finishing.md`](references/finishing.md).**
+> **Required reading at phase entry — when each menu option actually fits and the request-only Discard gate, commit-message rules (type prefix, no AI attribution, semver bump), git-safety anti-patterns (auto-push without consent, --no-verify, --amend after hook failure, force-push to shared branches), and edge cases (intentional uncommitted state, merge conflict, PR cannot open) — see [`references/finishing.md`](references/finishing.md).**
 
 ### Step 1: Final commit
 
@@ -640,8 +639,6 @@ If there are uncommitted implementation changes:
 git add <implementation files>
 git commit -m "<type>: <description>"
 ```
-
-If invoked from `resolve`, include the issue reference in the commit message.
 
 Skip if: not a git repo, no changes to commit, or PLAN route already produced per-task commits.
 
@@ -659,8 +656,6 @@ Present 3 options to the user:
 
 **Discard is not on the menu.** Deleting a branch happens only when the user explicitly asks for it, and only after they type the literal word `discard` — "yeah, get rid of it" does not count. It is the one irreversible option; the menu never hands it out. (PROTOTYPE-route branches follow their own disposal rule — preserved under `prototype/<name>`, never deleted.)
 
-If invoked from `resolve`, note that resolve will handle status transition after this step.
-
 Do NOT auto-merge or auto-push without the user's explicit choice.
 
 ### Exit gate
@@ -672,12 +667,6 @@ Do NOT auto-merge or auto-push without the user's explicit choice.
 ---
 
 ## Caller integration
-
-### From `jsk:resolve`
-
-- Clarify receives the issue title + body as starting context
-- All phases proceed normally
-- On completion, control returns to `resolve` for Notion status transition
 
 ### Standalone usage
 
