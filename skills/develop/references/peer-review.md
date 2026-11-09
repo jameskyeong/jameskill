@@ -1,6 +1,6 @@
 # Peer-review Discipline — Independent Diff Review
 
-Reference for develop's **Peer-review** phase. The Peer-review section of `SKILL.md` defines the surface mechanics (spawn an agent with a two-axis prompt, triage findings by severity, fix Critical/Important or explicitly defer). This document is the deeper discipline — why independence matters, how to make severity calls that are not arbitrary, what makes a review prompt actually produce useful findings, and the anti-patterns that turn the review into theater.
+Reference for develop's **Peer-review** phase. The Peer-review section of `SKILL.md` defines the surface mechanics (write the diff, dispatch a fresh reviewer with the two-axis prompt template below, triage findings by severity, fix Critical/Important or explicitly defer). This document is the deeper discipline — why independence matters, how to make severity calls that are not arbitrary, what makes a review prompt actually produce useful findings, and the anti-patterns that turn the review into theater.
 
 The non-negotiable: **the reviewer sees the diff, not the journey.** Everything Peer-review produces is grounded in what the code now is, not in how it came to be that way. Author recency bias is the thing this phase exists to defeat.
 
@@ -103,7 +103,7 @@ Minor findings are reported, not blocked. They do not cause re-loops, they do no
 
 ## The fix-loop circuit breaker
 
-Critical findings trigger a re-loop: fix (fresh RED → GREEN for the fix), then re-review. **Count the rounds.** After the third fix → re-review round that still leaves unresolved Critical or Important findings, STOP — do not start round four.
+Critical findings trigger a re-loop: fix (fresh RED → GREEN for the fix), then re-review. **Count the rounds, out loud.** Before each round, re-read this paragraph and state the count (`review round 2/3`): a count held only in memory resets silently when the context is compacted. After the third fix → re-review round that still leaves unresolved Critical or Important findings, STOP — do not start round four.
 
 At the cap, the orchestrator stops fixing and hands the decision up: compile every remaining finding with its status — what was attempted, why it still stands — and let the user rule on each one (fix now / defer with a note / reject with reasoning).
 
@@ -132,18 +132,55 @@ The peer-review subagent receives a prompt with at minimum:
 1. **Role and constraint.** "You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec."
 2. **The Standards axis content.** Relevant excerpts from CLAUDE.md / CONTEXT.md, and a one-paragraph summary of observed conventions from the surrounding files.
 3. **The Spec axis content — by file path.** Either the Clarify summary written to a scratch file (DIRECT route) or the plan file already on disk (PLAN route). Spec text is not pasted inline any more than the diff is.
-4. **The diff — by file path, not pasted.** Write `git diff <baseline-sha>..HEAD` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content. The baseline is the Docs Checkpoint commit from Route, or the branch root for DIRECT. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), the baseline stays the **original branch root**, not the upgrade's docs checkpoint — the commits made under the lighter route are exactly the ones the review must not skip.
+4. **The diff — by file path, not pasted, working tree included.** Run `git add -N <new files>` so untracked files appear, then write `git diff BASE` to a scratch file and hand the reviewer the path (see `references/subagent-patterns.md`, file-based handoffs). A pasted diff parks permanently in the reviewer's most expensive context and crowds out the standards and spec content.
+   - **Why not `BASE..HEAD`:** that range holds only commits. DIRECT commits nothing before Finish, so the range is empty and the reviewer reviews nothing; on any route it misses new untracked files.
+   - **BASE** is recorded where it survives the session: on PLAN, the docs-checkpoint SHA in the plan file; on other routes, `git rev-parse HEAD` at Build start, stated as `BASE: <sha>` and written atop the scratch spec file. A resumed run reuses the recorded BASE, never its own starting HEAD, or the tasks finished in earlier sessions drop out of the review. Do not guess "the branch root": on a long-lived branch it is undefined. For a run the ratchet upgraded mid-flight (DIRECT → PLAN), BASE stays the **first** one, not the upgrade's docs checkpoint — the work done under the lighter route is exactly what the review must not skip.
+   - **Refuse an empty or foreign range.** Before dispatch, confirm the scratch diff is non-empty and `git merge-base --is-ancestor BASE HEAD` succeeds. An empty diff dispatched anyway comes back "No issues found" and looks like a pass.
 5. **The output format.** Each finding must include Severity, File:line, Issue, Suggestion.
 6. **The "no false findings" instruction.** "If no issues found, state 'No issues found' — do not invent findings."
 
 That last instruction matters more than it sounds. A subagent dispatched without it tends to produce findings on every review, because "review with no findings" feels like a failed task. Explicitly permitting an empty review is what makes the reviews credible when they do contain findings.
 
-One requirement lives on the dispatch itself, not in the prompt: **name the model tier.** An unnamed dispatch silently inherits the orchestrator's tier — usually the most expensive — and the cost multiplies across re-review rounds. Mid tier is the reviewer floor (see `references/subagent-patterns.md`).
+Two requirements live on the dispatch itself, not in the prompt:
+
+- **A fresh agent, never a fork.** A forked subagent inherits the whole implementing conversation, which is exactly the author bias the review exists to escape, and it ignores any model override.
+- **Name the model tier.** An unnamed dispatch silently inherits the orchestrator's tier, and the cost multiplies across re-review rounds. The first review is the run's final whole-branch review, so it gets the most capable tier; re-review rounds, which confirm the fixes, get the mid tier, which is the reviewer floor (see `references/subagent-patterns.md`). Every round regenerates the scratch diff from BASE, so a re-review sees the fixes in context.
+
+### The prompt template
+
+```
+You are an independent code reviewer. You have NOT seen the implementation process — only the diff and the spec.
+
+## Your review axes
+
+### Axis 1: Standards compliance
+Check the diff against these project standards:
+- CLAUDE.md (if exists): [paste relevant sections]
+- CONTEXT.md (if exists): [paste domain glossary]
+- Existing code conventions observed in the surrounding files
+
+### Axis 2: Spec compliance
+Read the spec file at: [path — the plan file under docs/plans/ for PLAN runs, or the Clarify summary written to a scratch file for DIRECT; do not paste spec content inline]
+
+Does the implementation fulfill every requirement? Is anything missing? Is anything added that wasn't requested?
+
+## Review the following diff:
+Read the diff file at: [scratch-file path — `git diff BASE` with new files registered via `git add -N`; do not paste the diff inline]
+
+## Output format
+For each finding, state:
+- **Severity**: Critical / Important / Minor
+- **File:line**: location
+- **Issue**: what's wrong
+- **Suggestion**: how to fix
+
+If no issues found, state "No issues found" — do not invent findings.
+```
 
 ### Variants by route
 
 - **DIRECT route**: the Spec content is shorter (just Clarify output). The diff is smaller. The review tends to surface fewer findings but should still be run — a clean review is a green light, not a skipped phase.
-- **PLAN route**: the Spec content is the plan file. The diff spans multiple commits if PLAN.3 produced per-task commits. The review reads each task's commit individually if the plan file structures it that way.
+- **PLAN route**: the Spec content is the plan file. The diff spans multiple commits if sequential execution produced per-task commits. The review reads each task's commit individually if the plan file structures it that way.
 
 ---
 
@@ -231,7 +268,7 @@ The Peer-review exit gate is also evidence-based:
 
 A clean review is also acceptable:
 
-> **Findings: 0.** Subagent reviewed `<diff baseline>..HEAD` against `<spec source>`. Output: "No issues found."
+> **Findings: 0.** Subagent reviewed `git diff <BASE>` (`<N files, +X/−Y>`, working tree included) against `<spec source>`. Output: "No issues found."
 
 If the implementing agent cannot state this sentence with a specific list of findings and actions, Peer-review has not exited.
 

@@ -97,6 +97,8 @@ This rule has saved more time than any other in the loop. Tests that *should* pa
 
 After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through — write the missing test before moving on.
 
+When you check a mutation by actually editing the code rather than mentally, prove the edit landed before trusting the red: `git diff --stat` must show the mutated file. A "red" from a mutation that never reached the file is red for some other reason. Undo it the same way the DIAGNOSE revert ritual restores a fix (a saved patch, never `git stash`; see `references/diagnosis.md`).
+
 ---
 
 ## REFACTOR — structure only, behavior unchanged

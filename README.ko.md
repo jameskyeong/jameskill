@@ -77,7 +77,7 @@ Clarify 후 `/develop`는 작업의 종류에 따라 **하나의** 루트를 고
 ### 단계 한눈에 보기
 
 ```
-preflight → clarify → route → build (strict TDD) → peer-review → ship (slot) → verify → retrospective → finish
+preflight → clarify → route → build (strict TDD) → peer-review → verify → retrospective → finish
 ```
 
 - **집요한 질문, 핑퐁 없이** — 질문은 frontier 라운드로 옵니다(지금 답할 수 있는 질문 전부를 번호 붙여 한 번에, 각각 추천 답 포함). 5-카테고리 모호성 체크리스트가 0이 되어야 Route로 넘어갑니다.

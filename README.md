@@ -77,7 +77,7 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 ### Phases at a glance
 
 ```
-preflight → clarify → route → build (strict TDD) → peer-review → ship (slot) → verify → retrospective → finish
+preflight → clarify → route → build (strict TDD) → peer-review → verify → retrospective → finish
 ```
 
 - **Relentless clarification, without the ping-pong** — questions arrive in frontier rounds (every currently-answerable question at once, numbered, each with a recommended answer); the 5-category ambiguity checklist must reach 0 items before Route.

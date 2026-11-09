@@ -100,7 +100,7 @@ Large inputs — diffs, task text, logs, prior reports — are written to files 
 - **Pasted content parks permanently in the subagent's context.** A diff the subagent consults twice costs one file-read each time as a path, but occupies the prompt forever as a paste. (Upstream measured a real dispatch prompt at 42k characters — 99% of it pasted history the subagent never needed.)
 - **Files keep the prompt legible.** The prompt carries the role, criteria, and output format; the artifacts stay artifacts.
 
-Practical form: write `git diff <base>..HEAD` to a scratch file, the spec excerpt to another, and hand the subagent the paths plus reading instructions. Long subagent reports also go to files — the orchestrator reads the file rather than receiving a monster return message.
+Practical form: write the diff to a scratch file (for review, `git diff BASE` with new files registered via `git add -N`, so uncommitted work is included; see `references/peer-review.md`), the spec excerpt to another, and hand the subagent the paths plus reading instructions. Long subagent reports also go to files — the orchestrator reads the file rather than receiving a monster return message.
 
 ---
 
@@ -110,7 +110,18 @@ Every dispatch names its model tier. An unnamed model silently inherits the orch
 
 - **Cheapest tier**: mechanical, fully-specified work — apply a spelled-out change, run a command and report output.
 - **Mid tier as the floor for reviewers and prose-driven work**: turn count beats token price — a cheap model taking 2-3× the turns costs more *and* does worse.
-- **Most capable tier**: architecture judgement and final whole-branch review.
+- **Most capable tier**: architecture judgement and final whole-branch review. Develop's first Peer-review of the whole diff is that review; its re-review rounds drop to the mid tier.
+
+---
+
+## Fresh context, never a fork
+
+Start every subagent with a fresh context: a named agent type, never a fork. Some harnesses offer a fork that inherits the orchestrator's whole conversation (and, in Claude Code, ignores any model override). That defeats two rules at once:
+
+- **Independence.** A reviewer that has read the implementation conversation carries the author's bias the review exists to escape.
+- **Explicit model selection.** A fork runs on the orchestrator's own model, whatever tier the dispatch names.
+
+A fork also starts with the orchestrator's whole context in its window, which is the context-budget cost dispatch was meant to save. Everything the subagent needs goes in the prompt or in files it is pointed at.
 
 ---
 

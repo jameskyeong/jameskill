@@ -214,7 +214,7 @@ async function runLinkValidity(checks, results) {
 }
 
 async function runRepoChecks(checks, results) {
-  for (const id of ['version-sync', 'cross-cutting-gates-present']) {
+  for (const id of ['version-sync', 'cross-cutting-gates-present', 'skill-size']) {
     const check = checks[id];
     if (!check?.checkRepo) continue;
     const res = await check.checkRepo(ROOT);

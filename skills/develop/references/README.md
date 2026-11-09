@@ -17,7 +17,6 @@ See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationa
 | **Route → PROTOTYPE** | [`prototyping.md`](prototyping.md) | Throwaway exploration; TDD intentionally relaxed; Discard vs Promote-to-Plan |
 | **Build** | [`tdd-discipline.md`](tdd-discipline.md) | RED/GREEN/REFACTOR exit conditions; anti-patterns; legacy / incidents / UI / integration edges |
 | **Peer-review** | [`peer-review.md`](peer-review.md) | Independence vs author bias; two-axis review; sharpened severity definitions |
-| Ship | _(slot, deferred)_ | Activates when production-readiness skills are wired in |
 | **Verify** (cross-cutting) | [`verification.md`](verification.md) | Evidence before assertion; expanded forbidden language; per-phase evidence catalog |
 | **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — four channels (ADR / references / CONTEXT.md sweep / .out-of-scope/), per-channel thresholds, performative-deposit anti-patterns |
 | **Finish** | [`finishing.md`](finishing.md) | The three-option branch menu plus request-only Discard; commit discipline; git-safety anti-patterns |
@@ -41,15 +40,15 @@ If you are auditing a completed `/develop` run, the relevant module is the one f
 ## What makes a reference module a reference module
 
 - **One phase, one document.** Cross-cutting modules (verification, subagent-patterns) are clearly marked as such.
-- **Principles, not procedures.** `SKILL.md` has the procedure; the references explain why each step exists.
+- **Gates in `SKILL.md`, depth here.** `SKILL.md` holds every gate, loop count and stop rule, small enough to survive compaction; the references hold the procedures' detail (templates, prompts) and explain why each step exists.
 - **Anti-patterns are first-class.** Every module names the failure modes the discipline exists to prevent.
 - **Edge cases have recommended responses.** Not "do what feels right" — specific guidance for the awkward shape.
 - **Evidence-based exit sentences.** Each phase's exit gate is stated as a single sentence the orchestrator must produce.
 
 ## Future modules
 
-Tracked in `docs/plans/jameskyeong/forge-depth-references-vN.md`. Currently open:
+Tracked in this plugin's repository under `docs/plans/`. Currently open:
 
-- `architecture.md` — gated on a decision to promote PRD-scale architecture work to a supported route. ADR 0006 rejected ARCHITECT for v2.0 because PRD-level work overlaps with the existing tracker (`/resolve`, `/report`) and exceeds develop's single-session responsibility scope. Revisitable if post-launch usage signals demand.
+- `architecture.md` — gated on a decision to promote PRD-scale architecture work to a supported route. ADR 0006 rejected ARCHITECT for v2.0 because PRD-level work exceeds develop's single-session responsibility scope. Revisitable if post-launch usage signals demand.
 
 These modules will not be added until develop has a phase that consumes them. A module with no caller is documentation orphan; the references folder exists to back develop's orchestration, not to host orphaned discipline.
