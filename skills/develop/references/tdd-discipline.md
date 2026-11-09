@@ -1,8 +1,8 @@
-# TDD Discipline — RED → GREEN → REFACTOR
+# TDD Discipline: RED → GREEN → REFACTOR
 
-Reference for develop's **Build** phase. The Build section of `SKILL.md` enforces the loop at the orchestration level; this document is the deeper discipline — the rules, the anti-patterns, the edge cases that make the loop actually work instead of becoming theater.
+Reference for develop's **Build** phase. The Build section of `SKILL.md` enforces the loop at the orchestration level; this document is the deeper discipline: the rules, the anti-patterns, the edge cases that make the loop actually work instead of becoming theater.
 
-The non-negotiable: **a failing test exists before a line of implementation is written.** Every shortcut around this rule produces code that looks complete but cannot be evolved with confidence later. If implementation got written before its test, the recovery is deletion and a fresh RED — not retrofitting a test around the existing code.
+The non-negotiable: **a failing test exists before a line of implementation is written.** Every shortcut around this rule produces code that looks complete but cannot be evolved with confidence later. If implementation got written before its test, the recovery is deletion and a fresh RED, not retrofitting a test around the existing code.
 
 ---
 
@@ -20,38 +20,38 @@ A cycle is **one behavior**. Not one feature, not one file. If the next test you
 
 ---
 
-## RED — the failing test
+## RED: the failing test
 
 ### Pick the smallest meaningful behavior
 
-The right test for RED is the smallest behavior that, once green, leaves the system observably more correct than it was. Not the simplest test you can think of — the simplest *meaningful* one.
+The right test for RED is the smallest behavior that, once green, leaves the system observably more correct than it was. Not the simplest test you can think of, but the simplest *meaningful* one.
 
 Good: `it("rejects an empty username")`. The behavior is one validation rule; the test is small.
-Bad: `it("validates the form")`. The behavior is unbounded — multiple rules will collapse into one cycle, and you will not know which one drove which line of code.
+Bad: `it("validates the form")`. The behavior is unbounded: multiple rules will collapse into one cycle, and you will not know which one drove which line of code.
 
-If the test description contains the word "and", split it. If it contains "should work correctly", you have not picked a behavior — you have picked a vibe.
+If the test description contains the word "and", split it. If it contains "should work correctly", you have not picked a behavior; you have picked a vibe.
 
 ### Write only at pre-agreed seams
 
-A seam is the boundary a test attaches to — a unit's public interface, an HTTP endpoint, a CLI invocation. Which seams the tests live at is a design decision, and it was made in Clarify (the success-criteria question asks it explicitly) or in the plan file. **No test is written at a seam nobody agreed to.** A test at an improvised seam pins an interface the user never chose, and every later refactor pays for it.
+A seam is the boundary a test attaches to: a unit's public interface, an HTTP endpoint, a CLI invocation. Which seams the tests live at is a design decision, and it was made in Clarify (the success-criteria question asks it explicitly) or in the plan file. **No test is written at a seam nobody agreed to.** A test at an improvised seam pins an interface the user never chose, and every later refactor pays for it.
 
-If RED needs a seam that was never agreed — the behavior is unreachable from the agreed ones — that is a Clarify gap, not a license to improvise. Surface it, agree the seam, then write the test. Fewer seams is better: the ideal plan tests through the highest seam that can still express the failure.
+If RED needs a seam that was never agreed (the behavior is unreachable from the agreed ones), that is a Clarify gap, not a license to improvise. Surface it, agree the seam, then write the test. Fewer seams is better: the ideal plan tests through the highest seam that can still express the failure.
 
 When you propose a seam, give it a one-line note on what it catches, what it misses, and how fast it runs ("unit interface: catches calculation errors, misses request wiring; fast"). A seam chosen by name alone is chosen blind.
 
-### Name the break — the falsifiability check
+### Name the break: the falsifiability check
 
-Before writing the test body, answer one question: **what production change would make this test fail?** Name it concretely — "if the validator stops rejecting empty usernames, this fails." If you cannot name a realistic breaking change, the test is decoration: it will pass forever, guard nothing, and cost maintenance.
+Before writing the test body, answer one question: **what production change would make this test fail?** Name it concretely: "if the validator stops rejecting empty usernames, this fails." If you cannot name a realistic breaking change, the test is decoration: it will pass forever, guard nothing, and cost maintenance.
 
-Corollary: expected values come from an **independent source of truth** — hand-derived literals, the spec's stated example, a captured known-good output. Never compute the expectation with the same logic the production code uses (see the tautological-test anti-pattern below).
+Corollary: expected values come from an **independent source of truth**: hand-derived literals, the spec's stated example, a captured known-good output. Never compute the expectation with the same logic the production code uses (see the tautological-test anti-pattern below).
 
 ### Predict the failure before running
 
 Before running the failing test, state out loud (or in your head) what failure message you expect. Then run it. If the actual failure does not match your prediction:
 
-- **Test passes unexpectedly** — STOP. The feature already exists, or the test is hitting a stub, or the assertion is too weak. Investigate. Do not write implementation against a test that passes.
-- **Different error from expected** — typically a setup or import issue, not the missing behavior. Fix the setup first; otherwise you are about to implement code in response to a misleading signal.
-- **Error message points at a stack frame inside the test harness** — the test is malformed. Fix the test before continuing.
+- **Test passes unexpectedly**: STOP. The feature already exists, or the test is hitting a stub, or the assertion is too weak. Investigate. Do not write implementation against a test that passes.
+- **Different error from expected**: typically a setup or import issue, not the missing behavior. Fix the setup first; otherwise you are about to implement code in response to a misleading signal.
+- **Error message points at a stack frame inside the test harness**: the test is malformed. Fix the test before continuing.
 
 The prediction matters because it converts "the test failed" from a vague green light into specific evidence about *what* failed.
 
@@ -60,25 +60,25 @@ The prediction matters because it converts "the test failed" from a vague green 
 Tests that assert on the public-visible behavior survive refactors. Tests that assert on internal structure (which private method was called, which intermediate variable held what value, the exact SQL string emitted) break the moment anyone reorganizes the code, even when the behavior is unchanged.
 
 Symptoms that you are asserting on implementation:
-- The test changes whenever a renaming, an extraction, or an internal restructuring happens — even though the inputs and outputs are unchanged.
+- The test changes whenever a renaming, an extraction, or an internal restructuring happens, even though the inputs and outputs are unchanged.
 - The test imports private/internal symbols, not the public API.
-- The test uses mock-call-count assertions (`expect(mock).toHaveBeenCalledTimes(3)`) where the count is not actually a contract — just a snapshot of the current implementation.
+- The test uses mock-call-count assertions (`expect(mock).toHaveBeenCalledTimes(3)`) where the count is not actually a contract, just a snapshot of the current implementation.
 
 A test that breaks on every refactor is not a regression net. It is a tripwire on your own movement.
 
 ---
 
-## GREEN — the minimum implementation
+## GREEN: the minimum implementation
 
 ### "Minimum" is literal
 
-The implementation in GREEN is the **least code that makes this test pass**, not the least code that makes "the feature" work. If the test asserts on one input/output pair, returning the expected output for that single case is a legitimate first step. Generalization is not GREEN's job — it is REFACTOR's.
+The implementation in GREEN is the **least code that makes this test pass**, not the least code that makes "the feature" work. If the test asserts on one input/output pair, returning the expected output for that single case is a legitimate first step. Generalization is not GREEN's job; it is REFACTOR's.
 
 The fastest way to violate this is to think "well, while I'm here, I should handle the other cases too." That is scope creep at GREEN, and it produces code that has no test driving it.
 
 If you find yourself writing implementation that the test does not exercise:
 - STOP.
-- **Delete the extra code.** Do not keep it "as reference"; do not keep it while you author a test around it — a test written against code that already exists passes without ever having failed, which proves nothing.
+- **Delete the extra code.** Do not keep it "as reference"; do not keep it while you author a test around it: a test written against code that already exists passes without ever having failed, which proves nothing.
 - If the next behavior genuinely needs that code, write the next RED test first and let it pull the implementation back in, written fresh.
 
 There is no other option. Implementation without a test driving it is technical debt the moment it is written.
@@ -87,25 +87,25 @@ There is no other option. Implementation without a test driving it is technical 
 
 Hard-coding a return value to pass a single test is fine. So is using a literal where a calculation belongs. So is duplicating logic that "obviously" should be shared. **GREEN is permission to be ugly.** The point is to get to "test passes, output observed" with the smallest possible step, then let the next RED force generalization or let REFACTOR consolidate.
 
-The teams that have the most trouble with TDD are usually trying to skip this principle — wanting GREEN to also be REFACTOR. It cannot be both. Compress them and you lose the signal that tells you whether your tests are actually driving design.
+The teams that have the most trouble with TDD are usually trying to skip this principle: wanting GREEN to also be REFACTOR. It cannot be both. Compress them and you lose the signal that tells you whether your tests are actually driving design.
 
 ### Observe the pass directly
 
-The exit condition for GREEN is the same as the cross-cutting verification rule: read the output. Not "the test should pass now" — the actual output, the actual green line, the actual count of passed tests. If you cannot show the output, you have not finished GREEN.
+The exit condition for GREEN is the same as the cross-cutting verification rule: read the output. Not "the test should pass now", but the actual output, the actual green line, the actual count of passed tests. If you cannot show the output, you have not finished GREEN.
 
 This rule has saved more time than any other in the loop. Tests that *should* pass but in fact silently fail (because of a typo'd import, an environment variable, a stubbed function) are the single most common source of "completed work" that turns out not to be done.
 
-**"Other tests" means the project's suite, not your file.** A green run of the test you wrote is not a green suite. Before calling a unit of work done, run the project's test command (`npm test`, `pytest`, `cargo test`, whatever the repo uses) even when the task named one test file: a task's scope bounds the deliverable, not the verification. Report every failure that run shows by name, including ones this change did not cause; Preflight's baseline run says which failures were already there, and green means no failure beyond that baseline. A red test you watched scroll past and did not mention is a report falsified by omission. When the suite is too slow to run per task, run the affected subset, say so, and run the full suite at Verify.
+**"Other tests" means the project's suite, not your file.** A green run of the test you wrote is not a green suite. Before calling a unit of work done, run the project's test command (`npm test`, `pytest`, `cargo test`, whatever the repo uses) even when the task named one test file: a task's scope bounds the deliverable, not the verification. Report every failure that run shows by name, including ones this change did not cause; Preflight's baseline run says which failures were already there, and green means no failure beyond that baseline. A red test you watched scroll past and did not mention is a report falsified by omission. When the suite is too slow to run per task, run the affected subset, say so, and run the full suite at Verify. A long run goes to a file and is read by exit code, summary line, and a search for failures (see `references/verification.md`, Partial-output reads), not poured into the conversation.
 
 ### The mutation check
 
-After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through — write the missing test before moving on.
+After GREEN, spend thirty seconds mentally mutating the production code you just wrote: flip a comparison, off-by-one a boundary, drop a condition. **Each realistic mutation must fail at least one test.** A mutation that survives every test is a coverage gap at exactly the place a future regression will slip through; write the missing test before moving on.
 
 When you check a mutation by actually editing the code rather than mentally, prove the edit landed before trusting the red: `git diff --stat` must show the mutated file. A "red" from a mutation that never reached the file is red for some other reason. Undo it the same way the DIAGNOSE revert ritual restores a fix (a saved patch, never `git stash`; see `references/diagnosis.md`).
 
 ---
 
-## REFACTOR — structure only, behavior unchanged
+## REFACTOR: structure only, behavior unchanged
 
 ### What REFACTOR is
 
@@ -121,11 +121,11 @@ Do not refactor until the same idea appears in two tests. One test passing is no
 
 ### Refactor on green, never on red
 
-If a test is failing, do not refactor. The only thing you should be doing during a red is implementing to make it pass (GREEN) or reverting to the last green state. Refactoring during red mixes two signals — "did my structural change break something" and "is the new behavior implemented yet" — and you cannot separate them later.
+If a test is failing, do not refactor. The only thing you should be doing during a red is implementing to make it pass (GREEN) or reverting to the last green state. Refactoring during red mixes two signals ("did my structural change break something" and "is the new behavior implemented yet"), and you cannot separate them later.
 
 ### Stop when the structure is clearer
 
-The exit condition for REFACTOR is subjective but bounded: the structure is meaningfully clearer than it was, or the duplication is meaningfully reduced. Not "perfectly clean" — that is a moving target that produces endless rework. The right question is "would the next person on this code understand it faster than they would have five minutes ago?" If yes, stop. If no, you have over-refactored — consider reverting.
+The exit condition for REFACTOR is subjective but bounded: the structure is meaningfully clearer than it was, or the duplication is meaningfully reduced. Not "perfectly clean", which is a moving target that produces endless rework. The right question is "would the next person on this code understand it faster than they would have five minutes ago?" If yes, stop. If no, you have over-refactored; consider reverting.
 
 ---
 
@@ -133,15 +133,15 @@ The exit condition for REFACTOR is subjective but bounded: the structure is mean
 
 ### Test-after
 
-Writing the implementation first, then writing tests that confirm what you already wrote. This produces tests that always pass (because they were authored against working code) but do not constrain future changes. The hallmark is tests that mirror the implementation's structure exactly — one test per branch in the function, one test per line of code, no asymmetry between what the user cares about and what the code does internally.
+Writing the implementation first, then writing tests that confirm what you already wrote. This produces tests that always pass (because they were authored against working code) but do not constrain future changes. The hallmark is tests that mirror the implementation's structure exactly: one test per branch in the function, one test per line of code, no asymmetry between what the user cares about and what the code does internally.
 
-The fix: when you catch yourself test-after, the test you should write is **for a behavior that does not yet exist** — a missing case, an edge case, an error path. That puts you back in RED and recovers the discipline. And if the untested implementation is still uncommitted, the recovery is stronger: delete it and start from RED — deletion is what removes the bias the existing code would impose on the tests you write next.
+The fix: when you catch yourself test-after, the test you should write is **for a behavior that does not yet exist**: a missing case, an edge case, an error path. That puts you back in RED and recovers the discipline. And if the untested implementation is still uncommitted, the recovery is stronger: delete it and start from RED; deletion is what removes the bias the existing code would impose on the tests you write next.
 
 ### Mock-overuse
 
 Mocking every collaborator turns the test into a description of internal call patterns rather than a verification of behavior. The test passes because the mocks return what the test expects, not because the system actually does the right thing. When the real collaborator changes its contract, the mocked tests do not catch it.
 
-The rule: mock the boundary, not the interior. Mock the HTTP client at the edge of your code, mock the database driver at the boundary, but inside your own domain logic, prefer real objects. If "this would be hard without a mock" is the reason for the mock, that is usually a design signal — the code under test has more responsibilities than it should.
+The rule: mock the boundary, not the interior. Mock the HTTP client at the edge of your code, mock the database driver at the boundary, but inside your own domain logic, prefer real objects. If "this would be hard without a mock" is the reason for the mock, that is usually a design signal: the code under test has more responsibilities than it should.
 
 ### Scope creep at GREEN
 
@@ -149,7 +149,7 @@ Writing more implementation than the failing test demands, because "the next tes
 
 ### Refactor-on-red
 
-Restructuring the code while a test is failing. You lose the ability to localize problems — "did my restructuring break this, or was it already failing?" If you spot a refactor while red, write it on a sticky note (literal or metaphorical) and come back to it after GREEN.
+Restructuring the code while a test is failing. You lose the ability to localize problems: "did my restructuring break this, or was it already failing?" If you spot a refactor while red, write it on a sticky note (literal or metaphorical) and come back to it after GREEN.
 
 ### Skipping REFACTOR
 
@@ -159,23 +159,23 @@ The fix: end every two GREEN cycles by asking "do I see duplication that the nex
 
 ### Tautological test
 
-The assertion recomputes the expected value the same way the production code computes the actual value: `expect(formatPrice(n)).toBe(`${symbol}${n.toFixed(2)}`)`. The test and the code share the logic, so they share the bugs — the test passes when both are wrong. The tell: the test body imports or re-implements the formula under test.
+The assertion recomputes the expected value the same way the production code computes the actual value: `expect(formatPrice(n)).toBe(`${symbol}${n.toFixed(2)}`)`. The test and the code share the logic, so they share the bugs: the test passes when both are wrong. The tell: the test body imports or re-implements the formula under test.
 
 The fix: hand-derive the expectation and write it as a literal. `expect(formatPrice(1234.5)).toBe("$1,234.50")` can be wrong independently of the code, which is what makes it a check.
 
 ### Change-detector test
 
-`expect(MAX_RETRIES).toBe(5)` — a test that restates a constant or mirrors a config value. It fails only when someone *intentionally* changes the value, at which point they update the test to match. It detects change, not breakage, and trains everyone to treat red as "update the mirror."
+`expect(MAX_RETRIES).toBe(5)`: a test that restates a constant or mirrors a config value. It fails only when someone *intentionally* changes the value, at which point they update the test to match. It detects change, not breakage, and trains everyone to treat red as "update the mirror."
 
-The fix: test the *behavior* the value produces — "gives up after the fifth failure and surfaces the last error" — and let the constant be an implementation detail.
+The fix: test the *behavior* the value produces ("gives up after the fifth failure and surfaces the last error") and let the constant be an implementation detail.
 
 ### Asserting on incidental output
 
-Tests that fail when an error message is reworded, when a timestamp format changes, when a log line moves. These tests guard nothing — they just create maintenance load when the system improves. Assert on the contract, not the prose.
+Tests that fail when an error message is reworded, when a timestamp format changes, when a log line moves. These tests guard nothing; they just create maintenance load when the system improves. Assert on the contract, not the prose.
 
 ### "I'll come back and add a test"
 
-The cycle in which you write GREEN implementation and tell yourself you will write the test next. You will not. Even if you do, you have lost the design signal that comes from authoring the test first — you have authored implementation, then validated it against itself. RED before GREEN is not a procedural preference; it is the mechanism by which the test forces design pressure on the code.
+The cycle in which you write GREEN implementation and tell yourself you will write the test next. You will not. Even if you do, you have lost the design signal that comes from authoring the test first: you have authored implementation, then validated it against itself. RED before GREEN is not a procedural preference; it is the mechanism by which the test forces design pressure on the code.
 
 ---
 
@@ -183,13 +183,13 @@ The cycle in which you write GREEN implementation and tell yourself you will wri
 
 ### Existing legacy code with no tests
 
-You cannot write a failing test against code that already does the thing. The work here is not to retroactively TDD the entire codebase — that is busywork. The work is to **add a characterization test** that pins the current behavior (even if it is wrong), then make the change you actually wanted to make with a normal RED → GREEN cycle against the characterization baseline.
+You cannot write a failing test against code that already does the thing. The work here is not to retroactively TDD the entire codebase; that is busywork. The work is to **add a characterization test** that pins the current behavior (even if it is wrong), then make the change you actually wanted to make with a normal RED → GREEN cycle against the characterization baseline.
 
 If the legacy code is too entangled to test, you have a refactoring task before the TDD task. Extract a seam, write the characterization test against the seam, then proceed.
 
 ### Time pressure / production incident
 
-Strict TDD slows you down deliberately. In an active incident, that tradeoff inverts — speed matters more than discipline, and the post-incident write-up captures the test. The right move is:
+Strict TDD slows you down deliberately. In an active incident, that tradeoff inverts: speed matters more than discipline, and the post-incident write-up captures the test. The right move is:
 - Apply the smallest change that resolves the incident, even without a test.
 - Open a follow-up task to add the regression test before merging anything else into the affected area.
 - The regression test for the incident is non-negotiable; it is what prevents the same incident from recurring. Skipping the test "because we already fixed it" is how the same incident recurs in six weeks.
@@ -198,7 +198,7 @@ This is not permission to drop TDD in non-incident work because the work feels u
 
 ### UI / visual changes
 
-You cannot meaningfully RED a "the button should be more aligned" test. UI alignment is verified by looking at it. The TDD discipline still applies to the parts of UI code that have behavior — event handlers, state transitions, conditional rendering — and the test is for that behavior, not for pixels.
+You cannot meaningfully RED a "the button should be more aligned" test. UI alignment is verified by looking at it. The TDD discipline still applies to the parts of UI code that have behavior (event handlers, state transitions, conditional rendering), and the test is for that behavior, not for pixels.
 
 For pure visual work, the discipline is screenshot-based and the orchestration is: capture the current screenshot, make the change, capture the new screenshot, compare. This is verification, not TDD, but the principle (evidence before claim) is the same.
 
@@ -212,9 +212,9 @@ Both layers exist. The unit-level layer is where TDD lives; the integration laye
 
 ### Prototypes and exploratory spikes
 
-Code written to learn something and then thrown away is not subject to TDD. The whole point of a spike is to find out what you do not yet know — you cannot write a test for that. The discipline is:
+Code written to learn something and then thrown away is not subject to TDD. The whole point of a spike is to find out what you do not yet know; you cannot write a test for that. The discipline is:
 - Be explicit that this is a spike. Time-box it.
-- When the spike resolves what you wanted to learn, **throw it away**. Do not edit it into "production code" — that path produces untested code that masquerades as tested because the spike's existence creates the illusion of intent.
+- When the spike resolves what you wanted to learn, **throw it away**. Do not edit it into "production code"; that path produces untested code that masquerades as tested because the spike's existence creates the illusion of intent.
 - Start fresh with RED, using what the spike taught you.
 
 ---
@@ -236,7 +236,7 @@ The list is short on purpose. The instinct to say "TDD does not apply to *this* 
 
 ## Relationship to `develop`'s other phases
 
-- **Clarify** must reach 0 ambiguities before Build starts. If RED makes you discover an ambiguity ("what should this return when input is empty?"), that is a Clarify failure — go back, resolve, return.
+- **Clarify** must reach 0 ambiguities before Build starts. If RED makes you discover an ambiguity ("what should this return when input is empty?"), that is a Clarify failure: go back, resolve, return.
 - **Peer-review** reads the diff, not the cycle. The diff should tell the story by itself: tests added, implementation matching the tests, refactors visible as their own commits or commit-message lines.
 - **Verify** runs the full suite, not just this cycle's test. If the full suite was green before Build started and is not green now, something broke that this cycle's tests did not catch. That is a coverage gap; add the missing test before declaring Verify green.
 - **Finish** is downstream of all of this. The branch decision (merge / PR / keep) is about the work product; the discipline that produced it is the loop above.

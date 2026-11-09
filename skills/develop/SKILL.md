@@ -22,7 +22,7 @@ This file holds every gate, loop count and stop rule, small enough to survive co
 
 | Phase | Read at phase entry |
 |---|---|
-| Preflight | [`references/verification.md`](references/verification.md) (driver table) |
+| Preflight | [`references/verification.md`](references/verification.md) |
 | Clarify | [`references/grilling.md`](references/grilling.md) |
 | Route → PLAN | [`references/planning.md`](references/planning.md) |
 | Route → DIAGNOSE | [`references/diagnosis.md`](references/diagnosis.md) |
@@ -57,13 +57,13 @@ Banned in any completion claim; writing one means you have not verified: "should
 
 | Phase | Exit gate |
 |---|---|
-| Preflight | All environment checks pass — output observed |
+| Preflight | All environment checks pass (output observed) |
 | Clarify | Ambiguity checklist = 0 items AND user chose an approach AND playback shown AND user explicitly confirms |
 | Route (PLAN only) | User confirms plan file |
 | Build (per task) | The project's test command shows no failure beyond the Preflight baseline; every failure named |
 | Peer-review | Every Critical/Important finding addressed or explicitly user-deferred |
-| Verify | lint + typecheck + test + architecture review all green — output observed — AND the UI surface driven, or its absence stated |
-| Retrospective | Each qualifying channel (ADR / references / glossary / .out-of-scope/) reached an explicit user decision |
+| Verify | lint + typecheck + test + architecture review all green (output observed) AND the UI surface driven, or its absence stated |
+| Retrospective | Each qualifying channel (ADR / rules / glossary / .out-of-scope/ / checks) reached an explicit user decision |
 | Finish | git status clean after commit AND recorded rulings presented (or "none" stated) |
 
 ---
@@ -76,7 +76,7 @@ Two loops have hard caps: **DIAGNOSE fix attempts (3)** and **Peer-review fix �
 
 ## Cross-cutting rule: rulings, not stalls (Build through Verify)
 
-After the user confirms the approach, from **Build through Verify** (DIAGNOSE's Fix, PROTOTYPE's build and review triage included), when a non-catastrophic decision blocks progress, make the call, log `Ruling: <what> | why: <why> | cost if wrong: <cost>` (the plan's `## Progress`, else the run file), and keep going. Finish lists every ruling from that log: a ruling that dies with the session was a decision made in secret.
+After the user confirms the approach, from **Build through Verify** (DIAGNOSE's Fix, PROTOTYPE's build and review triage included), when a non-catastrophic decision blocks progress, make the call, log `Ruling: <what> | why: <why> | cost if wrong: <cost>` (the plan's `## Progress`, else the run file), and keep going. Finish lists them from that log; a ruling that dies with the session was made in secret.
 
 **Still stop and ask**, always, for these four classes:
 
@@ -91,16 +91,17 @@ Clarify, Route and plan confirmation belong to the user and stay blocking.
 
 ## Cross-cutting gate: user-facing communication style
 
-Every user-facing summary **MUST** gloss non-obvious identifiers on first mention (internal names, abbreviations, project terms): 5–15 characters in the user's language, e.g. `combineQuality(품질 등급 결합 함수)`. Skip standard terms, terms the user already used, and code blocks. Never send identifier soup (three or more un-glossed identifiers in one bullet) or a name glossed with itself. Depth: [`references/communication-style.md`](references/communication-style.md).
+Every user-facing summary **MUST** gloss non-obvious identifiers on first mention (internal names, abbreviations, project terms): 5–15 characters in the user's language. Skip standard terms, terms the user already used, and code blocks. Never send identifier soup (three or more un-glossed identifiers in one bullet) or a name glossed with itself. Depth: [`references/communication-style.md`](references/communication-style.md).
 
 ---
 
 ## Preflight: Environment check
 
 1. **Git repository** (`git rev-parse --git-dir`). Not a repo → **HALT**.
-2. **Test runner** (`package.json`, `Makefile`, `pyproject.toml`, …). None → **HALT**: strict TDD needs one; set it up, then re-run `/develop`. Report the command, run it once, and note the failures already present (the baseline).
-3. **Type checker** (`tsconfig.json`, `mypy.ini`, `pyrightconfig.json`) and 4. **linter** (`.eslintrc*`, `biome.json`, `ruff.toml`, `.flake8`), both optional. None → NOTE: Verify skips it.
+2. **Test runner**. None → **HALT**: strict TDD needs one; set it up, then re-run `/develop`. Report the command, run it once, and note the failures already present (the baseline).
+3. **Type checker** and 4. **linter**, both optional (detection files in `references/verification.md`). None → NOTE: Verify skips it.
 5. **UI surface and driver** (optional; detection table in `references/verification.md`). Report both; a surface without a driver is a NOTE: Verify uses substitute evidence.
+6. **Open follow-ups** in `$(git rev-parse --git-dir)/develop/follow-ups.md`: show them before Clarify; they go first.
 
 **Exit gate:** all checks ran, output observed, no HALT.
 
@@ -108,15 +109,15 @@ Every user-facing summary **MUST** gloss non-obvious identifiers on first mentio
 
 ## Clarify: Relentless questioning
 
-**Goal:** shared understanding with zero ambiguity. Invoked with a plan file path (`docs/plans/<github-id>/*.md`) → skip Clarify and Route; Build resumes it.
+Invoked with a plan file path (`docs/plans/<github-id>/*.md`) → skip Clarify and Route; Build resumes it after the resume check in `references/planning.md`.
 
-- Ask in **rounds** over a decision tree: each round presents every **frontier question** that changes the build (prerequisites settled), numbered, each with a **recommended answer** worded so "yes" accepts it (`1️⃣ **<title>**: … / ➡️ Recommended: …, because <why>`), `---` between questions, in plain text. Everything else is stated as `My call: X, because Y`; process choices are the agent's. If the request omits **why**, open with that one open question, no recommendation. If the user asked for one question at a time, send only the most-blocking one.
+- Ask in **rounds** over a decision tree: each round presents every **frontier question** that changes the build numbered, each with a **recommended answer** worded so "yes" accepts it (`1️⃣ **<title>**: … / ➡️ Recommended: …, because <why>`), `---` between questions. Everything else is stated as `My call: X, because Y`; process choices are the agent's. If the request omits **why**, open with that one open question, no recommendation. One at a time if the user asked.
 - **Facts are the agent's job; decisions are the user's.** Read the codebase instead of asking.
 - Scan `.out-of-scope/` first, if present. Read the glossary (`GLOSSARY.md`, else `CONTEXT.md`), if present, and challenge language that conflicts with it; propose a glossary entry **inline** the moment a term resolves.
 - **Checklist**, all five: scope boundaries, edge cases, term definitions, conflicts with existing code, success criteria and anti-goals (which test proves it, at **which seam**, each seam noted with what it catches, misses, and its speed; Build tests only at agreed seams).
 - **Approaches:** at checklist zero, 2-3 structurally different approaches with trade-offs, recommendation first (one viable → say why the others are not). No plan, routing or code before the user chooses.
 
-**Exit gate:** zero remaining ambiguities, approach chosen, a playback shown (`You decided:` / `My call:` / `Review focus:` lines; off PLAN it is saved in the run file as the spec), and the user explicitly confirms **"All ambiguities resolved, approach chosen. Proceed?"** Skip only when the user says "skip clarify", "requirements are clear", or "skip brainstorming"; never on the agent's own judgment.
+**Exit gate:** zero remaining ambiguities, approach chosen, a playback shown (`You decided:` / `My call:` / `Review focus:` lines; off PLAN it is saved in the run file as the spec), and the user explicitly confirms **"All ambiguities resolved, approach chosen. Proceed?"** Skip only when the user says "skip clarify", "requirements are clear", or "skip brainstorming"; never on the agent's own judgment. On a new project, a skip still states the build choices in one line.
 
 ---
 
@@ -129,7 +130,7 @@ Every user-facing summary **MUST** gloss non-obvious identifiers on first mentio
 | **DIAGNOSE** | Bug-first: errors, "something is broken" | Reproduce → Minimize → Investigate → Fix → Regression-prevent |
 | **PROTOTYPE** | Throwaway exploration: "which design fits" | Prototype branch → user review → Discard or Promote |
 
-**Ratchet, upgrades only.** One route at a time. When in doubt, take the heavier route; reaching for the lighter one to skip its ceremony is itself the doubt. "Small" measures the change and the repo, not your familiarity: an unfamiliar codebase or a new project is heavier by definition. A DIRECT run that uncovers hidden dependencies, shared state, or a growing task list stops at a clean point, keeps the work, writes the plan file for the rest (carrying over the run file's log), and gets confirmation. State every route change out loud. PRD-scale work is unsupported: suggest a PRD in `docs/prd/` split into several sessions.
+**Ratchet, upgrades only.** One route at a time. When in doubt, take the heavier route; reaching for the lighter one to skip its ceremony is itself the doubt. "Small" measures the change and the repo, not your familiarity: an unfamiliar codebase or a new project is heavier by definition. A DIRECT run that uncovers hidden dependencies, shared state, or a growing task list stops at a clean point, keeps the work, writes the plan file for the rest (carrying over the run file's log), and gets confirmation. State every route change out loud. PRD-scale work is unsupported: suggest a PRD in `docs/prd/` and several sessions.
 
 **DIRECT:** proceed to Build.
 
@@ -159,7 +160,7 @@ Every user-facing summary **MUST** gloss non-obvious identifiers on first mentio
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 ```
 
-Implementation written before its test is **deleted**: not kept as reference, not adapted, not commented out. A test written around existing code never failed, so it proves nothing.
+Implementation written before its test is **deleted**: not kept as reference, not adapted, not commented out.
 
 Per unit of work (one PLAN task, or the whole DIRECT change):
 1. **RED:** write the test, run it, **observe it fail** with the expected message. Unexpected pass → STOP and investigate. Unexpected error → fix the test.
@@ -173,8 +174,8 @@ Per unit of work (one PLAN task, or the whole DIRECT change):
 
 ## Peer-review: Independent diff review
 
-1. **Diff to a scratch file, working tree included:** `git add -N <new files>`, then `git diff BASE > <scratch>`. (`BASE..HEAD` misses uncommitted work.) Do not dispatch on an empty diff, or when `git merge-base --is-ancestor BASE HEAD` fails.
-2. **Dispatch a fresh reviewer**, a named agent type, never a fork (it inherits this conversation and ignores the model override). The first review runs on the most capable tier; re-review rounds on mid tier. Every round regenerates the scratch diff from BASE. Use the prompt template in `references/peer-review.md`; pass the spec, the diff and the rule files covering the changed paths **by path**. The reviewer also judges what a reasonable user would expect, and lists what it declined to judge; log each such line as a `Ruling:`.
+1. **Diff to a scratch file, working tree included:** `git add -N <new files>`, then `git diff BASE > <scratch>`. Do not dispatch on an empty diff, or when `git merge-base --is-ancestor BASE HEAD` fails.
+2. **Dispatch a fresh reviewer**, a named agent type, never a fork (it inherits this conversation and ignores the model override). The first review runs on the most capable tier; re-review rounds on mid tier. A re-review judges only the fix diff since the last round's snapshot (`references/peer-review.md`). No reviewer dispatchable at all → a labeled, logged self-review, disclosed at Finish. Use the prompt template in `references/peer-review.md`; pass the spec, the diff and the rule files covering the changed paths **by path**. Log each line it declined to judge as a `Ruling:`.
 3. **Triage:** **Critical** → fix now through the Build loop, then re-review. **Important** → fix unless the user explicitly defers. **Minor** → note, do not block. Push back on a wrong finding with reasoning; never agree performatively.
 
 **Circuit breaker: count fix → re-review rounds.** After the third round that still leaves Critical/Important findings, STOP: no round four. Hand the user the remaining findings and what was attempted, to rule on each (fix now / defer / reject).
@@ -185,7 +186,7 @@ Per unit of work (one PLAN task, or the whole DIRECT change):
 
 ## Verify: Comprehensive confirmation
 
-Run and read: (1) type checking and (2) lint, if present; (3) the full test suite (if it cannot run here, say so; it then runs before Finish or in CI); (4) architecture review of the changed files: single responsibility, naming conventions, dead code (issues → fix and re-run); (5) the UI surface, driven with Preflight's driver, or its absence stated.
+Run and read: (1) type checking and (2) lint, if present; (3) the full test suite (if it cannot run here, say so; it then runs before Finish or in CI); (4) architecture review of the changed files: single responsibility, naming conventions, dead code; (5) the UI surface, driven with Preflight's driver, or its absence stated.
 
 **Exit gate:** every check green (tests: nothing beyond the baseline) with output observed; no warning accepted without justification; "all checks pass" only after listing what ran and what it printed.
 
@@ -196,9 +197,10 @@ Run and read: (1) type checking and (2) lint, if present; (3) the full test suit
 After Verify, before Finish. Check each channel silently; propose only when its threshold is met and you can name the session moment that triggered it. Formats are in `references/retrospective.md`.
 
 1. **ADR** (`docs/adr/`): triple gate, all required: hard to reverse, surprising without context, a real trade-off. Never for bug fixes.
-2. **Discipline references** (`skills/develop/references/`): a new failure mode or edge case the reference does not cover.
-3. **Glossary** (`GLOSSARY.md` or `CONTEXT.md`, final sweep): a term introduced or contested this session and not deposited inline.
+2. **Discipline rules** (the repo's own rule files): a new failure mode or edge case they do not cover.
+3. **Glossary** (`GLOSSARY.md` or an existing `CONTEXT.md`; new ones are `GLOSSARY.md`; final sweep): a term introduced or contested this session and not deposited inline.
 4. **`.out-of-scope/`**: a rejection with a load-bearing reason that a future session will likely re-propose. One file per concept; a deferral is not a rejection.
+5. **Check** (lint rule, hook, test): a mechanical mistake this session. On accept, log `Follow-up:`; it is the next run's first task, never built after Verify.
 
 Propose one at a time, never batched, each `[y/edit/n]`. On accept, write and `git add` the file. If nothing qualifies, say *"Retrospective: no compounding-worthy artifacts this session."*
 
@@ -208,8 +210,8 @@ Propose one at a time, never batched, each `[y/edit/n]`. On accept, write and `g
 
 ## Finish: Commit and decide
 
-1. **Final commit** of uncommitted implementation changes (`git add <implementation files>`, `git commit -m "<type>: <description>"`); skip if none.
-2. **Session report**, built from the log, not memory: what was done, every `Ruling:` and deferred Minor, or "No rulings this session."
+1. **Final commit** of every path this run changed, deposits included: `git add <paths> && git commit -m "<type>: <description>" -- <paths>`, never `--amend`, then `git show --name-only HEAD`.
+2. **Session report**, built from the log, not memory: what was done, every `Ruling:`, deferred Minor and `Follow-up:`, or "No rulings this session."
 3. **Branch decision**, three options: **Local merge**, **Open PR** (body: Summary, Evidence before/after, Merge danger), **Keep branch**.
 
 **Discard is not on the menu.** A branch is deleted only when the user explicitly asks and then types the literal word `discard`; "yeah, get rid of it" does not count. No auto-merge or auto-push without the user's explicit choice.
@@ -221,7 +223,7 @@ Propose one at a time, never batched, each `[y/edit/n]`. On accept, write and `g
 ## Session boundaries and context hygiene
 
 - Keep Clarify through plan confirmation in one unbroken context: those decisions have no artifact yet.
-- When context runs long: continue; else end at a task boundary and resume with `/develop <plan-file>`; else dispatch scoped work to a subagent; compact last.
+- When context runs long: end at a task boundary and resume, or dispatch scoped work to a subagent; compact last.
 - **Compaction can also happen unchosen.** After one, apply the re-read rule and restate any loop count.
 
 **Abort:** completed work stays in the working tree; the user decides where to resume.

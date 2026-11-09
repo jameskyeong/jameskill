@@ -29,7 +29,11 @@ eval/
 │   ├── inline-gloss-discipline.mjs ← first-mention gloss + identifier-soup detection
 │   ├── version-sync.mjs            ← package.json ↔ marketplace.json
 │   ├── link-validity.mjs           ← markdown link target existence
-│   └── cross-cutting-gates-present.mjs ← skills declare/inherit develop gates
+│   ├── cross-cutting-gates-present.mjs ← skills declare/inherit develop gates
+│   ├── skill-size.mjs              ← every SKILL.md under 20,000 bytes (survives compaction)
+│   ├── skills-dir-clean.mjs        ← skills/ holds only SKILL.md + references/*.md
+│   ├── no-argument-placeholders.mjs ← no $1 / $ARGUMENTS in a SKILL.md body
+│   └── no-em-dash.mjs              ← no em-dash under skills/ or in README.ko.md
 └── fixtures/                       ← hand-written sample outputs
     ├── good-build-summary.md       ← positive — should pass declared checks
     ├── good-diagnose-conclusion.md ← positive

@@ -3,7 +3,7 @@
 Developer productivity skills for Claude Code. Built on two pillars:
 
 1. **`/develop`** — signature skill. Self-contained development orchestrator with auto-routing. One command drives the full flow.
-2. **Compound engineering, in one skill** — every session deposits durable artifacts in the repo across six channels: plan files (auto, PLAN route), regression tests (auto, DIAGNOSE route), CONTEXT.md domain glossary (inline, the moment a term resolves), ADRs / discipline references / `.out-of-scope/` rejection records (auto-prompted by the Retrospective phase). Bundled into one orchestrator — no skill composition required. The codebase gets *easier to work in* over time.
+2. **Compound engineering, in one skill** — every session deposits durable artifacts in the repo across seven channels: plan files (auto, PLAN route), regression tests (auto, DIAGNOSE route), the domain glossary (inline, the moment a term resolves), ADRs / discipline rules / `.out-of-scope/` rejection records / automated-check follow-ups (auto-prompted by the Retrospective phase). Bundled into one orchestrator — no skill composition required. The codebase gets *easier to work in* over time.
 
 The other skills (inspection) are supplementary utilities you can opt into.
 

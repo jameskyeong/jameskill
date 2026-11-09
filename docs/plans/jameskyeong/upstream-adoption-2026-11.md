@@ -6,7 +6,7 @@ Decide which methodology changes to take into `/develop`, `/security` and `/ship
 
 - Survey date: 2026-11-09.
 - Sources: the two public agent-skill methodology projects surveyed on 2026-08-13 (see [upstream-adoption-2026-08.md](upstream-adoption-2026-08.md)), read from their changes since that date. One project shipped five releases; the other landed 99 non-merge commits.
-- Status: **Groups A and B implemented (2026-11-09).** Group C items are proposals awaiting decisions. Non-PLAN routes keep their BASE, approved playback and log in a run file, `$(git rev-parse --git-dir)/develop/<slug>.md` (added while implementing B3 and B10).
+- Status: **Groups A, B and C implemented (2026-11-09)** (C5 rejected). Non-PLAN routes keep their BASE, approved playback and log in a run file, `$(git rev-parse --git-dir)/develop/<slug>.md` (added while implementing B3 and B10).
 
 ## Decision record (Group B)
 
@@ -31,6 +31,31 @@ Decided one item at a time with the author; implemented together once every B it
 | B15 | Adopt |
 
 Separate request during the session: every icon the skills print is a boxed emoji. PASS ✅, WARN 🟨, BLOCK and bad examples 🟥 (❎ was rejected because it is green like ✅), SKIP ⏭️, recommendation ➡️, question numbers 1️⃣ 2️⃣ …, security title ☑️, ship title ▶️. Quoted tool output and the quoted forbidden attribution line keep their original characters.
+
+## Decision record (Group C)
+
+Decided one item at a time with the author; implemented together once every C item is decided.
+
+| ID | Decision |
+|---|---|
+| C1 | Adopt, deferred build: Retrospective proposes the check (what it catches, where it hooks); on accept it is logged as `Follow-up:` and becomes the first task of the next `/develop` run, never built after Verify in the same run |
+| C2 | Adopt: re-review gets the full diff as context and the fix diff (changes since the last reviewed snapshot, taken without commit or stash) as its scope; per-finding addressed / not addressed; new findings outside the fix diff become `Minor (deferred)` |
+| C3 | Adopt |
+| C4 | Adopt, limited: offered only when the open question is visual (screens, layouts, flows, options that look different), at most once per Clarify |
+| C5 | Reject: our spec on PLAN is the ≤250-word playback, so every multi-task plan would read as "several times longer"; B6's two-direction step scan already catches transcribed bodies directly |
+| C6 | Adopt, extended: `## Approach` holds the chosen approach with why, one line per rejected approach, and the approved playback's `You decided:` / `My call:` lines, so PLAN keeps the record other routes keep in the run file |
+| C7 | Adopt: on resume, re-check the remaining tasks' Interfaces against current code; a mismatch is a recorded plan update (ruling if decidable, else a question); the check itself gets one `## Progress` line |
+| C8 | Adopt: long output goes to a file; reading it means the summary line, a search of the whole file for fail / error / skip, and the exit code; reading only the head and tail stays forbidden |
+| C9 | Adopt: inline review only when no fresh reviewer can be dispatched, labeled as not independent, logged as a `Ruling:`, and disclosed at Finish with a recommendation to get an independent review before merge |
+| C10 | Adopt: every dispatch prompt (reviewer template, subagent prompt construction) says do not invoke skills or dispatch further agents; do the task and report |
+| C11 | Adopt: wait for a report the next step consumes (review, a fact a decision waits on); never fill in a pending result; background only for work nothing waits on |
+| C12 | Adopt: checked first that no Channel 2 deposit ever landed outside this repo (only jameskill has `skills/develop/references/`; the installed plugin copy matches its tag). Channel 2 now writes to the consuming repo's own rule files (path-scoped rule dirs first, then CONTRIBUTING-style docs, CLAUDE.md only for pointers within the repo's line limit); `skills/develop/references/` only when developing this plugin; never the installed plugin copy |
+| C13 | Adopt as the default, not an edge case: path-scoped `git commit -m … -- <paths>`, no `--amend` inside develop (a new commit instead), confirm with `git show --name-only HEAD`; grouped with A3's no-stash rule |
+| C14 | Adopt: ship calls the Skill tool with `jsk:security`, waits for its full output, and never re-creates the checks itself (which would skip security's value masking) |
+| C15 | Adopt: Channel 2 trigger list gains process-failure moments (user corrections, redone or reverted work, re-reads after compaction, plan steps changed without a record, claims without evidence in the same turn, review points acknowledged but not acted on); thresholds unchanged |
+| C16 | Adopt: eval fails on any file under `skills/` other than `SKILL.md` and `references/*.md`, and on `$<digit>` or `$ARGUMENTS` in a SKILL.md body |
+| C17 | Adopt: a glossary created from scratch is `GLOSSARY.md`; skill text says "the glossary (new: GLOSSARY.md; existing: whichever file is there)"; this repo keeps its own `CONTEXT.md` |
+| C18 | Adopt, scoped: every em-dash under `skills/` (475 at decision time) and in `README.ko.md` is rewritten by hand, sentence by sentence (no blind substitution); an eval check keeps both free of em-dashes. English README, CLAUDE.md, CONTEXT.md and historical docs stay as they are |
 
 ## How to read this
 
