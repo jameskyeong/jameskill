@@ -26,7 +26,7 @@ Inspects **the current project** for service-configuration security holes that c
 
 Run the 3 checks below in order. For each check:
 - If the relevant stack is **not used** in this project, output `⏭️  SKIP (not applicable)` — this is **not** a failure.
-- Otherwise output `✅ PASS`, `⚠️  WARN`, or `❌ BLOCK` with **file:line evidence** and a **one-line fix suggestion**.
+- Otherwise output `✅ PASS`, `🟨 WARN`, or `🟥 BLOCK` with **file:line evidence** and a **one-line fix suggestion**.
 
 Collect all results and print the summary block at the end.
 
@@ -71,16 +71,16 @@ Look in `supabase/migrations/*.sql`, `schema.sql`, or Prisma/Drizzle schema file
    **The verdict depends on which strategy produced the data:**
 
    - **Strategy A (CLI `db dump` — authoritative):** the dump reflects the database's real state, including RLS enabled via the dashboard.
-     - No RLS on a user-data table → `❌ BLOCK` (confirmed off)
-     - RLS on, **zero policies** → `✅ PASS`. RLS with no policies *fails closed* (deny-all) — that is safe, not a hole. (Optionally `⚠️  WARN` only if the table is clearly meant to be readable and now isn't.)
-     - RLS on, policy `USING (true)` / `USING (1=1)` on a user-data table → `❌ BLOCK` (effectively public)
+     - No RLS on a user-data table → `🟥 BLOCK` (confirmed off)
+     - RLS on, **zero policies** → `✅ PASS`. RLS with no policies *fails closed* (deny-all) — that is safe, not a hole. (Optionally `🟨 WARN` only if the table is clearly meant to be readable and now isn't.)
+     - RLS on, policy `USING (true)` / `USING (1=1)` on a user-data table → `🟥 BLOCK` (effectively public)
      - RLS on, policy scoped by `auth.uid()` → `✅ PASS`
 
    - **Strategy B (migration-file fallback — NOT authoritative):** RLS is very commonly enabled via the Supabase dashboard, which never appears in migration SQL. Absence of an `ENABLE ROW LEVEL SECURITY` statement does **not** prove RLS is off.
-     - No RLS statement found for a user-data table → `⚠️  WARN`: "RLS not found in migrations — confirm it's enabled in the Supabase dashboard." **Never BLOCK from Strategy B** — you cannot distinguish "off" from "set elsewhere".
-     - Policy `USING (true)` found in a migration on a user-data table → `❌ BLOCK` (an explicit public policy *is* authoritative even in Strategy B)
+     - No RLS statement found for a user-data table → `🟨 WARN`: "RLS not found in migrations — confirm it's enabled in the Supabase dashboard." **Never BLOCK from Strategy B** — you cannot distinguish "off" from "set elsewhere".
+     - Policy `USING (true)` found in a migration on a user-data table → `🟥 BLOCK` (an explicit public policy *is* authoritative even in Strategy B)
 
-3. Tables that are clearly public reference data (e.g. `countries`, `plans`, `categories`) with RLS off → `⚠️  WARN` (intentional is plausible, confirm with user).
+3. Tables that are clearly public reference data (e.g. `countries`, `plans`, `categories`) with RLS off → `🟨 WARN` (intentional is plausible, confirm with user).
 
 **Fix suggestion template:**
 > `ALTER TABLE <table> ENABLE ROW LEVEL SECURITY;` then add a policy: `CREATE POLICY "owner_only" ON <table> USING (auth.uid() = user_id);`
@@ -114,12 +114,12 @@ grep -rnoE "(NEXT_PUBLIC_|VITE_|PUBLIC_)[A-Z_]*(SECRET|SERVICE_ROLE|SERVICE_KEY|
 
 ### What to flag
 
-1. **`NEXT_PUBLIC_*` / `VITE_*` / `PUBLIC_*` env var whose name contains `SECRET`, `SERVICE_ROLE`, `SERVICE_KEY`, `PRIVATE_KEY`, or `SK` as a whole token (`_SK_` / `_SK`)** → `❌ BLOCK`. The public prefix forces the value into the client bundle. Do **not** flag names where `SK` is part of a word (`TASK`, `DISK`, `RISK`, `MASK`) — those are ordinary public vars.
-2. **A secret key (`sk_live_`, `sk_test_`, `SUPABASE_SERVICE_ROLE_KEY`, `service_role`) referenced in a file that is client-reachable** → `❌ BLOCK`.
+1. **`NEXT_PUBLIC_*` / `VITE_*` / `PUBLIC_*` env var whose name contains `SECRET`, `SERVICE_ROLE`, `SERVICE_KEY`, `PRIVATE_KEY`, or `SK` as a whole token (`_SK_` / `_SK`)** → `🟥 BLOCK`. The public prefix forces the value into the client bundle. Do **not** flag names where `SK` is part of a word (`TASK`, `DISK`, `RISK`, `MASK`) — those are ordinary public vars.
+2. **A secret key (`sk_live_`, `sk_test_`, `SUPABASE_SERVICE_ROLE_KEY`, `service_role`) referenced in a file that is client-reachable** → `🟥 BLOCK`.
    - **Client-reachable** = the file has `"use client"` at the top, OR is imported by such a file. In the Next.js App Router, components are Server Components *by default* — a secret in an ordinary `app/` or `components/` file with **no** `"use client"` directive is server-only and **safe** (`✅ PASS`). The discriminating signal is the *presence* of `"use client"`, not the absence of a server marker.
    - **Server-only (safe → `✅ PASS`):** `app/api/**/route.ts`, files importing `server-only`, `getServerSideProps`, server actions, and any `app/` file without `"use client"`.
-   - **If you cannot trace whether a file reaches the client** (mixed import graph, unclear) → downgrade to `⚠️  WARN` with reason "can't confirm whether this file reaches the client bundle". Do not BLOCK on a guess.
-3. A hard-coded literal key (starts with `sk_live_`/`sk_test_` as a string literal, not an env reference) **anywhere** → `❌ BLOCK` (should be an env var regardless of context).
+   - **If you cannot trace whether a file reaches the client** (mixed import graph, unclear) → downgrade to `🟨 WARN` with reason "can't confirm whether this file reaches the client bundle". Do not BLOCK on a guess.
+3. A hard-coded literal key (starts with `sk_live_`/`sk_test_` as a string literal, not an env reference) **anywhere** → `🟥 BLOCK` (should be an env var regardless of context).
 
 **Fix suggestion template:**
 > Move the secret to a server-only env var (drop the `NEXT_PUBLIC_` prefix) and read it only inside API routes / server actions. Rotate the key — it has already shipped to clients.
@@ -153,9 +153,9 @@ For each file that handles an incoming Stripe webhook (an API route reading a PO
 grep -n "constructEvent\|stripe.webhooks.constructEvent" <file>
 ```
 
-- **No `constructEvent` call** in the webhook handler → `❌ BLOCK`. The endpoint trusts unsigned input.
+- **No `constructEvent` call** in the webhook handler → `🟥 BLOCK`. The endpoint trusts unsigned input.
 - `constructEvent` present and passed the raw body + signature header + webhook secret → `✅ PASS`.
-- `constructEvent` present **but** the body is parsed as JSON before verification (signature needs the *raw* body) → `⚠️  WARN` (verification will fail or be bypassed). Look for `await req.json()` / `express.json()` applied before the verify call.
+- `constructEvent` present **but** the body is parsed as JSON before verification (signature needs the *raw* body) → `🟨 WARN` (verification will fail or be bypassed). Look for `await req.json()` / `express.json()` applied before the verify call.
 
 **Fix suggestion template:**
 > Verify the signature before trusting the event:
@@ -169,19 +169,19 @@ grep -n "constructEvent\|stripe.webhooks.constructEvent" <file>
 After all checks, print:
 
 ```
-🔒 SECURITY-CHECK — <project name>
+☑️ SECURITY-CHECK — <project name>
 
 Check 1 — Supabase RLS:          <status>
 Check 2 — Secret key exposure:   <status>
 Check 3 — Stripe webhook:        <status>
 
-❌ Blocking (<n>):
+🟥 Blocking (<n>):
   • [RLS] Table `users` has RLS disabled — supabase/migrations/0003_users.sql:12
     → ALTER TABLE users ENABLE ROW LEVEL SECURITY; + owner policy
   • [Secret] STRIPE_SECRET referenced in client component — components/Checkout.tsx:8
     → Move to API route, rotate the key
 
-⚠️  Warnings (<n>):
+🟨 Warnings (<n>):
   • ...
 
 For a GO/NO-GO verdict, run /jsk:ship.
@@ -203,11 +203,11 @@ If a check found nothing actionable, show it as `✅ PASS` or `⏭️  SKIP`. Ne
 When findings or summaries mention service-specific terms, env vars, or abbreviations (`RLS`, `anon-key`, `service-role key`, `STRIPE_SECRET`, `webhook-sig`, etc.), append a short parenthetical gloss (5–15 chars in the response language) on first mention. The user must be able to act on a finding without grepping.
 
 ```
-✗ [RLS] Table `users` has RLS disabled
-✓ [RLS] Table `users` has RLS(행 단위 권한) disabled
+🟥 [RLS] Table `users` has RLS disabled
+✅ [RLS] Table `users` has RLS(행 단위 권한) disabled
 
-✗ STRIPE_SECRET referenced in client component
-✓ STRIPE_SECRET(서버 전용 결제 시크릿) referenced in client component
+🟥 STRIPE_SECRET referenced in client component
+✅ STRIPE_SECRET(서버 전용 결제 시크릿) referenced in client component
 ```
 
 Skip glossing terms the user already used, terms inside code blocks, and standard programming words. Develop's [`communication-style.md`](../develop/references/communication-style.md) holds the full discipline.

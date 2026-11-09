@@ -152,7 +152,7 @@ Two pieces of work are genuinely independent:
 Examples that work:
 - Search the codebase for usages of pattern A; in parallel, search for usages of pattern B.
 - Audit module X against standards; in parallel, audit module Y against standards.
-- Read CLAUDE.md for relevant rules; in parallel, read CONTEXT.md for relevant glossary.
+- Read CLAUDE.md for relevant rules; in parallel, read the glossary (GLOSSARY.md or CONTEXT.md).
 
 ### How to fan back in
 

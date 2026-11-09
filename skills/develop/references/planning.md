@@ -44,24 +44,37 @@ actually reach per-task execution.
 ### Task N: <title>
 - **What**: description of the change
 - **Interfaces**: what this task consumes from / produces for other tasks — exact signatures
-- **Test**: what test to write first (RED step)
-- **Implement**: what code to write (GREEN step)
-- **Verify**: how to confirm it works
+- **Test**: test name + the assertions it makes, with the spec's exact values (RED step)
+- **Implement**: signature + file + the spec's values; a body only for an algorithm the signature and tests do not determine (GREEN step)
+- **Verify**: the command and its passing output
 - **Commit**: commit message
 
 ## Dependencies
 Which tasks depend on which.
 
+## Review focus
+Up to five inputs or failure modes the spec implies but no task's test exercises yet,
+each pinned by a test in the task that owns the code. Handed verbatim to the reviewer.
+
 ## Out of scope
 What this plan deliberately does NOT cover.
+
+## Progress
+BASE: <docs-checkpoint sha>
+(Appended during Build, never edited before it. One line per event.)
 ```
 
-**No placeholders.** A plan containing "TBD", "add appropriate error handling", "write tests for the above" (without naming them), "similar to Task N" (repeat the content instead), or references to types no task defines is not finished. Resolve the gap or return to Clarify before presenting.
+**A step records decisions, not code.** A plan fails in two directions:
+
+- **Lines that decide nothing:** "TBD", "add appropriate error handling", "write tests for the above" (without naming them), references to types no task defines. Resolve the gap or return to Clarify before presenting.
+- **Bodies the signature already determines:** writing out code a capable implementer would produce from the signature and the test. That turns the plan into a transcript of the implementation, takes several times as long to write, and invites building the project while planning it.
+
+A reference to another task goes through that task's **Interfaces** block ("uses `validateToken` from Task 2's Interfaces"), not a copy of its code.
 
 **Docs checkpoint.** After the user confirms the plan, commit uncommitted documentation before building:
 
 ```bash
-git add CONTEXT.md docs/adr/ docs/plans/ <other-doc-paths>
+git add <glossary file> docs/adr/ docs/plans/ <other-doc-paths>
 git commit -m "docs: capture context for <feature>"
 ```
 
@@ -69,9 +82,26 @@ Record this commit's SHA in the plan file (`BASE: <sha>`): it is the run's revie
 
 ---
 
+## The run log
+
+**Two parts, kept apart.** Everything above `## Progress` is the contract and changes only through a recorded plan update. `## Progress` is the log, appended from Build on and committed with each task.
+
+Routes without a plan file keep the same log in the **run file**, `$(git rev-parse --git-dir)/develop/<slug>.md`: untracked, so it never lands in a commit, yet on disk, so it survives compaction and a new session. Its first lines are `BASE: <sha>` and the approved Clarify playback (the spec the reviewer reads).
+
+Log lines:
+
+- `Task N: complete, commit "<message>" (red: <the failure line RED showed> → green: <the test command's summary line>)`, written only after the passing run was observed. The red line is what the PR's before-and-after evidence quotes later.
+- `Ruling: <what> | why: <why> | cost if wrong: <cost>` for every ruling made from Build through Verify.
+- `Ruling (declined to judge): <behavior>: <decision> | why: <why> | cost if wrong: <cost>` for each behavior the reviewer set aside.
+- `Minor (deferred): <finding>` for each Minor review finding left for later.
+
+Conversation memory does not survive compaction; the log does. Finish builds its report from it, and a resumed session starts from it. When the ratchet upgrades a DIRECT run to PLAN, copy the run file's lines into the new plan's `## Progress` first, so the report keeps the rulings made before the upgrade.
+
+---
+
 ## Anatomy of a good plan file
 
-The template above names the sections: Goal, Global constraints, Tasks, Dependencies, Out of scope. Plus per-task structure (What / Interfaces / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
+The template above names the sections: Goal, Global constraints, Tasks, Dependencies, Review focus, Out of scope, and the Progress log. Plus per-task structure (What / Interfaces / Test / Implement / Verify / Commit). Here is what makes each section actually load-bearing.
 
 ### Goal — one sentence
 
@@ -95,8 +125,8 @@ Each task carries six fields:
 
 - **What** — one sentence describing the change.
 - **Interfaces** — what this task consumes from other tasks and produces for them, as exact signatures (`consumes: createToken(userId: string): Token from Task 2; produces: validateToken(raw: string): Claims`). A task is executed with attention on that task alone — this block is how it learns its neighbors' names and types. Vague interfaces ("uses the token helper") are how two tasks each invent half of a mismatched contract.
-- **Test** — the failing test (or test name) that drives this task.
-- **Implement** — the surface that will change to make the test pass.
+- **Test** — the failing test's name and the assertions it makes, with the spec's exact values (`rejects_expired_token: validateToken(expiredRaw) throws TokenExpired`).
+- **Implement** — the exact signature, the file, and the spec's values. Include a body only for an algorithm the signature and tests do not determine; the reader is a capable engineer who writes idiomatic code once the interface and the test are fixed.
 - **Verify** — the specific command and the observed output that proves the task is done.
 - **Commit** — the commit message for this task (per `references/finishing.md` conventions).
 
@@ -180,11 +210,12 @@ The payoff compounds with develop's own machinery: any session boundary between 
 
 ## Inline self-review — the last step before presenting
 
-After writing the plan and before presenting it to the user, the orchestrator reviews its own document. Three sweeps:
+After writing the plan and before presenting it to the user, the orchestrator reviews its own document. Four sweeps:
 
-1. **Placeholder scan** — search for "TBD", "TODO", "appropriate", "as needed", "similar to Task", "etc." — each hit is an unfinished decision to resolve or take back to Clarify.
+1. **Step scan, both directions** — search for "TBD", "TODO", "appropriate", "as needed", "etc." (lines that decide nothing), and for code bodies a signature and test already determine (lines that transcribe). Each hit is resolved, cut to a signature, or taken back to Clarify.
 2. **Interface consistency** — every signature a task *consumes* is *produced*, with the same name and types, by a task it depends on. Mismatches here are precisely the bugs that surface three tasks later.
 3. **Coverage sweep** — every requirement from Clarify's output maps to some task. An uncovered requirement is a plan gap; an unmapped task is scope creep at write-time.
+4. **Review focus** — list the inputs and failure modes the spec implies but never names (empty, huge, duplicate, concurrent, unauthorized), keep up to five that no task's test exercises, and pin each with a test in the task that owns the code. The spec's silence on an input is not permission for that input to break the program.
 
 This is done inline, never by a dispatched subagent. The upstream result is worth recording: subagent review of plan *documents* was measured (5×5 regression trials) to double wall-clock time at identical quality — inline self-review catches the same real defects in seconds. (This says nothing about *code* review, where the independence of a fresh reviewer earns its cost — see `references/peer-review.md`.)
 
@@ -214,7 +245,7 @@ The fix: every task has a "Verify" line naming the exact command and the expecte
 
 "Task 4: add appropriate error handling." "Task 6: write tests for the above." "Task 7: same as Task 3 but for orders." Each of these defers a decision to Build time, which means Build stalls or improvises — and improvisation at Build is exactly what the plan exists to prevent. "Similar to Task N" is the sneakiest form: it feels like brevity but forces the executor to re-derive the content, and the two derivations drift.
 
-The fix: the plan is finished only when every task could be executed by someone with no access to the planning conversation. Repeat content instead of referencing it; name the tests instead of gesturing at them; resolve "appropriate" into the actual behavior.
+The fix: the plan is finished only when every task could be executed by someone with no access to the planning conversation. Point at the other task's Interfaces block instead of "similar to"; name the tests and their assertions instead of gesturing at them; resolve "appropriate" into the actual behavior.
 
 ### Hidden dependencies
 
@@ -249,7 +280,7 @@ The fix: every plan has the Out of scope section, even if it is short. "Out of s
 Build is on Task 3 and discovers Task 5 depends on a surface that does not exist. Build is under the rulings-not-stalls rule (`SKILL.md`), so the question is whether the fix is decidable:
 
 - Finish the current task first (do not start Task 5 yet).
-- **Decidable** (the smallest change that satisfies the spec is clear, e.g. add Task 4.5 to create surface X): make the call, record `Ruling: added Task 4.5 (create surface X) — Task 5 needs it — cost if wrong: one extra task to revert`, update the plan file ("Updated: added Task 4.5. Ruling, <timestamp>."), and continue.
+- **Decidable** (the smallest change that satisfies the spec is clear, e.g. add Task 4.5 to create surface X): make the call, log `Ruling: added Task 4.5 (create surface X) | why: Task 5 needs it | cost if wrong: one extra task to revert` in `## Progress`, update the plan file ("Updated: added Task 4.5. Ruling, <timestamp>."), and continue.
 - **Not decidable** (every option changes what the user asked for, or a stop class applies): stop and surface it: "Task 5 needs surface X, which the plan did not include. Options: add Task 4.5, or restructure Task 5 to not need it." Update the plan with the user's choice.
 
 Either way the change is logged in the plan file, not silently absorbed. The plan stays the truth.
@@ -277,10 +308,9 @@ Build executes Task 3 and the test the plan named cannot be written, or fails fo
 
 The session ends after Task 4. The user resumes hours or days later with `/develop docs/plans/<github-id>/<feature>.md`. The discipline:
 
-- Re-read the plan file as the source of truth.
-- Scan the working tree to detect which tasks have already been completed (test files exist, commits present).
-- Identify the first incomplete task by scanning the plan top-down for "no commit yet" or "no test file yet."
-- Resume from that task; do not re-do completed ones.
+- Re-read the plan file as the source of truth, `## Progress` first: its `BASE:` line and its `Task N: complete` lines say where the run stands.
+- Check the working tree against it (the listed commits exist, the tests named there pass). The log wins over memory; the working tree breaks a tie only when the log is missing a line.
+- Resume from the first task with no completion line; do not re-do completed ones. At each task's start, re-read that task's section of the plan: what you remember of it is a summary.
 - If the working tree shows partial progress on an incomplete task, surface it to the user: "Task 5 has partial state in the working tree. Continue from here, or revert and restart Task 5?"
 
 The plan file makes resume mechanical. Without the plan file, resume would require the user to reconstruct mental state.

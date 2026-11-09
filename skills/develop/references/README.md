@@ -6,11 +6,13 @@ Reading the phase's module at phase entry is **mandatory** — `SKILL.md`'s refe
 
 See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationale.
 
+**Why the description is trigger-only.** `SKILL.md`'s frontmatter description names only when to use the skill; the pipeline summary lives in the body. A workflow summary in the description makes agents follow the summary and skip the body's gates.
+
 ## Phase mapping
 
 | Develop phase | Reference module | One-line summary |
 |---|---|---|
-| Preflight | _(inline in SKILL.md)_ | Mechanical environment check; no separate discipline |
+| Preflight | _(inline in SKILL.md)_ + [`verification.md`](verification.md) | Mechanical environment check; the UI surface and driver table lives in `verification.md` |
 | **Clarify** | [`grilling.md`](grilling.md) | Ambiguity as load-bearing signal; frontier-round questioning; 5-category checklist deepened |
 | **Route → PLAN** | [`planning.md`](planning.md) | Plan file as contract; task sizing; dependencies; out-of-scope as scope guard |
 | **Route → DIAGNOSE** | [`diagnosis.md`](diagnosis.md) | Bug-first workflow: Reproduce → Minimize → Investigate → Fix → Regression-prevent |
@@ -18,7 +20,7 @@ See [ADR 0005](../../../docs/adr/0005-forge-depth-references.md) for the rationa
 | **Build** | [`tdd-discipline.md`](tdd-discipline.md) | RED/GREEN/REFACTOR exit conditions; anti-patterns; legacy / incidents / UI / integration edges |
 | **Peer-review** | [`peer-review.md`](peer-review.md) | Independence vs author bias; two-axis review; sharpened severity definitions |
 | **Verify** (cross-cutting) | [`verification.md`](verification.md) | Evidence before assertion; expanded forbidden language; per-phase evidence catalog |
-| **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — four channels (ADR / references / CONTEXT.md sweep / .out-of-scope/), per-channel thresholds, performative-deposit anti-patterns |
+| **Retrospective** | [`retrospective.md`](retrospective.md) | Compound-engineering deposit at session end — four channels (ADR / references / glossary sweep / .out-of-scope/), per-channel thresholds, performative-deposit anti-patterns |
 | **Finish** | [`finishing.md`](finishing.md) | The three-option branch menu plus request-only Discard; commit discipline; git-safety anti-patterns |
 | _Cross-cutting_ | [`subagent-patterns.md`](subagent-patterns.md) | When and how to dispatch subagents without abdicating responsibility |
 | _Cross-cutting_ | [`communication-style.md`](communication-style.md) | Inline-gloss discipline for user-facing summaries — what to gloss, length budget, per-phase patterns, anti-patterns |
