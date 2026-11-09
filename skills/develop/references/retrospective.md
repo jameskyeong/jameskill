@@ -128,7 +128,7 @@ Append? [y/edit/n]
 Trigger signals (any of):
 - A Clarify approach or scope item the user explicitly excluded, with reasoning recorded nowhere else.
 - A Peer-review or Retrospective proposal the user declined for a reason that will still hold next time.
-- A feature request (via `resolve`) closed as wontfix with rationale.
+- A feature request closed as wontfix with rationale.
 
 Not an out-of-scope entry:
 - Deferrals — "later" is not "rejected"; a deferred item belongs in an issue, not here.
@@ -207,10 +207,6 @@ Retrospective is for *compounding artifacts* — durable deposits that lift futu
 ### Multiple sessions of the same plan
 
 If `/develop docs/plans/<github-id>/<feature>.md` resumes a prior session, the Retrospective runs on the *completed-this-session* tasks, not the whole plan. The threshold checks compare against the project state, not the session boundary — if the prior session already deposited an ADR for this feature's architectural choice, this session does not propose a duplicate.
-
-### Resolve-issue-caller integration
-
-When `/develop` is invoked by `/resolve`, the Retrospective still runs. Deposits proposed here are independent of the Notion status update `resolve` performs after Finish. An ADR or reference deposit may happen even if the issue itself is rejected by the user during `resolve`.
 
 ### PROTOTYPE Discard
 

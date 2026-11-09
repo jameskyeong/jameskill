@@ -5,7 +5,7 @@ Developer productivity skills for Claude Code. Built on two pillars:
 1. **`/develop`** — signature skill. Self-contained development orchestrator with auto-routing. One command drives the full flow.
 2. **Compound engineering, in one skill** — every session deposits durable artifacts in the repo across six channels: plan files (auto, PLAN route), regression tests (auto, DIAGNOSE route), CONTEXT.md domain glossary (inline, the moment a term resolves), ADRs / discipline references / `.out-of-scope/` rejection records (auto-prompted by the Retrospective phase). Bundled into one orchestrator — no skill composition required. The codebase gets *easier to work in* over time.
 
-The other skills (issue tracking, inspection) are supplementary utilities you can opt into.
+The other skills (inspection) are supplementary utilities you can opt into.
 
 ## Signature skill
 
@@ -18,15 +18,9 @@ The other skills (issue tracking, inspection) are supplementary utilities you ca
 - **`/security`** — Inspect a project for service-configuration security holes (Supabase RLS gaps, secret-key client exposure, missing webhook signature verification). Reports PASS/WARN/BLOCK with fix suggestions.
 - **`/ship`** — One-line GO / NO-GO deploy verdict. Aggregates inspection findings (currently `/security`) into a single binary decision.
 
-### Notion issue tracking (optional integration)
-
-- **`/tracker`** — Configure Notion API key, connect databases, detect templates, set defaults.
-- **`/report`** — Report issues to a Notion database. Parses prompts, verifies against codebase, creates pages with proper template blocks.
-- **`/resolve`** — Fetch pending issues, brainstorm solutions (invokes `/develop` internally), implement fixes, update status.
-
 ## Configuration
 
-Only the Notion tracking skills require configuration. Each project stores its config in `.claude/tracking-issue.json` (gitignored). Run `/tracker` to create it. `/develop`, `/security`, `/ship` need no setup.
+No skill requires configuration — `/develop`, `/security`, `/ship` need no setup.
 
 See `CONTEXT.md` for domain glossary and `docs/adr/` for architectural decisions.
 
@@ -34,7 +28,6 @@ See `CONTEXT.md` for domain glossary and `docs/adr/` for architectural decisions
 
 - **`/develop`** — no external dependencies.
 - **`/security`, `/ship`** — no external dependencies.
-- **`/tracker`, `/report`, `/resolve`** (Notion integration only) — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
 
 ## Versioning policy
 

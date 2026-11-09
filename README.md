@@ -36,7 +36,7 @@ The common shape for agent skills is a toolbox: one skill per discipline — bra
 2. **Auto-routing by intent.** After Clarify, `/develop` *infers* what kind of work this is and picks one of 4 routes. You don't choose; it decides.
 3. **Different phase shapes per route.** DIAGNOSE writes the reproduction test before the fix. PROTOTYPE relaxes TDD on purpose. These aren't relabeled flows — they're different phase orders.
 4. **No-soft-language verification.** Every phase boundary rejects "should work", "seems fine", "looks good". Verification means running the command and observing the output.
-5. **Tracker-free core.** Develop itself never reads or writes Notion. Issue tracking is a separate, opt-in surface.
+5. **Tracker-free core.** Develop itself never reads or writes Notion.
 6. **Self-contained.** Zero external skill dependencies — every discipline lives inside `skills/develop/references/`, versioned with the plugin and editable per project. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
 
 ### Pillar 2 — Compound engineering, in one skill
@@ -73,7 +73,6 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 
 - **Resume mid-flow** — `/develop docs/plans/<github-id>/<feature>.md` re-enters the plan, skips Clarify+Route, picks up from the first incomplete task.
 - **Skip Clarify** — say "skip clarify" or "requirements are clear" when you've already specced the work.
-- **Called from `/resolve`** — the Notion issue title + body seeds Clarify automatically.
 
 ### Phases at a glance
 
@@ -105,18 +104,6 @@ Ships in v2.0 but not the v2.0 headline — the author doesn't use them daily an
 
 > **Framework note**: `/security`'s secret-key check assumes a Next.js-style client/server boundary. SvelteKit / Nuxt / Remix may receive false PASSes on that specific check — manual review recommended for those stacks until framework-specific detection lands.
 
-### 🗂 Notion issue tracking (optional integration)
-
-Notion-backed issue lifecycle. From a Slack-pasted blob of bug reports to grouped, codebase-verified tickets — and back out into shippable fixes.
-
-| Command | What it does |
-|---|---|
-| `/tracker` | One-time Notion connection — API key, database, property mapping, defaults |
-| `/report` | Parse a prompt into issues, auto-group related items, verify against the codebase, create pages |
-| `/resolve` | Pick a pending issue, call `/develop` to implement, update status with a human-readable outcome note |
-
-**Why it's different** — issue titles are written as user-visible problems, not git commit messages. Cross-functional readers (PMs, support, customers) can scan the tracker without engineering context.
-
 ## Installation
 
 ```bash
@@ -137,7 +124,6 @@ claude plugins install jsk
 
 - [Claude Code](https://claude.ai/claude-code) — required for all skills.
 - **`/develop`, `/security`, `/ship`** — no external dependencies.
-- **`/tracker`, `/report`, `/resolve`** — `curl`, `jq`, and a [Notion Internal Integration](https://www.notion.so/my-integrations) token.
 
 ## License
 

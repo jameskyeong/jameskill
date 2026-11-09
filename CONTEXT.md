@@ -70,20 +70,6 @@ _Avoid_: harden (v1 name, retired), lock (v2.0 name, retired), production-readin
 Alpha utility (`/jsk:ship`) that issues a **security** GO / NO-GO verdict from `security`'s findings. v0.1 is deliberately security-only — there is no design / quality / performance axis, and multi-axis aggregation is not promised (see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)). Ships in v2.0 but is **off the marketing surface** for the same reason as security (see ADR 0004). The output reads "LAUNCH READY?". Future direction tied to whether post-launch users ask for it.
 _Avoid_: ship-ready (v1 name, retired), launch (v2.0 name, retired), production-readiness gate (deferred from v2.0 surface), multi-axis aggregator (overclaims v0.1 — that framing was retired in ADR 0010), ship-check (alpha.13–16 name, retired — ADR 0015).
 
-### Issue tracking
-
-**Tracker**:
-The tracker uplink skill (`/jsk:tracker`). One-time Notion connection — API key, database, property mapping, defaults.
-_Avoid_: setup-issue (v1 name, retired), link (v2.0 name, retired), tracker-setup (alpha.13–16 name, retired — ADR 0015)
-
-**Report**:
-The issue flagging skill (`/jsk:report`). Parses a prompt into Notion issues, auto-groups related items, verifies against the codebase, creates pages with proper template blocks.
-_Avoid_: tag (v2.0 name, retired), report-issue (alpha.13–15 name, retired — ADR 0014), tracker-report (alpha.16 name, retired — ADR 0015)
-
-**Resolve**:
-The issue resolution skill (`/jsk:resolve`). Fetches pending issues, brainstorms solutions via **develop**, implements fixes, updates Notion status.
-_Avoid_: strike (v2.0 name, retired), resolve-issue (alpha.13–15 name, retired — ADR 0014), tracker-resolve (alpha.16 name, retired — ADR 0015)
-
 ## Flagged ambiguities
 
 **"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **develop**; the concept is **production-readiness gate**. The v1.x orchestrator once named "workflow" (later `workflow-external`) was retired entirely in 2.0.0-alpha.19 — avoid the bare word "workflow" as a skill name.
