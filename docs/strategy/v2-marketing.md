@@ -1,5 +1,7 @@
 # mekaknight v2.0 — Marketing Strategy
 
+> ⚠️ Historical document: part of the v2.0 launch plan from 2026-05, kept as a record. Names have since changed: the mekaknight brand became jameskill ([ADR 0013](../adr/0013-retire-mekaknight-brand.md)); `forge`, `lock` and `launch` became `develop`, `security` and `ship` ([ADR 0015](../adr/0015-single-word-domain-names.md)); the tracker skills (`link`, `tag`, `strike`) were removed in 2.0.0-alpha.22. Current state: [README.md](../../README.md), [CONTEXT.md](../../CONTEXT.md).
+
 > 청중 0에서 시작 + 영어 콘텐츠 직접 작성 부담 + dogfooding 자산은 저자의 실제 작업 세션.
 > 핵심 전략: **forge-led messaging + humane tracker secondary + Product-led growth + 익명 기반 채널 + Anthropic 생태계 노출**.
 > 피벗: ADR 0004 (narrow). 리드 스킬은 **forge** (저자가 매일 사용). 2차는 **tracker** (link/tag/strike). lock + launch는 alpha utility로 헤드라인 밖. 1-2주 finishing touches 출시.
