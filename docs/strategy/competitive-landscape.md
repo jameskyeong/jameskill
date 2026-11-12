@@ -1,5 +1,7 @@
 # Competitive Landscape — Claude Code Skills & Production-readiness 도구
 
+> ⚠️ Historical document: a market snapshot taken on 2026-05-28, kept as a record. Names have since changed: the mekaknight brand became jameskill ([ADR 0013](../adr/0013-retire-mekaknight-brand.md)); `forge`, `lock` and `launch` became `develop`, `security` and `ship` ([ADR 0015](../adr/0015-single-word-domain-names.md)); the tracker skills (`link`, `tag`, `strike`) were removed in 2.0.0-alpha.22. Current state: [README.md](../../README.md), [CONTEXT.md](../../CONTEXT.md).
+
 > 작성일: 2026-05-28
 > 데이터: GitHub API 라이브 조회 + 공식 마켓플레이스 (2026-05-28)
 

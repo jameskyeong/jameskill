@@ -1,5 +1,7 @@
 # mekaknight v2.0 — Skill Catalog
 
+> ⚠️ Historical document: part of the v2.0 launch plan from 2026-05, kept as a record. Names have since changed: the mekaknight brand became jameskill ([ADR 0013](../adr/0013-retire-mekaknight-brand.md)); `forge`, `lock` and `launch` became `develop`, `security` and `ship` ([ADR 0015](../adr/0015-single-word-domain-names.md)); the tracker skills (`link`, `tag`, `strike`) were removed in 2.0.0-alpha.22. Current state: [README.md](../../README.md), [CONTEXT.md](../../CONTEXT.md).
+
 > v2.0 surface 분해. narrow pivot 후 (ADR 0004) **forge가 리드**, tracker (link/tag/strike)가 2차 리드. lock + launch는 invocable한 채로 남되 **marketing surface 밖 alpha utilities**로 분류.
 > 피벗 근거: `docs/adr/0004-narrow-v2-to-forge-and-tracker.md`. 상세: `docs/plans/jameskyeong/v2-narrow-pivot.md`.
 

@@ -1,5 +1,7 @@
 # Plan — mekaknight 리브랜드 + 명령어 메카 톤 통일
 
+> ⚠️ Historical document: this plan was executed and later reversed, so its status line below is out of date. Names have since changed: the mekaknight brand became jameskill ([ADR 0013](../../adr/0013-retire-mekaknight-brand.md)); `forge`, `lock` and `launch` became `develop`, `security` and `ship` ([ADR 0015](../../adr/0015-single-word-domain-names.md)); the tracker skills (`link`, `tag`, `strike`) were removed in 2.0.0-alpha.22. Current state: [README.md](../../../README.md), [CONTEXT.md](../../../CONTEXT.md).
+
 > **결정 일자**: 2026-05-29 저녁 세션 (집)
 > **상태**: 작성 완료, 실행 대기
 > **선행 결정**: 핸드오프 `jameskill-v2-handoff-2026-05-29-pm.md` Week 1-2 완료

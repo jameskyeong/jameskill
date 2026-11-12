@@ -1,5 +1,7 @@
 # mekaknight v2.0 — Roadmap
 
+> ⚠️ Historical document: part of the v2.0 launch plan from 2026-05, kept as a record. Names have since changed: the mekaknight brand became jameskill ([ADR 0013](../adr/0013-retire-mekaknight-brand.md)); `forge`, `lock` and `launch` became `develop`, `security` and `ship` ([ADR 0015](../adr/0015-single-word-domain-names.md)); the tracker skills (`link`, `tag`, `strike`) were removed in 2.0.0-alpha.22. Current state: [README.md](../../README.md), [CONTEXT.md](../../CONTEXT.md).
+
 > ~1-2주 finishing touches 후 출시. 새로운 코드 작업 없음 — 문서·마케팅 정렬 + 데모만.
 > 피벗 근거: `docs/adr/0004-narrow-v2-to-forge-and-tracker.md`. 상세 계획: `docs/plans/jameskyeong/v2-narrow-pivot.md`.
 > ADR 0003 (lite-wrap)은 superseded. v2.0 surface는 forge + tracker로 좁혀졌고, lock + launch는 alpha utilities로 마케팅 surface 밖에 둠.
