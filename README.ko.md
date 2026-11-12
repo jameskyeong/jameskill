@@ -9,7 +9,7 @@
 <p align="center">
   <a href="#설치"><img src="https://img.shields.io/badge/install-claude%20plugin-1a1a1a?style=flat-square" alt="install" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square" alt="MIT" /></a>
-  <img src="https://img.shields.io/badge/skills-6-1a1a1a?style=flat-square" alt="6 skills" />
+  <img src="https://img.shields.io/badge/skills-3-1a1a1a?style=flat-square" alt="3 skills" />
 </p>
 
 <p align="center">
