@@ -22,7 +22,7 @@
 
 Built on two pillars: **`/develop`** — a self-contained development orchestrator that drives the full flow from one command — and **compound engineering** baked into the structure, so every session deposits artifacts that lift the next one.
 
-The rest (issue tracking, inspection) are opt-in utilities — supplementary, not required.
+The inspection skills (`/security`, `/ship`) are opt-in utilities — supplementary, not required.
 
 <br clear="right" />
 
@@ -36,8 +36,7 @@ The common shape for agent skills is a toolbox: one skill per discipline — bra
 2. **Auto-routing by intent.** After Clarify, `/develop` *infers* what kind of work this is and picks one of 4 routes. You don't choose; it decides.
 3. **Different phase shapes per route.** DIAGNOSE writes the reproduction test before the fix. PROTOTYPE relaxes TDD on purpose. These aren't relabeled flows — they're different phase orders.
 4. **No-soft-language verification.** Every phase boundary rejects "should work", "seems fine", "looks good". Verification means running the command and observing the output.
-5. **Tracker-free core.** Develop itself never reads or writes Notion.
-6. **Self-contained.** Zero external skill dependencies — every discipline lives inside `skills/develop/references/`, versioned with the plugin and editable per project. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
+5. **Self-contained.** Zero external skill dependencies — every discipline lives inside `skills/develop/references/`, versioned with the plugin and editable per project. See [ADR 0001](docs/adr/0001-self-contained-orchestrator.md).
 
 ### Pillar 2 — Compound engineering, in one skill
 
@@ -65,7 +64,7 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 
 | Route | When | Phase shape | Why it's different |
 |---|---|---|---|
-| **DIRECT** | Small contained change. 1-4 commits, tightly-grouped files. | Build → Peer-review → Verify → Finish | Skips plan file. No ceremony for a one-shot change. |
+| **DIRECT** | Small contained change. 1-4 commits, tightly-grouped files. | Build → Peer-review → Verify → Retrospective → Finish | Skips plan file. No ceremony for a one-shot change. |
 | **PLAN** | Medium feature. 5-15 commits, 2-4 files with shared state. | Plan file → user confirms → sequential Build | Plan file becomes the contract; cross-session pickup runs off it. |
 | **DIAGNOSE** | Bug-first work. Reproduction steps, error messages, "it's broken". | Reproduce → Minimize → Investigate → Fix → Regression-prevent | The reproduction test is written *first* and stays in the suite as the regression net. |
 | **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches". | Time-boxed variations (relaxed TDD) → user reviews → Discard or Promote | TDD is intentionally relaxed. Prototype code parks under `prototype/<name>` as a primary source — never merged. Promote = restart as a fresh PLAN run, not a graduation. |
