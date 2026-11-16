@@ -23,6 +23,26 @@ Built on two pillars: **`/develop`** — a self-contained development orchestrat
 
 <br clear="right" />
 
+## How `/develop` works
+
+One command runs the whole flow. Clarify settles what to build, Route picks one of four phase orders, and every run that builds code ends by keeping what the next run needs.
+
+```mermaid
+flowchart TD
+    A(["/develop + your request"]) --> B["Preflight<br/>git repo, test runner, type checker, linter"]
+    B --> C["Clarify<br/>one question at a time, each with a recommended answer"]
+    C --> D{"Route"}
+    D -->|"small change"| E["DIRECT<br/>build with strict TDD"]
+    D -->|"medium feature"| F["PLAN<br/>plan file, then build task by task"]
+    D -->|"something is broken"| G["DIAGNOSE<br/>reproduce, minimize, investigate, fix"]
+    D -->|"open design question"| H["PROTOTYPE<br/>time-boxed variations, relaxed TDD"]
+    E & F & G --> I["Peer-review<br/>a fresh subagent reads the diff"]
+    I --> J["Verify<br/>run it and observe the output"]
+    J --> K["Retrospective<br/>propose what is worth keeping"]
+    K --> L["Finish<br/>commit, then you pick: merge, PR or keep the branch"]
+    H --> M["You decide<br/>Discard (default), Promote to a fresh PLAN run, or Re-Clarify"]
+```
+
 ## Why `/develop` is one skill, not a toolbox
 
 The common shape for agent skills is a toolbox: one skill per discipline — brainstorm, plan, test, review — and it's on you (or the model) to invoke the right one at the right moment. Each invocation starts fresh, and a discipline that never gets called never protects you. `/develop` inverts both halves:
@@ -39,6 +59,27 @@ The common shape for agent skills is a toolbox: one skill per discipline — bra
 
 Each `/develop` session deposits durable artifacts in your repo so future sessions start ahead. **Seven channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
 
+```mermaid
+flowchart LR
+    S(["A /develop run"]) --> W & P
+    subgraph W ["Written as part of the work"]
+        W1["Plan files<br/>PLAN route"]
+        W2["Regression tests<br/>DIAGNOSE route"]
+    end
+    subgraph P ["Proposed, kept only if you accept"]
+        P1["Glossary entries<br/>the moment a term settles"]
+        P2["ADRs"]
+        P3["Discipline rules"]
+        P4["Rejection records"]
+        P5["Automated checks"]
+    end
+    W & P --> R[("Your repo")]
+    R --> N(["The next run starts ahead"])
+```
+
+<details>
+<summary><b>The seven channels in detail</b></summary>
+
 | Channel | How `/develop` deposits | What compounds |
 |---|---|---|
 | **Plan files** | Auto — PLAN route writes `docs/plans/<github-id>/<feature>.md` | Resumable contracts. `/develop docs/plans/<github-id>/<feature>.md` re-enters from the first incomplete task across sessions. |
@@ -51,13 +92,29 @@ Each `/develop` session deposits durable artifacts in your repo so future sessio
 
 The Retrospective phase runs between Verify and Finish, checks each channel against a threshold, and proposes deposits one at a time. Silent exit when no channel qualifies — performative deposits are explicitly rejected. See [ADR 0007](docs/adr/0007-retrospective-phase.md).
 
+</details>
+
 > Your repo gets *easier to work in* over time. That's the compound part.
 
-## `/develop` — Development Orchestrator
-
-### The 4-way router
+## Picking a route
 
 After Clarify, `/develop` picks **one** route based on the kind of work. Each route is a meaningfully different phase shape — not the same flow renamed.
+
+```mermaid
+flowchart TD
+    Q1{{"Is something broken?"}} -->|"yes"| DG["DIAGNOSE"]
+    Q1 -->|"no"| Q2{{"Still choosing a design?"}}
+    Q2 -->|"yes"| PT["PROTOTYPE"]
+    Q2 -->|"no"| Q3{{"How big is the change?"}}
+    Q3 -->|"1 to 4 commits"| DR["DIRECT"]
+    Q3 -->|"5 to 15 commits"| PL["PLAN"]
+    Q3 -->|"bigger"| PRD["Split it into a PRD<br/>and several sessions"]
+```
+
+When in doubt, `/develop` takes the heavier route. A DIRECT run that turns up hidden dependencies stops at a clean point, writes a plan file for the rest, and continues as PLAN once you confirm.
+
+<details>
+<summary><b>What each route does differently</b></summary>
 
 | Route | When | Phase shape | Why it's different |
 |---|---|---|---|
@@ -66,16 +123,14 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 | **DIAGNOSE** | Bug-first work. Reproduction steps, error messages, "it's broken". | Reproduce → Minimize → Investigate → Fix → Regression-prevent | The reproduction test is written *first* and stays in the suite as the regression net. |
 | **PROTOTYPE** | Throwaway exploration. "How should this look", "try a few approaches". | Time-boxed variations (relaxed TDD) → user reviews → Discard or Promote | TDD is intentionally relaxed. Prototype code parks under `prototype/<name>` as a primary source — never merged. Promote = restart as a fresh PLAN run, not a graduation. |
 
+</details>
+
 ### Flexible entry & resume
 
 - **Resume mid-flow** — `/develop docs/plans/<github-id>/<feature>.md` re-enters the plan, skips Clarify+Route, picks up from the first incomplete task.
 - **Skip Clarify** — say "skip clarify" or "requirements are clear" when you've already specced the work.
 
-### Phases at a glance
-
-```
-preflight → clarify → route → build (strict TDD) → peer-review → verify → retrospective → finish
-```
+### What every run holds to
 
 - **Relentless clarification, one question at a time**: each message asks the one or two decisions that matter most right now, each with why it matters and a recommended answer, and says how many are left; the 5-category ambiguity checklist must reach 0 items before Route.
 - **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later". Tests must be falsifiable: name the production change that would break each one.
