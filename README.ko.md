@@ -123,6 +123,16 @@ claude plugins install jsk
 - [Claude Code](https://claude.ai/claude-code): 모든 스킬에 필요.
 - **`/develop`, `/security`, `/ship`**: 외부 의존성 없음.
 
+## 출처
+
+`/develop`은 공개 스킬 모음 두 곳을 묶어 쓰는 스킬로 시작했고, references에는 지금도 그 생각이 남아 있습니다. 두 곳 모두 MIT 라이선스입니다.
+
+- **[superpowers](https://github.com/obra/superpowers)** (Jesse Vincent): `tdd-discipline.md`, `verification.md`, `planning.md`, `peer-review.md`, `finishing.md`, `subagent-patterns.md`의 바탕이 된 규율
+- **[Matt Pocock의 skills](https://github.com/mattpocock/skills)**: `grilling.md`의 질문 방식(질문을 묶어서 묻기, 질문마다 추천 답, 프로젝트 용어집), `diagnosis.md`의 재현 방법 목록, `prototyping.md`의 LOGIC과 UI 두 갈래
+- **[Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin)** (Every): 한 번의 작업이 다음 작업을 쉽게 만들어야 한다는 생각
+
+두 곳의 변경은 때때로 살펴보고 항목별로 골라 반영합니다. 결정 기록은 `docs/plans/jameskyeong/upstream-adoption-*.md`에 있습니다. 원문의 라이선스 표시는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다.
+
 ## 라이선스
 
 [MIT](LICENSE)

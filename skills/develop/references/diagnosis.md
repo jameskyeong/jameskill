@@ -1,5 +1,7 @@
 # DIAGNOSE Discipline: Bug-First Workflow
 
+> Adapted from Matt Pocock's diagnosing-bugs skill ([mattpocock/skills](https://github.com/mattpocock/skills), MIT). The loop-construction menu in step 1 follows its list.
+
 Reference for develop's **DIAGNOSE route**. The Route → DIAGNOSE section of `SKILL.md` enforces the phase order (Reproduce → Minimize → Investigate → Fix → Regression-prevent). This document is the deeper discipline: why each step exists, the anti-patterns that turn diagnosis into guess-and-check, and what to do at the edges (cannot reproduce locally, intermittent bugs, production-only data).
 
 The non-negotiable: **a fast, deterministic pass/fail signal that captures the bug (ideally a failing test) is the goal of Reproduce.** Everything after Reproduce is downstream of that signal. Changing code without a failing signal that proves the change matters is guess-and-check dressed up as fixing.

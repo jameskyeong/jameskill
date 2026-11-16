@@ -2,7 +2,7 @@
 
 ## Goal
 
-Adopt 17 methodology improvements — surveyed 2026-08-13 from current public agent-skill methodology projects — into the develop orchestrator, each explicitly accepted by the user in a 19-item decision session.
+Adopt 17 methodology improvements — surveyed 2026-08-13 from superpowers (obra/superpowers) and Matt Pocock's skills (mattpocock/skills) — into the develop orchestrator, each explicitly accepted by the user in a 19-item decision session.
 
 ## Decision record
 

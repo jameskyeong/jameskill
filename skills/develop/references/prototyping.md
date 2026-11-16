@@ -1,5 +1,7 @@
 # PROTOTYPE Discipline: Throwaway Exploration
 
+> Adapted from Matt Pocock's prototype skill ([mattpocock/skills](https://github.com/mattpocock/skills), MIT): the LOGIC and UI split and the throwaway rules.
+
 Reference for develop's **PROTOTYPE route**. The Route → PROTOTYPE section of `SKILL.md` enforces the phase order (Clarify the question → create the `prototype/` branch → pick the LOGIC/UI shape → Build → User review → Discard or Promote-to-Plan). This document is the deeper discipline: why prototypes are throwaway by default, the time-box and variation rules that prevent prototype-into-production drift, and what to do when the prototype reveals the original question was wrong.
 
 The non-negotiable: **a prototype answers a question; it is not delivery.** The output is not the deliverable; the *answer* is. The prototype code itself is throwaway by default; the chosen direction goes into a fresh PLAN run with full discipline.

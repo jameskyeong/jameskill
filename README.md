@@ -125,6 +125,16 @@ claude plugins install jsk
 - [Claude Code](https://claude.ai/claude-code) — required for all skills.
 - **`/develop`, `/security`, `/ship`** — no external dependencies.
 
+## Credits
+
+`/develop` began as a wrapper around two public skill collections, and its references still carry their ideas. Both are MIT licensed.
+
+- **[superpowers](https://github.com/obra/superpowers)** by Jesse Vincent: the discipline behind `tdd-discipline.md`, `verification.md`, `planning.md`, `peer-review.md`, `finishing.md` and `subagent-patterns.md`.
+- **[Matt Pocock's skills](https://github.com/mattpocock/skills)**: the questioning style in `grilling.md` (rounds of questions, a recommended answer for each, a project glossary), the feedback-loop menu in `diagnosis.md`, and the LOGIC and UI split in `prototyping.md`.
+- **[Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin)** by Every: the idea that each unit of work should make the next one easier.
+
+Upstream changes are reviewed from time to time and adopted item by item; the decisions are in `docs/plans/jameskyeong/upstream-adoption-*.md`. Their license notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## License
 
 [MIT](LICENSE)

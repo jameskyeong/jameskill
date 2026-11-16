@@ -5,7 +5,7 @@
 Decide which methodology changes to take into `/develop`, `/security` and `/ship`, and fix the defects the survey exposed in our own skills.
 
 - Survey date: 2026-11-09.
-- Sources: the two public agent-skill methodology projects surveyed on 2026-08-13 (see [upstream-adoption-2026-08.md](upstream-adoption-2026-08.md)), read from their changes since that date. One project shipped five releases; the other landed 99 non-merge commits.
+- Sources: superpowers (obra/superpowers) and Matt Pocock's skills (mattpocock/skills), first surveyed on 2026-08-13 (see [upstream-adoption-2026-08.md](upstream-adoption-2026-08.md)), read from their changes since that date. One project shipped five releases; the other landed 99 non-merge commits.
 - Status: **Groups A, B and C implemented (2026-11-09)** (C5 rejected). Non-PLAN routes keep their BASE, approved playback and log in a run file, `$(git rev-parse --git-dir)/develop/<slug>.md` (added while implementing B3 and B10).
 
 ## Decision record (Group B)

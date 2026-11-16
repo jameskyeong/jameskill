@@ -1,5 +1,7 @@
 # Clarify Discipline: Grilling for Ambiguity
 
+> Builds on Matt Pocock's grilling skill ([mattpocock/skills](https://github.com/mattpocock/skills), MIT): rounds of questions, a recommended answer for each, and the project glossary.
+
 Reference for develop's **Clarify** phase. The Clarify section of `SKILL.md` enforces the surface rule (frontier questions in rounds, each with a recommended answer; ambiguity checklist must reach zero; 2-3 approaches proposed before Route). This document is the deeper discipline: why the rule exists, how to actually grill an ambiguity to the ground, and what to do at the awkward edges (the user wants to skip, no domain doc exists, every question feels like friction).
 
 The non-negotiable: **ambiguity is a load-bearing signal, not friction.** Every question you do not ask now becomes a question you answer wrong later, in code, where it costs much more to revisit.
