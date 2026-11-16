@@ -28,19 +28,20 @@ jameskill의 핵심은 두 가지입니다. 첫째, `/develop`은 명령 하나�
 명령 하나로 전체 흐름이 이어집니다. Clarify에서 무엇을 만들지 정하고, Route에서 단계 순서 네 가지 중 하나를 고릅니다. 코드를 만든 실행은 다음 실행에 필요한 기록을 남기고 끝납니다.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart TD
-    A(["/develop + 요청"]) --> B["Preflight(준비)<br/>git 저장소, 테스트 도구, 타입 검사, 린터 확인"]
+    A(["/develop + 요청"]) --> B["Preflight(준비)<br/>저장소, 테스트, 린터 확인"]
     B --> C["Clarify(질문)<br/>한 번에 하나씩, 추천 답과 함께"]
     C --> D{"Route(루트 선택)"}
-    D -->|"작은 변경"| E["DIRECT<br/>엄격한 TDD로 바로 구현"]
-    D -->|"중간 규모 기능"| F["PLAN<br/>플랜 파일을 쓰고 작업별로 구현"]
+    D -->|"작은 변경"| E["DIRECT<br/>바로 구현, 엄격한 TDD"]
+    D -->|"중간 규모 기능"| F["PLAN<br/>플랜 파일 후 작업별 구현"]
     D -->|"고장 남"| G["DIAGNOSE<br/>재현, 축소, 조사, 수정"]
-    D -->|"디자인 미정"| H["PROTOTYPE<br/>시간을 정해 시안 제작, TDD 완화"]
-    E & F & G --> I["Peer-review(리뷰)<br/>맥락 없는 서브에이전트가 변경분 검토"]
+    D -->|"디자인 미정"| H["PROTOTYPE<br/>시간 제한 시안, TDD 완화"]
+    E & F & G --> I["Peer-review(리뷰)<br/>새 서브에이전트가 변경분 검토"]
     I --> J["Verify(검증)<br/>직접 실행하고 출력 확인"]
-    J --> K["Retrospective(회고)<br/>남길 만한 기록 제안"]
-    K --> L["Finish(마무리)<br/>커밋 후 병합, PR, 브랜치 유지 중 선택"]
-    H --> M["사용자 결정<br/>Discard(기본), 새 PLAN 실행으로 Promote, Re-Clarify 중 선택"]
+    J --> K["Retrospective(회고)<br/>남길 기록 제안"]
+    K --> L["Finish(마무리)<br/>커밋 후 선택:<br/>병합, PR, 브랜치 유지"]
+    H --> M["사용자 결정<br/>Discard(기본)<br/>Promote(새 PLAN으로)<br/>Re-Clarify"]
 ```
 
 ## `/develop`을 여러 스킬로 나누지 않은 이유
@@ -60,6 +61,7 @@ flowchart TD
 `/develop`은 세션마다 저장소에 기록을 남기고, 다음 세션은 그 기록을 읽고 시작합니다. 기록이 쌓이는 곳(채널)은 7개이고, 모두 `/develop` 흐름 안에서 처리됩니다. 다른 스킬을 조합할 필요가 없고, 코드를 쓰는 과정에서 기록도 함께 남습니다.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart LR
     S(["/develop 실행 한 번"]) --> W & P
     subgraph W ["작업하면서 바로 남김"]
@@ -99,6 +101,7 @@ Retrospective는 Verify와 Finish 사이에서 돌아갑니다. 채널마다 정
 Clarify가 끝나면 `/develop`은 작업 종류에 맞는 루트 하나를 고릅니다. 루트마다 거치는 단계가 다릅니다.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart TD
     Q1{{"고장 난 것이 있나?"}} -->|"예"| DG["DIAGNOSE"]
     Q1 -->|"아니오"| Q2{{"아직 디자인을 고르는 중인가?"}}

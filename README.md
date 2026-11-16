@@ -28,6 +28,7 @@ Built on two pillars: **`/develop`** — a self-contained development orchestrat
 One command runs the whole flow. Clarify settles what to build, Route picks one of four phase orders, and every run that builds code ends by keeping what the next run needs.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart TD
     A(["/develop + your request"]) --> B["Preflight<br/>git repo, test runner, type checker, linter"]
     B --> C["Clarify<br/>one question at a time, each with a recommended answer"]
@@ -60,6 +61,7 @@ The common shape for agent skills is a toolbox: one skill per discipline — bra
 Each `/develop` session deposits durable artifacts in your repo so future sessions start ahead. **Seven channels, all automated — bundled into one orchestrator**, no skill composition required. Discipline runs as part of the same flow that builds the code:
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart LR
     S(["A /develop run"]) --> W & P
     subgraph W ["Written as part of the work"]
@@ -101,6 +103,7 @@ The Retrospective phase runs between Verify and Finish, checks each channel agai
 After Clarify, `/develop` picks **one** route based on the kind of work. Each route is a meaningfully different phase shape — not the same flow renamed.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}, "themeVariables": {"useGradient": true, "gradientStart": "#8b93ff", "gradientStop": "#4fc3b4"}, "themeCSS": ".node rect, .node polygon, .node path { fill: var(--bgColor-muted, #f6f8fa) !important; filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.18)) !important; } .node rect { rx: 10px; ry: 10px; } .cluster rect { fill: var(--bgColor-default, #ffffff) !important; filter: none !important; rx: 14px; ry: 14px; } .cluster-label, .cluster-label span, .cluster-label p { color: var(--fgColor-muted, #59636e) !important; } .edgeLabel, .edgeLabel p, .edgeLabel span, .labelBkg { background-color: var(--bgColor-default, #ffffff) !important; color: var(--fgColor-muted, #59636e) !important; }"}}%%
 flowchart TD
     Q1{{"Is something broken?"}} -->|"yes"| DG["DIAGNOSE"]
     Q1 -->|"no"| Q2{{"Still choosing a design?"}}
