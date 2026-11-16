@@ -1,8 +1,8 @@
 # Clarify Discipline: Grilling for Ambiguity
 
-> Builds on Matt Pocock's grilling skill ([mattpocock/skills](https://github.com/mattpocock/skills), MIT): rounds of questions, a recommended answer for each, and the project glossary.
+> Builds on Matt Pocock's grilling skill ([mattpocock/skills](https://github.com/mattpocock/skills), MIT): walking a decision tree, a recommended answer for each question, and the project glossary.
 
-Reference for develop's **Clarify** phase. The Clarify section of `SKILL.md` enforces the surface rule (frontier questions in rounds, each with a recommended answer; ambiguity checklist must reach zero; 2-3 approaches proposed before Route). This document is the deeper discipline: why the rule exists, how to actually grill an ambiguity to the ground, and what to do at the awkward edges (the user wants to skip, no domain doc exists, every question feels like friction).
+Reference for develop's **Clarify** phase. The Clarify section of `SKILL.md` enforces the surface rule (one or two frontier questions per message, each with a recommended answer; ambiguity checklist must reach zero; 2-3 approaches proposed before Route). This document is the deeper discipline: why the rule exists, how to actually grill an ambiguity to the ground, and what to do at the awkward edges (the user wants to skip, no domain doc exists, every question feels like friction).
 
 The non-negotiable: **ambiguity is a load-bearing signal, not friction.** Every question you do not ask now becomes a question you answer wrong later, in code, where it costs much more to revisit.
 
@@ -24,34 +24,32 @@ The grilling discipline trades a few minutes of friction at Clarify for the cost
 
 ## How to question
 
-### Rounds over the frontier
+### One question at a time over the frontier
 
 Map the open decisions as a tree before asking anything. Some questions stand alone; some depend on another question's answer. The **frontier** is every question whose prerequisites are already settled, the set the user can actually answer right now.
 
-The rule: each round presents the **whole frontier at once** (every open decision that would change what gets built; see *Ask only what changes the build*), numbered with keycap digits (1️⃣ 2️⃣ 3️⃣ …), each question in a fixed shape, with a `---` line between questions so each reads as its own unit:
+The rule: each message asks **one** frontier question, the one whose answer changes the most of what gets built or unblocks the most other questions (only decisions that change the build qualify; see *Ask only what changes the build*). A second question may join it only when both block the build and neither answer can change the other. Never three. Each question takes a fixed shape:
 
 > 1️⃣ **\<short title\>**: \<the question\>
+> Why it matters: \<what changes in the build depending on the answer\>
 > ➡️ Recommended: \<answer\>, because \<one-sentence why\>
->
-> ---
->
-> 2️⃣ **\<short title\>**: \<the question\>
-> ➡️ Recommended: \<answer\>, because \<one-sentence why\>
+
+When a second question joins, number it 2️⃣ and put a `---` line between the two so each reads as its own unit. End the message with one line, `Questions left: about N`, counted from the current tree. N is an estimate, since answers open new questions and close old ones, but it lets the user see the end coming.
 
 - **Word each question so "yes" accepts the recommendation.** "Keep the cache on? (recommended)" lets an agreeing user say yes. "Turn the cache off?" with "keep it on" recommended makes the agreeing answer "no", and the answers come back crossed.
 - **Ask in plain chat text** the user answers in their own words, not through a picker widget. Pickers push toward pre-baked multiple-choice answers and leave no room for the constraint the agent did not think of.
 
-A question whose answer depends on another question still open in this round belongs to a **later round**. Batching a dependent question with its prerequisite is how partial answers turn into wrong assumptions: the user answers Q1 in a way that invalidates Q3, but Q3's answer is already on record.
+A question whose answer depends on another question still open belongs to a **later message**. Pairing a dependent question with its prerequisite is how partial answers turn into wrong assumptions: the user answers Q1 in a way that invalidates Q2, but Q2's answer is already on record.
 
-Read all answers, redraw the tree (answers open new questions and close old ones), present the next round. Rounds continue until the frontier is empty.
+Read the answer, redraw the tree (answers open new questions and close old ones), ask the next question. Continue until the frontier is empty.
 
-Why rounds beat one-at-a-time: a five-decision Clarify at one question per message costs five round-trips and the user's patience; the same five decisions usually fit in two rounds. One-at-a-time is the default only as the degenerate case: a round whose frontier happens to hold a single question.
+Why one or two beat the whole frontier at once: a message holding five questions, each with a recommendation and a reason, is long to read. Users skim it and reply "all as recommended", which records five decisions nobody weighed. One question gets real attention, and asking the most blocking one first often closes later questions before they are asked, so the total usually drops. The cost is more round-trips on decision-heavy work; *Ask only what changes the build* keeps that small, because every other decision becomes a stated call.
 
-**Unless the user asks for one at a time.** When the user's instructions (CLAUDE.md, memory, or the conversation) say to ask one question at a time, honor it: still map the full frontier, but send only the most decision-blocking question per message, and the next one after it is answered. The checklist coverage does not shrink; only the delivery does.
+**Unless the user asks otherwise.** When the user's instructions (CLAUDE.md, memory, or the conversation) ask for all questions at once, send the whole frontier in one message, numbered, with `---` between questions. When they ask for strictly one at a time, never pair. The checklist coverage does not change; only the delivery does.
 
 ### Intent before shape
 
-When the request does not say **why** the user wants the change, round 1 opens with that question: one open question about the purpose ("what will this let you do?"), with **no recommended answer** attached. It is the one exception to the recommended-answer rule below: a recommendation for a question about intent steers the user toward a plausible-sounding reason instead of their real one. When the request already states its purpose, skip it.
+When the request does not say **why** the user wants the change, the first message asks that question: one open question about the purpose ("what will this let you do?"), with **no recommended answer** attached. It is the one exception to the recommended-answer rule below: a recommendation for a question about intent steers the user toward a plausible-sounding reason instead of their real one. When the request already states its purpose, skip it.
 
 This is not the "philosophical questions" anti-pattern: it asks about the intent of this change, the input every later decision (scope, edge cases, approach) is judged against.
 
@@ -63,7 +61,7 @@ A stated call is not "answering your own question": the anti-pattern hides the d
 
 ### Facts are the agent's job; decisions are the user's
 
-Never put a *fact* question to the user: anything answerable by reading the codebase, the docs, or by dispatching a research subagent is the agent's legwork. A running lookup does not block the round: only the questions downstream of that fact wait for it; the rest of the frontier ships now.
+Never put a *fact* question to the user: anything answerable by reading the codebase, the docs, or by dispatching a research subagent is the agent's legwork. A running lookup does not block asking: only the questions downstream of that fact wait for it; ask the next independent question now.
 
 What remains for the user is *decisions*: trade-offs, preferences, scope calls. Put each decision that changes what gets built to the user and wait; the rest are stated calls (see *Ask only what changes the build*). If a "question" you are about to ask has an objectively correct answer discoverable without the user, you are outsourcing legwork, not clarifying.
 
@@ -210,7 +208,7 @@ Presenting one approach with "this is the standard way" framing when real altern
 
 ### Shotgun questioning
 
-Firing questions as an unstructured pile: dependent questions mixed with their prerequisites, no numbering, no recommendations. The user answers two, half-answers one, and the answer to Q1 quietly invalidates the recorded answer to Q3. This is the round discipline's counterfeit, not its application: a real round contains only frontier questions (prerequisites settled), numbered, each carrying a recommendation, with dependent questions explicitly deferred.
+Firing questions as an unstructured pile: dependent questions mixed with their prerequisites, no numbering, no recommendations. The user answers two, half-answers one, and the answer to Q1 quietly invalidates the recorded answer to Q3. A tidy version is still the same failure: the whole frontier numbered in one message buries each question under the others. The discipline is one or two frontier questions per message (prerequisites settled), each carrying a recommendation, with dependent questions waiting for a later message.
 
 The fix: draw the decision tree first. If you cannot say which questions block which, you are not ready to ask any of them.
 
@@ -270,7 +268,7 @@ The user is frustrated, the questions feel slow, the user wants to ship. Two fai
 - **Collapse and skip.** The discipline does not bend to social pressure. Skipping the grill because the user is tired produces the same downstream cost as skipping it for any other reason.
 - **Cargo-cult the grill.** Asking questions you do not actually need just because "the discipline says so" trains the user to ignore future questions that *are* needed.
 
-The middle path: triage your own list. Shrink the round to the **single most decision-blocking question** you have. If the user answers that, you may find the rest resolves itself or can be deferred to a follow-up. The user's irritation is signal that the questions feel low-value; the right response is to raise the per-question value, not to drop the discipline.
+The middle path: triage your own list. Make sure the one question you send is the **most decision-blocking** one, and turn every question you can decide yourself into a stated call. If the user answers that, you may find the rest resolves itself or can be deferred to a follow-up. The user's irritation is signal that the questions feel low-value; the right response is to raise the per-question value, not to drop the discipline.
 
 ### Recurring user across many `/develop` sessions
 

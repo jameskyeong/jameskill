@@ -80,7 +80,7 @@ After Clarify, `/develop` picks **one** route based on the kind of work. Each ro
 preflight → clarify → route → build (strict TDD) → peer-review → verify → retrospective → finish
 ```
 
-- **Relentless clarification, without the ping-pong** — questions arrive in frontier rounds (every currently-answerable question at once, numbered, each with a recommended answer); the 5-category ambiguity checklist must reach 0 items before Route.
+- **Relentless clarification, one question at a time**: each message asks the one or two decisions that matter most right now, each with why it matters and a recommended answer, and says how many are left; the 5-category ambiguity checklist must reach 0 items before Route.
 - **Strict TDD** — RED → GREEN → REFACTOR for every unit. No skipped tests, no commented-out tests, no "TODO: add test later". Tests must be falsifiable: name the production change that would break each one.
 - **Independent peer-review subagent** — fresh perspective on the diff, free from author recency bias, with a built-in 12-smell baseline and a 3-round fix-loop circuit breaker.
 - **Autonomous where it's safe** — from Build through Verify, non-catastrophic calls are decided and logged as rulings instead of stalling the session; irreversible or security-sensitive decisions still stop and ask.
@@ -130,7 +130,7 @@ claude plugins install jsk
 `/develop` began as a wrapper around two public skill collections, and its references still carry their ideas. Both are MIT licensed.
 
 - **[superpowers](https://github.com/obra/superpowers)** by Jesse Vincent: the discipline behind `tdd-discipline.md`, `verification.md`, `planning.md`, `peer-review.md`, `finishing.md` and `subagent-patterns.md`.
-- **[Matt Pocock's skills](https://github.com/mattpocock/skills)**: the questioning style in `grilling.md` (rounds of questions, a recommended answer for each, a project glossary), the feedback-loop menu in `diagnosis.md`, and the LOGIC and UI split in `prototyping.md`.
+- **[Matt Pocock's skills](https://github.com/mattpocock/skills)**: the questioning style in `grilling.md` (walking a decision tree, a recommended answer for each question, a project glossary), the feedback-loop menu in `diagnosis.md`, and the LOGIC and UI split in `prototyping.md`.
 - **[Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin)** by Every: the idea that each unit of work should make the next one easier.
 
 Upstream changes are reviewed from time to time and adopted item by item; the decisions are in `docs/plans/jameskyeong/upstream-adoption-*.md`. Their license notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

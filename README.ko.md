@@ -78,7 +78,7 @@ Clarify가 끝나면 `/develop`은 작업 종류에 맞는 루트 하나를 고�
 preflight → clarify → route → build (strict TDD) → peer-review → verify → retrospective → finish
 ```
 
-- **질문은 라운드마다 모아서**: 앞선 답을 기다리지 않고 지금 정할 수 있는 질문을 라운드마다 모두 모아 번호를 붙여 묻고, 질문마다 추천 답을 붙입니다. 코드를 읽으면 알 수 있는 사실은 묻지 않습니다. 다섯 가지 확인 항목(범위, 예외 상황, 용어 뜻, 기존 코드와의 충돌, 성공 기준)에 모호한 점이 하나도 남지 않아야 Route로 넘어갑니다.
+- **질문은 하나씩**: 지금 가장 중요한 결정 하나를 묻고, 서로 얽히지 않는 질문일 때만 두 개까지 함께 묻습니다. 질문마다 왜 묻는지와 추천 답을 붙이고, 남은 질문 수를 알려 줍니다. 코드를 읽으면 알 수 있는 사실은 묻지 않습니다. 다섯 가지 확인 항목(범위, 예외 상황, 용어 뜻, 기존 코드와의 충돌, 성공 기준)에 모호한 점이 하나도 남지 않아야 Route로 넘어갑니다.
 - **엄격한 TDD**: 작업 단위마다 RED → GREEN → REFACTOR(실패하는 테스트 작성 → 통과시키는 코드 작성 → 정리) 순서를 지킵니다. 테스트 건너뛰기, 주석 처리, "TODO: 나중에 테스트"는 금지입니다. 테스트마다 어떤 코드 변경이 그 테스트를 실패시키는지 말할 수 있어야 합니다.
 - **별도 서브에이전트의 리뷰**: 코드를 쓴 대화 맥락이 없는 서브에이전트(따로 띄운 보조 AI)가 변경분을 검토합니다. 흔한 코드 문제 유형 12가지(Fowler가 정리한 code smell)를 기본으로 확인합니다. 수정 후 재검토는 최대 3번까지 하고, 그래도 남은 문제는 사용자가 하나씩 판단합니다.
 - **작은 결정은 스스로**: Build부터 Verify까지, 큰 문제로 번지지 않는 결정은 멈추지 않고 직접 정한 뒤 이유를 기록합니다(ruling). 되돌릴 수 없는 작업, 보안 관련 결정, 외부 서비스에 영향을 주는 작업은 멈추고 사용자에게 묻습니다. 계획이 근본부터 틀렸으면 Clarify로 돌아갑니다.
@@ -128,7 +128,7 @@ claude plugins install jsk
 `/develop`은 공개 스킬 모음 두 곳을 묶어 쓰는 스킬로 시작했고, references에는 지금도 그 생각이 남아 있습니다. 두 곳 모두 MIT 라이선스입니다.
 
 - **[superpowers](https://github.com/obra/superpowers)** (Jesse Vincent): `tdd-discipline.md`, `verification.md`, `planning.md`, `peer-review.md`, `finishing.md`, `subagent-patterns.md`의 바탕이 된 규율
-- **[Matt Pocock의 skills](https://github.com/mattpocock/skills)**: `grilling.md`의 질문 방식(질문을 묶어서 묻기, 질문마다 추천 답, 프로젝트 용어집), `diagnosis.md`의 재현 방법 목록, `prototyping.md`의 LOGIC과 UI 두 갈래
+- **[Matt Pocock의 skills](https://github.com/mattpocock/skills)**: `grilling.md`의 질문 방식(결정 트리를 따라 묻기, 질문마다 추천 답, 프로젝트 용어집), `diagnosis.md`의 재현 방법 목록, `prototyping.md`의 LOGIC과 UI 두 갈래
 - **[Compound Engineering](https://github.com/EveryInc/compound-engineering-plugin)** (Every): 한 번의 작업이 다음 작업을 쉽게 만들어야 한다는 생각
 
 두 곳의 변경은 때때로 살펴보고 항목별로 골라 반영합니다. 결정 기록은 `docs/plans/jameskyeong/upstream-adoption-*.md`에 있습니다. 원문의 라이선스 표시는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다.
