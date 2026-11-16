@@ -1,6 +1,6 @@
 {
   "name": "jameskill",
-  "version": "2.0.0-alpha.26",
+  "version": "2.0.0-alpha.27",
   "description": "A self-contained development orchestrator for Claude Code (/develop)",
   "scripts": {
     "version": "node scripts/sync-version.mjs && git add .claude-plugin/marketplace.json",

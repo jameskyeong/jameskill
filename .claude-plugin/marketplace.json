@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "A development orchestrator for Claude Code by James Kyeong",
-    "version": "2.0.0-alpha.26"
+    "version": "2.0.0-alpha.27"
   },
   "plugins": [
     {
@@ -16,7 +16,7 @@
         "url": "https://github.com/jameskyeong/jameskill.git"
       },
       "description": "A self-contained development orchestrator for Claude Code (/develop)",
-      "version": "2.0.0-alpha.26",
+      "version": "2.0.0-alpha.27",
       "strict": true
     }
   ]
