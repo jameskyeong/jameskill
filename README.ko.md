@@ -3,13 +3,12 @@
 </p>
 
 <p align="center">
-  <em><a href="https://claude.ai/claude-code">Claude Code</a>용 개발 생산성 스킬</em>
+  <em><a href="https://claude.ai/claude-code">Claude Code</a>용 개발 오케스트레이터</em>
 </p>
 
 <p align="center">
   <a href="#설치"><img src="https://img.shields.io/badge/install-claude%20plugin-1a1a1a?style=flat-square" alt="install" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square" alt="MIT" /></a>
-  <img src="https://img.shields.io/badge/skills-3-1a1a1a?style=flat-square" alt="3 skills" />
 </p>
 
 <p align="center">
@@ -21,8 +20,6 @@
 <img align="right" src="docs/jameskill-hero.jpg" width="220" alt="jameskill character" />
 
 jameskill의 핵심은 두 가지입니다. 첫째, `/develop`은 명령 하나로 요구사항 정리부터 커밋까지 처리하는 오케스트레이터(여러 단계를 차례로 이끄는 스킬)입니다. 둘째, **컴파운드 엔지니어링**(compound: 복리로 쌓인다는 뜻)은 세션마다 다음 작업에 쓸 기록을 저장소에 남기는 원칙입니다. 덕분에 다음 세션은 처음부터 다시 파악하지 않고, 앞 세션이 남긴 기록을 이어받아 시작합니다.
-
-점검 스킬 두 개(`/security`, `/ship`)는 필요할 때만 쓰는 보조 도구입니다.
 
 <br clear="right" />
 
@@ -89,19 +86,6 @@ preflight → clarify → route → build (strict TDD) → peer-review → verif
 
 ---
 
-## 보조 스킬
-
-### 🔬 점검 (alpha)
-
-v2.0에 들어 있지만 주력 기능은 아닙니다. 제작자가 매일 쓰지 않고, 실제 프로젝트 3곳에 돌려 봤을 때 막아야 할 문제가 나오지 않았기 때문입니다. 필요하면 쓸 수 있고, 앞으로의 방향은 출시 후 반응을 보고 정합니다. [ADR 0004](docs/adr/0004-narrow-v2-to-forge-and-tracker.md) 참고.
-
-| 명령 | 하는 일 |
-|---|---|
-| `/security` | v0.1 점검 3가지: Supabase RLS(행 단위 접근 권한) 누락, 비밀 키의 브라우저 코드 노출(Next.js `"use client"` 기준), Stripe 웹훅 서명 검증 누락 |
-| `/ship` | `/security` 결과로 배포 가능 여부를 GO / NO-GO로 판정하는 v0.1 기능. 보안만 봅니다. 다른 항목까지 합친 판정은 아직 계획에 없습니다([ADR 0010](docs/adr/0010-launch-v0.1-security-only.md) 참고). |
-
-> **프레임워크 주의**: `/security`의 비밀 키 검사는 Next.js 방식의 클라이언트/서버 구분을 전제로 합니다. SvelteKit, Nuxt, Remix 프로젝트에서는 키가 실제로 노출돼 있어도 PASS가 나올 수 있습니다. 이 프레임워크들을 따로 지원하기 전까지는 직접 확인해야 합니다.
-
 ## 설치
 
 ```bash
@@ -120,8 +104,7 @@ claude plugins install jsk
 
 ## 요구사항
 
-- [Claude Code](https://claude.ai/claude-code): 모든 스킬에 필요.
-- **`/develop`, `/security`, `/ship`**: 외부 의존성 없음.
+- [Claude Code](https://claude.ai/claude-code)만 있으면 됩니다. `/develop`은 다른 의존성이 없습니다.
 
 ## 출처
 

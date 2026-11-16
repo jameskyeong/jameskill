@@ -4,17 +4,11 @@ import path from 'node:path';
 export const id = 'cross-cutting-gates-present';
 
 export const description =
-  'Each user-facing skill must reference develop cross-cutting gates: Forbidden language (develop) and inline-gloss / communication-style (all user-facing skills).';
+  'develop must declare its cross-cutting gates: the Forbidden language section and the user-facing communication style gate.';
 
 const FORGE_REQUIRED = [
   { needle: 'Forbidden language', name: '"Forbidden language" section' },
   { needle: 'user-facing communication style', name: '"user-facing communication style" gate' },
-];
-
-const SUPPLEMENTARY = ['security', 'ship'];
-const SUPP_REQUIRED = [
-  { needle: 'inline-gloss', name: 'inline-gloss mention' },
-  { needle: 'communication-style.md', name: 'communication-style.md link' },
 ];
 
 export async function checkRepo(rootDir) {
@@ -28,28 +22,6 @@ export async function checkRepo(rootDir) {
       findings.push({
         severity: 'fail',
         message: `skills/develop/SKILL.md missing ${req.name} (needle: "${req.needle}")`,
-      });
-    }
-  }
-
-  // supplementary
-  for (const skill of SUPPLEMENTARY) {
-    const skillPath = path.join(rootDir, 'skills', skill, 'SKILL.md');
-    let content;
-    try {
-      content = await fs.readFile(skillPath, 'utf8');
-    } catch {
-      findings.push({
-        severity: 'fail',
-        message: `skills/${skill}/SKILL.md not found`,
-      });
-      continue;
-    }
-    const missing = SUPP_REQUIRED.filter((req) => !content.includes(req.needle));
-    if (missing.length === SUPP_REQUIRED.length) {
-      findings.push({
-        severity: 'fail',
-        message: `skills/${skill}/SKILL.md has no inline-gloss reference (need at least one of: ${SUPP_REQUIRED.map((r) => r.needle).join(', ')})`,
       });
     }
   }

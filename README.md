@@ -3,13 +3,12 @@
 </p>
 
 <p align="center">
-  <em>Developer productivity skills for <a href="https://claude.ai/claude-code">Claude Code</a></em>
+  <em>A self-contained development orchestrator for <a href="https://claude.ai/claude-code">Claude Code</a></em>
 </p>
 
 <p align="center">
   <a href="#installation"><img src="https://img.shields.io/badge/install-claude%20plugin-1a1a1a?style=flat-square" alt="install" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square" alt="MIT" /></a>
-  <img src="https://img.shields.io/badge/skills-3-1a1a1a?style=flat-square" alt="3 skills" />
 </p>
 
 <p align="center">
@@ -21,8 +20,6 @@
 <img align="right" src="docs/jameskill-hero.jpg" width="220" alt="jameskill character" />
 
 Built on two pillars: **`/develop`** — a self-contained development orchestrator that drives the full flow from one command — and **compound engineering** baked into the structure, so every session deposits artifacts that lift the next one.
-
-The inspection skills (`/security`, `/ship`) are opt-in utilities — supplementary, not required.
 
 <br clear="right" />
 
@@ -91,19 +88,6 @@ preflight → clarify → route → build (strict TDD) → peer-review → verif
 
 ---
 
-## Supplementary skills
-
-### 🔬 Inspection (alpha)
-
-Ships in v2.0 but not the v2.0 headline — the author doesn't use them daily and dogfooding didn't surface real findings. Available if you want them; future direction tied to post-launch feedback. See [ADR 0004](docs/adr/0004-narrow-v2-to-forge-and-tracker.md).
-
-| Command | What it does |
-|---|---|
-| `/security` | v0.1 inspection for Supabase RLS gaps, secret-key client exposure (Next.js `"use client"` paradigm), missing Stripe webhook signatures |
-| `/ship` | v0.1 security GO / NO-GO deploy verdict from `/security`'s findings (security-only by design — multi-axis aggregation is not promised, see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)) |
-
-> **Framework note**: `/security`'s secret-key check assumes a Next.js-style client/server boundary. SvelteKit / Nuxt / Remix may receive false PASSes on that specific check — manual review recommended for those stacks until framework-specific detection lands.
-
 ## Installation
 
 ```bash
@@ -122,8 +106,7 @@ claude plugins install jsk
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/claude-code) — required for all skills.
-- **`/develop`, `/security`, `/ship`** — no external dependencies.
+- [Claude Code](https://claude.ai/claude-code). `/develop` has no other dependencies.
 
 ## Credits
 

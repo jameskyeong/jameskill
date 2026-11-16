@@ -1,6 +1,6 @@
 # jameskill
 
-Claude Code plugin that provides production-readiness skills for AI-built apps. Skills are invoked as `/jsk:<skill-name>` in Claude Code sessions.
+Claude Code plugin that provides **develop**, a self-contained development orchestrator, invoked as `/jsk:develop` in Claude Code sessions.
 
 ## Language
 
@@ -9,10 +9,6 @@ Claude Code plugin that provides production-readiness skills for AI-built apps. 
 **Develop**:
 The development orchestrator skill (`/jsk:develop`). Takes raw requirements through a disciplined pipeline — clarify → route → build → review → verify → finish — to produce production-grade code. The router branches 4-way: **DIRECT** / **PLAN** for feature work, **DIAGNOSE** for bugs, **PROTOTYPE** for throwaway exploration. Each phase hardens the work one pass at a time — no phase boundary is crossed on soft language.
 _Avoid_: workflow (ambiguous — see Flagged Ambiguities), temper (v1 name, retired), forge (v2.0 name, retired), powertasking (alpha.11–16 name, retired — ADR 0015)
-
-**Production-readiness gate**:
-The architectural concept spanning the jameskill v2.0 pipeline: **develop** builds the code, an **inspection layer** (currently `jsk:security` alone) checks service-configuration security, **ship** issues the final verdict. Not a single skill — the emergent property of these working in sequence. v2.0 ships the inspection layer as security-only; multi-axis inspection (design / quality / performance / dependencies) is post-v2.0 work, deliberately not promised — see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md).
-_Avoid_: workflow, pipeline (too generic), launch-check (a never-shipped umbrella name — the actual layer is "the inspection skills launch invokes")
 
 **Cross-cutting verify gate**:
 A discipline enforced at every phase boundary within **develop**: no phase may declare completion without running verification commands and directly observing the output. "Should work" and "seems to pass" are treated as "not verified."
@@ -58,25 +54,13 @@ _Avoid_: debug, troubleshoot (too vague — DIAGNOSE is the route name with a sp
 A **develop** routing decision for throwaway exploration ("which design fits", "try a few approaches"). TDD is intentionally relaxed; two or three meaningfully different variations are built within a time-box; the user reviews and chooses Discard (default), Promote-to-Plan (kicks off a fresh PLAN run on the chosen variation), or Re-Clarify (the question was wrong). Prototype code does not graduate to production — Promote means restart with full discipline. See [ADR 0006](docs/adr/0006-forge-route-expansion.md).
 _Avoid_: spike (too informal — PROTOTYPE has explicit phase order and exit gate), POC (overloaded term)
 
-### Inspection
-
-**Security**:
-Alpha utility (`/jsk:security`) for service-configuration security inspection — Supabase RLS gaps, secret-key client exposure, missing Stripe webhook signatures. v0.1 ships in v2.0 but is **off the marketing surface** (see ADR 0004): the author does not rely on it daily, and three live codebases returned zero BLOCK findings during dogfooding. Reachable for users who want it; future direction (wrap, deep, or sunset) is deferred to v2.1+. Named for the lockdown step before a mech sortie.
-_Avoid_: harden (v1 name, retired), lock (v2.0 name, retired), production-readiness gate (security is not the gate in v2.0; see ADR 0004), security-check (alpha.13–16 name, retired — ADR 0015).
-
-### Ship ecosystem
-
-**Ship**:
-Alpha utility (`/jsk:ship`) that issues a **security** GO / NO-GO verdict from `security`'s findings. v0.1 is deliberately security-only — there is no design / quality / performance axis, and multi-axis aggregation is not promised (see [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md)). Ships in v2.0 but is **off the marketing surface** for the same reason as security (see ADR 0004). The output reads "LAUNCH READY?". Future direction tied to whether post-launch users ask for it.
-_Avoid_: ship-ready (v1 name, retired), launch (v2.0 name, retired), production-readiness gate (deferred from v2.0 surface), multi-axis aggregator (overclaims v0.1 — that framing was retired in ADR 0010), ship-check (alpha.13–16 name, retired — ADR 0015).
-
 ## Flagged ambiguities
 
-**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **develop**; the concept is **production-readiness gate**. The v1.x orchestrator once named "workflow" (later `workflow-external`) was retired entirely in 2.0.0-alpha.19 — avoid the bare word "workflow" as a skill name.
+**"workflow"**: Previously used for both the orchestrator skill name AND the general concept of jameskill's pipeline. Resolved: the skill is now **develop**, and the flow it runs is described under **Develop**. The v1.x orchestrator once named "workflow" (later `workflow-external`) was retired entirely in 2.0.0-alpha.19 — avoid the bare word "workflow" as a skill name.
 
 ## Example dialogue
 
-> **Dev**: "I want to wire security into the develop pipeline."
-> **Domain expert**: "Develop has no ship step. The inert Ship slot it once carried named skills that never existed and was removed; `security` runs standalone, when the user asks for it."
-> **Dev**: "So how does ship fit in?"
-> **Domain expert**: "Ship is a separate skill the user invokes when they want a deploy verdict. It calls `security`, reads the findings, and issues a security GO / NO-GO. It is not a multi-axis aggregator — that framing was retired in [ADR 0010](docs/adr/0010-launch-v0.1-security-only.md). v0.1 is security-only by design, and post-v0.1 expansion is gated on real user demand, not pre-announced."
+> **Dev**: "The export button throws on an empty report. Should I prototype a fix?"
+> **Domain expert**: "No. A broken behavior is a DIAGNOSE run: reproduce it, minimize it, fix it, and keep the regression test. PROTOTYPE is for an open design question, and its code never ships."
+> **Dev**: "And if the fix shows the export design itself is wrong?"
+> **Domain expert**: "Finish the fix first. Retrospective then proposes an ADR, and the redesign starts as its own PLAN run."

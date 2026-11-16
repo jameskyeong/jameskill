@@ -29,7 +29,7 @@ eval/
 │   ├── inline-gloss-discipline.mjs ← first-mention gloss + identifier-soup detection
 │   ├── version-sync.mjs            ← package.json ↔ marketplace.json
 │   ├── link-validity.mjs           ← markdown link target existence
-│   ├── cross-cutting-gates-present.mjs ← skills declare/inherit develop gates
+│   ├── cross-cutting-gates-present.mjs ← develop declares its cross-cutting gates
 │   ├── skill-size.mjs              ← every SKILL.md under 20,000 bytes (survives compaction)
 │   ├── skills-dir-clean.mjs        ← skills/ holds only SKILL.md + references/*.md
 │   ├── no-argument-placeholders.mjs ← no $1 / $ARGUMENTS in a SKILL.md body
@@ -110,4 +110,4 @@ A "real" eval would call `claude -p "<prompt>"` against each fixture, capture de
 - **Non-determinism** — same prompt produces different outputs; check criteria must be structural, which is harder to write.
 - **Slow** — multi-minute runs vs sub-second static checks.
 
-v1 catches the high-value-low-cost drift: SKILL.md files contradicting their own declared rules, broken cross-references, supplementary skills missing inherited gates, version desync. v2 will add real-session evals on top of the same check library — checks are deliberately written to take a plain content string so they apply to both fixture text and session output.
+v1 catches the high-value-low-cost drift: SKILL.md files contradicting their own declared rules, broken cross-references, missing cross-cutting gates, version desync. v2 will add real-session evals on top of the same check library — checks are deliberately written to take a plain content string so they apply to both fixture text and session output.
